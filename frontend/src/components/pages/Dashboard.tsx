@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Sidebar from "../layout/SideBar";
-import Header from "../layout/Header";
 import GlobalFilterBar from "../filters/GlobalFilterBars";
 import CustomBarChart from "../charts/BarChart";
 import PieChartComponent from "../charts/PieChart";

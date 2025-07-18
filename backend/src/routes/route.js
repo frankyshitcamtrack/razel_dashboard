@@ -1,13 +1,13 @@
 const express = require('express');
 const repportsRouter = express.Router();
 
-const { httpGetHeureMoteur } = require('../controllers/heuremoteur.controllers');
-const { httpGetExceptions } = require('../controllers/exceptions.controllers')
+const { httpGetHeureMoteur, httpGetHeureMoteurByParams } = require('../controllers/heuremoteur.controllers');
+const { httpGetExceptions, httpGetExceptionsByParams } = require('../controllers/exceptions.controllers')
 const { httpGetVehicles } = require('../controllers/vehicles.controllers')
 
 
-repportsRouter.get('/heuremoteur', httpGetHeureMoteur);
-repportsRouter.get('/exeptions', httpGetExceptions);
+repportsRouter.get('/heuremoteur', httpGetHeureMoteurByParams);
+repportsRouter.get('/exceptions', httpGetExceptionsByParams);
 repportsRouter.get('/vehicles', httpGetVehicles);
 
 

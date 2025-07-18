@@ -1,4 +1,4 @@
-const { getExceptions } = require('../models/exceptions.model');
+const { getExceptions, getExceptionsByDatesAndId } = require('../models/exceptions.model');
 
 async function httpGetExceptions(req, res) {
     try {
@@ -13,4 +13,43 @@ async function httpGetExceptions(req, res) {
 
 
 
-module.exports = { httpGetExceptions }
+async function httpGetExceptionsByParams(req, res) {
+    try {
+
+        const { date1, date2, id } = req.query;
+
+        if (date1 && isNaN(new Date(date1).getTime())) {
+            return res.status(400).json({
+                error: 'date1 doit être une date valide (format: YYYY-MM-DD)'
+            });
+        }
+
+        if (date2 && isNaN(new Date(date2).getTime())) {
+            return res.status(400).json({
+                error: 'date2 doit être une date valide (format: YYYY-MM-DD)'
+            });
+        }
+
+
+        if (id && isNaN(Number(id))) {
+            return res.status(400).json({
+                error: 'id doit être un nombre valide'
+            });
+        }
+
+
+        const results = await getExceptionsByDatesAndId(date1, date2, id);
+
+        return res.status(200).json(results);
+
+    } catch (error) {
+        console.error('Erreur dans httpGetHeureMoteur:', error);
+        return res.status(500).json({
+            error: 'Une erreur est survenue lors de la récupération des données'
+        });
+    }
+}
+
+
+
+module.exports = { httpGetExceptions, httpGetExceptionsByParams }

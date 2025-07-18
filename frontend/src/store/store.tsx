@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { dashboardType } from '../types/ChartDataType';
+import React, { createContext, useContext, useState } from 'react';
+
 
 interface ContextType {
     vehicleImmat: string | null;
@@ -17,7 +17,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const [vehicleImmat, setvehicleImmat] = useState<string | null>(null);
     const [startDate, setStartDate] = useState<string | Date | null>(null);
     const [endDate, setEndDate] = useState<string | Date | null>(null);
-    const [data, setData] = useState<dashboardType | {}>({});
+    //const [data, setData] = useState<dashboardType | {}>({});
 
     const updateVehicleImmat = (immat: string) => {
         setvehicleImmat(immat);

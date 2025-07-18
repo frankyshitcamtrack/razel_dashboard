@@ -60,7 +60,7 @@ const CustomBarChart: React.FC<BarChartProps> = ({
                         <XAxis dataKey="name" axisLine={{ stroke: "#9ca3af" }} tick={{ fill: "#6b7280" }} />
                         <YAxis
                             yAxisId="left"
-                            tickFormatter={percentage ? (val) => `${val}%` : formatYAxis}
+                            tickFormatter={percentage ? (val) => `${val}%` : (val) => formatYAxis(val).toString()}
                             axisLine={{ stroke: "#9ca3af" }}
                             tick={{ fill: "#6b7280" }}
                         />
