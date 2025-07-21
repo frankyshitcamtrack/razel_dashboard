@@ -59,7 +59,7 @@ export type HundredKmConsumptionData = HundredKmConsumptionItem[];
 export type RatioConsumptionData = RatioConsumptionItem[];
 export type SpeedingData = SpeedingItem[];
 
-export type dashboardType = {
+export type DashboardData = {
     engineData: EngineUsageData,
     engineDataPercentage: EngineUsagePercentageData,
     dureeDistanceparcouru: DurationDistanceData,

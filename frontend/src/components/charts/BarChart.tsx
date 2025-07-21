@@ -10,13 +10,9 @@ import {
     ComposedChart,
 } from "recharts";
 
-interface DataItem {
-    name: string;
-    [key: string]: number | string;
-}
 
 interface BarChartProps {
-    data?: DataItem[];
+    data?: any;
     title: string;
     dataKey1: string;
     label1: string;

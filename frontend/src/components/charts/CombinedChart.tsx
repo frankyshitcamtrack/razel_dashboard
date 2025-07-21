@@ -11,13 +11,10 @@ import {
     ComposedChart,
 } from "recharts";
 
-interface DataItem {
-    name: string;
-    [key: string]: number | string;
-}
+
 
 interface CombinedChartProps {
-    data?: DataItem[];
+    data?: any;
     title: string;
     barDataKey: string;
     barLabel: string;
@@ -33,10 +30,10 @@ const CombinedChartComponent: React.FC<CombinedChartProps> = ({
     barLabel,
     lineDataKey,
     lineLabel,
-    isTimeBased = false,
+    //isTimeBased = false,
 }) => {
-    const formatYAxis = (value: number) =>
-        isTimeBased ? `${Math.floor(value / 60)}:${(value % 60).toString().padStart(2, "0")}` : value;
+    const formatYAxis = (value: number): string =>
+        +   value > 1000 ? `${value / 1000}k` : value.toString();
 
     return (
         <div className="bg-white rounded-lg shadow p-4 h-full flex flex-col">

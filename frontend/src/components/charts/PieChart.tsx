@@ -27,7 +27,7 @@ const PieChartComponent: React.FC<PieChartProps> = ({
         { name: "Véhicule C", consumption: 45 },
     ],
     title,
-    legendPosition = "right",
+    // legendPosition = "right",
 }) => {
     return (
         <div className="bg-white rounded-lg shadow p-4 h-full flex flex-col">
@@ -43,9 +43,9 @@ const PieChartComponent: React.FC<PieChartProps> = ({
                             outerRadius={100}
                             fill="#8884d8"
                             dataKey="consumption"
-                            label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                            label={({ name, percent = 0 }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                         >
-                            {data.map((entry, index) => (
+                            {data.map((_, index) => (
                                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                             ))}
                         </Pie>

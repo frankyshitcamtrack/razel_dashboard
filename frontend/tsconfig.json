@@ -1,15 +1,5 @@
 {
   "files": [],
-  "compilerOptions": {
-    "skipLibCheck": true, // Ignore les erreurs dans les types des dépendances
-    "strict": false, // Désactive toutes les vérifications strictes
-    "noEmitOnError": false, // Permet de compiler même avec des erreurs
-    "esModuleInterop": true, // Résout les problèmes d'import CommonJS/ES6
-    "allowJs": true, // Permet de mélanger .js et .ts
-    "forceConsistentCasingInFileNames": true, // Évite les bugs liés à la casse
-    "moduleResolution": "node", // Compatibilité avec Node.js
-    "resolveJsonModule": true // Permet d'importer des fichiers JSON
-  },
   "references": [
     {
       "path": "./tsconfig.app.json"
@@ -17,5 +7,19 @@
     {
       "path": "./tsconfig.node.json"
     }
-  ]
+  ],
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "noEmitOnError": false,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
+  }
 }

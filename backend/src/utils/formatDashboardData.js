@@ -1,7 +1,19 @@
-function formatDashboardData(rawData) {
+// Fonction utilitaire pour convertir des secondes en hh:mm:ss
+function secondsToHms(totalSeconds) {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = Math.floor(totalSeconds % 60);
 
+    // Formatage à 2 chiffres avec padding zéro si nécessaire
+    const pad = (num) => num.toString().padStart(2, '0');
+
+    return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+}
+
+function formatDashboardData(rawData) {
     const dataByDay = {};
 
+    // 1. Grouper les données par jour
     rawData.forEach(item => {
         const date = new Date(item.dates);
         const dayKey = date.toLocaleDateString('fr-FR', { weekday: 'short' });
@@ -12,105 +24,63 @@ function formatDashboardData(rawData) {
         dataByDay[dayKey].push(item);
     });
 
-    // Créer les différentes catégories de données
-    const engineData = [];
-    const engineDataPercentage = [];
-    const dureeDistanceparcouru = [];
-    const DistanConsommation = [];
-    const hundredKmConsumption = [];
-    const ratioConsumption = [];
-    const speeding = [];
+    // 2. Structurer les données pour le dashboard
+    const result = {
+        engineData: [],
+        engineDataPercentage: [],
+        dureeDistanceparcouru: [],
+        DistanConsommation: [],
+        hundredKmConsumption: [],
+        ratioConsumption: [],
+        speeding: []
+    };
 
-    // Traiter chaque jour
+    // 3. Parcourir les données groupées
     Object.entries(dataByDay).forEach(([day, dayData]) => {
-        // Calculs pour EngineUsage
-        const totalStops = dayData.reduce((sum, item) => {
-            const [hours, minutes, seconds] = item.arretmoteurtournant.split(':').map(Number);
-            return sum + hours * 3600 + minutes * 60 + seconds;
-        }, 0);
+        // Prendre le premier élément comme référence (supposant que les calculs sont déjà faits)
+        const sampleData = dayData[0];
 
-        const totalUsage = dayData.reduce((sum, item) => {
-            const [hours, minutes, seconds] = item.dureel.split(':').map(Number);
-            return sum + hours * 3600 + minutes * 60 + seconds;
-        }, 0);
-
-        // Calculs pour EngineUsagePercentage
-        const totalDuration = dayData.reduce((sum, item) => {
-            const [hours, minutes, seconds] = item.dureetotal.split(':').map(Number);
-            return sum + hours * 3600 + minutes * 60 + seconds;
-        }, 0);
-
-        const stopsPercentage = totalDuration > 0 ? Math.round((totalStops / totalDuration) * 100) : 0;
-        const usagePercentage = totalDuration > 0 ? Math.round((totalUsage / totalDuration) * 100) : 0;
-
-        // Calculs pour DurationDistance
-        const totalDistance = dayData.reduce((sum, item) => sum + (item.distancekm || 0), 0);
-
-        // Calculs pour DistanceConsumption
-        const totalConsumption = dayData.reduce((sum, item) => sum + (item.consototal || 0), 0);
-
-        // Calculs pour HundredKmConsumption
-        const avgConsumption = totalDistance > 0 ? (totalConsumption / totalDistance) * 100 : 0;
-
-        // Calculs pour RatioConsumption
-        const totalDurationHours = totalUsage > 0 ? totalUsage / 3600 : 1; // Éviter la division par zéro
-        const consumptionRatio = totalConsumption / totalDurationHours;
-
-        // Calculs pour Speeding (exemple: nombre de fois où vmax > 80)
-        const speedingCount = dayData.filter(item => item.vmax > 80).length;
-
-        // Ajouter les données pour ce jour
-        engineData.push({
+        result.engineData.push({
             name: day,
-            stops: Math.round(totalStops / 3600 * 10) / 10, // Convertir en heures
-            usage: Math.round(totalUsage / 3600 * 10) / 10   // Convertir en heures
+            stops: sampleData.arretmoteurtournant, // Format hh:mm:ss existant
+            usage: sampleData.dureel               // Format hh:mm:ss existant
         });
 
-        engineDataPercentage.push({
+        result.engineDataPercentage.push({
             name: day,
-            stops: stopsPercentage,
-            usage: usagePercentage
+            stops: sampleData.percentuse ? 100 - sampleData.percentuse : 0,
+            usage: sampleData.percentuse || 0
         });
 
-        dureeDistanceparcouru.push({
+        result.dureeDistanceparcouru.push({
             name: day,
-            duration: Math.round(totalUsage / 60), // Convertir en minutes
-            distance: Math.round(totalDistance * 10) / 10
+            duration: sampleData.dureel,
+            distance: sampleData.distancekm
         });
 
-        DistanConsommation.push({
+        result.DistanConsommation.push({
             name: day,
-            consumption: Math.round(totalConsumption * 10) / 10,
-            distance: Math.round(totalDistance * 10) / 10
+            consumption: sampleData.consototal,
+            distance: sampleData.distancekm
         });
 
-        hundredKmConsumption.push({
+        result.hundredKmConsumption.push({
             name: day,
-            value: Math.round(avgConsumption * 10) / 10
+            value: sampleData.conso100km
         });
 
-        ratioConsumption.push({
+        result.ratioConsumption.push({
             name: day,
-            value: Math.round(consumptionRatio * 10) / 10
+            value: sampleData.consolitperhour
         });
 
-        speeding.push({
+        result.speeding.push({
             name: day,
-            value: speedingCount
+            value: sampleData.vmax > 80 ? 1 : 0 // Exemple: compte comme excès si > 80
         });
     });
 
-    // Retourner l'objet formaté
-    return {
-        engineData,
-        engineDataPercentage,
-        dureeDistanceparcouru,
-        DistanConsommation,
-        hundredKmConsumption,
-        ratioConsumption,
-        speeding
-    };
+    return result;
 }
 
-
-module.exports = { formatDashboardData }
+module.exports = { formatDashboardData, secondsToHms };

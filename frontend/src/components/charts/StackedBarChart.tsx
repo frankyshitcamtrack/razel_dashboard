@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import { PureComponent } from "react";
 import {
     BarChart,
     Bar,
@@ -10,14 +10,8 @@ import {
     ResponsiveContainer,
 } from "recharts";
 
-// Types
-interface ChartData {
-    name: string;
-    [key: string]: number | string;
-}
-
 interface StackedBarChartProps {
-    data: ChartData[];
+    data: any;
     dataKey1: string;
     dataKey2: string;
     label1: string;
@@ -43,9 +37,8 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
         } = this.props;
 
         // Fonction pour formater les valeurs Y
-        const formatYAxis = (tickItem: number) => {
-            return isPercentage ? `${tickItem}%` : tickItem;
-        };
+        const formatYAxis = (value: number): string =>
+            +   value > 1000 ? `${value / 1000}k` : value.toString();
 
         return (
             <div className="bg-white rounded-lg shadow p-4 h-full flex flex-col">
