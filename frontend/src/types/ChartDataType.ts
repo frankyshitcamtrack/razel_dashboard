@@ -98,3 +98,10 @@ export type vehicles = {
     create_at: string,
     ids: number
 }
+
+export type filtersProps = {
+    date1: string;
+    date2: string;
+    vehicle: number | string;
+    groupBy?: "day" | "week" | "month";
+}

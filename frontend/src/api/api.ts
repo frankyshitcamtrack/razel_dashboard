@@ -13,6 +13,7 @@ export const fetchHeureMoteurData = async (
         date1?: string;
         date2?: string;
         vehicle?: number;
+        groupBy?: "day" | "week" | "month";
     }
 ): Promise<DashboardData> => {
     try {
@@ -22,6 +23,7 @@ export const fetchHeureMoteurData = async (
         if (params.date1) queryParams.append('date1', params.date1);
         if (params.date2) queryParams.append('date2', params.date2);
         if (params.vehicle !== undefined) queryParams.append('id', params.vehicle.toString());
+        if (params.groupBy !== undefined) queryParams.append('groupBy', params.groupBy.toString());
 
         const response: AxiosResponse<DashboardData> = await axios.get(
             `/api/razel_dashboard/heuremoteur`,
@@ -62,6 +64,7 @@ export const fetchExeptions = async (
         date1?: string;
         date2?: string;
         id?: number;
+        groupBy?: "day" | "week" | "month";
     }
 ): Promise<exceptions> => {
 
@@ -72,6 +75,7 @@ export const fetchExeptions = async (
         if (params.date1) queryParams.append('date1', params.date1);
         if (params.date2) queryParams.append('date2', params.date2);
         if (params.id !== undefined) queryParams.append('id', params.id.toString());
+        if (params.groupBy !== undefined) queryParams.append('groupBy', params.groupBy.toString());
 
         const response: AxiosResponse<exceptions> = await axios.get(
             `/api/razel_dashboard/exceptions`,

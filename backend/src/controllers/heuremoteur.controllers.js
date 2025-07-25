@@ -1,5 +1,5 @@
 const { getHmoteur, getHmoteurByDatesAndId } = require('../models/heuremoteur.model');
-const { formatDashboardData } = require('../utils/formatDashboardData');
+const { formatDashboardData, formatDashboardDataWithperiod } = require('../utils/formatDashboardData');
 
 async function httpGetHeureMoteur(req, res) {
     try {
@@ -13,10 +13,12 @@ async function httpGetHeureMoteur(req, res) {
 }
 
 
+
+
 async function httpGetHeureMoteurByParams(req, res) {
     try {
 
-        const { date1, date2, id } = req.query;
+        const { date1, date2, groupBy, id } = req.query;
 
         if (date1 && isNaN(new Date(date1).getTime())) {
             return res.status(400).json({
@@ -40,7 +42,7 @@ async function httpGetHeureMoteurByParams(req, res) {
 
         const results = await getHmoteurByDatesAndId(date1, date2, id);
 
-        const data = await formatDashboardData(results, id)
+        const data = await formatDashboardDataWithperiod(results, groupBy, id)
 
         return res.status(200).json(data);
 

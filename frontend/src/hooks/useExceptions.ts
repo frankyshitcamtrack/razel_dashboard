@@ -6,11 +6,12 @@ export const useExceptions = (params: {
     date1?: string;
     date2?: string;
     vehicle?: number;
+    groupBy?: "day" | "week" | "month";
 }) => {
     return useQuery<exceptions, Error>({
         queryKey: ['exceptions values', params],
         queryFn: () => fetchExeptions(params),
-        enabled: !!params.date1 || !!params.date2 || params.vehicle !== undefined,
+        enabled: !!params.date1 || !!params.date2 || params.vehicle !== undefined || params.groupBy !== undefined,
         staleTime: 5 * 60 * 1000,
     });
 };

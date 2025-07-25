@@ -1,5 +1,5 @@
 const { getExceptions, getExceptionsByDatesAndId } = require('../models/exceptions.model');
-const { formatExceptionsData } = require('../utils/formatDashboardData')
+const { formatExceptionsData, formatExceptionsDataWithperiod } = require('../utils/formatDashboardData')
 
 async function httpGetExceptions(req, res) {
     try {
@@ -17,7 +17,7 @@ async function httpGetExceptions(req, res) {
 async function httpGetExceptionsByParams(req, res) {
     try {
 
-        const { date1, date2, id } = req.query;
+        const { date1, date2, groupBy, id } = req.query;
 
         if (date1 && isNaN(new Date(date1).getTime())) {
             return res.status(400).json({
@@ -40,7 +40,7 @@ async function httpGetExceptionsByParams(req, res) {
 
 
         const results = await getExceptionsByDatesAndId(date1, date2, id);
-        const formatData = await formatExceptionsData(results);
+        const formatData = await formatExceptionsDataWithperiod(results, groupBy);
 
         return res.status(200).json(formatData);
 
