@@ -45,8 +45,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, []);
 
     const handleLogin = async (username: string, password: string) => {
-        const { user, token } = await login(username, password);
-        localStorage.setItem('authToken', token); // Optionnel
+        const { user } = await login(username, password);
         setAuthState({
             user,
             isAuthenticated: true,
@@ -56,7 +55,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const handleLogout = async () => {
         await logout();
-        localStorage.removeItem('authToken'); // Optionnel
+        localStorage.removeItem('authToken');
         setAuthState({
             user: null,
             isAuthenticated: false,

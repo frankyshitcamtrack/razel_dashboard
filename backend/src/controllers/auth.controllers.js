@@ -1,24 +1,32 @@
 const { getUserByUserNamePwd } = require('../models/user.model')
-
+const jwt = require('jsonwebtoken');
 
 const login = async (req, res) => {
     const { username, pwd } = req.body;
+
     try {
-        const result = await getUserByUserNamePwd(pwd, username);
+        const result = await getUserByUserNamePwd(username, pwd);
+
         if (result.rows.length === 0) {
             return res.status(401).json({ error: 'Identifiants invalides' });
         }
 
         const user = result.rows[0];
 
-        // Création du JWT
+        console.log(user);
+
+        if (!user) {
+            return res.status(401).json({ error: 'Identifiants invalides' });
+        }
+
+
         const token = jwt.sign(
             { id: user.ids, username: user.username },
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
 
-        // Stockage en session
+
         req.session.token = token;
         req.session.user = user;
 
@@ -31,6 +39,7 @@ const login = async (req, res) => {
         });
 
     } catch (error) {
+        console.log(error);
         res.status(500).json({ error: 'Erreur serveur' });
     }
 };

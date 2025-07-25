@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../store/AuthContext';
 import { Truck, Fuel, Lock } from 'lucide-react';
-import { VehicleLoadingSpinner } from '../components/UI/LoadingSpinner';
+import LoadingIndicator from '../components/UI/Loader';
 
 const LoginPage = () => {
     const [username, setUsername] = useState('');
@@ -35,11 +35,11 @@ const LoginPage = () => {
                         <Lock className="h-10 w-10 text-blue-500" />
                     </div>
                     <h2 className="mt-6 text-3xl font-bold text-gray-900">
-                        Fleet Management Pro
+                        Razel Fleet Management Dashboard
                     </h2>
-                    <p className="mt-2 text-gray-600">
+                    {/*  <p className="mt-2 text-gray-600">
                         Système de suivi des consommations et mouvements
-                    </p>
+                    </p> */}
                 </div>
 
                 {/* Carte de formulaire */}
@@ -103,11 +103,11 @@ const LoginPage = () => {
                                 </label>
                             </div>
 
-                            <div className="text-sm">
+                            {/*   <div className="text-sm">
                                 <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
                                     Assistance technique ?
                                 </a>
-                            </div>
+                            </div> */}
                         </div>
 
                         <div>
@@ -119,7 +119,7 @@ const LoginPage = () => {
                             >
                                 {isLoading || isSubmitting ? (
                                     <>
-                                        <VehicleLoadingSpinner />
+                                        <LoadingIndicator />
                                     </>
                                 ) : (
                                     'Accéder au dashboard'
@@ -130,7 +130,7 @@ const LoginPage = () => {
                 </div>
 
                 <div className="text-center text-sm text-gray-500">
-                    <p>Version {process.env.REACT_APP_VERSION} • Sécurisé par JWT</p>
+                    <p> by camtrack</p>
                 </div>
             </div>
         </div>

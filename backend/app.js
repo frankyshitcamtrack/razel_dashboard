@@ -6,10 +6,10 @@ const path = require('path');
 const cors = require('cors');
 const morgan = require('morgan');
 const helmet = require('helmet');
-
+const { authenticateJWT } = require('./src/midleware/auth')
 const app = express();
 const api = require('./src/routes/api');
-
+const auth = require('./src/routes/auth')
 
 app.use(helmet());
 app.use(morgan('combined'));
@@ -41,38 +41,12 @@ app.use(session({
 }))
 
 
-const authenticateJWT = (req, res, next) => {
-  const authHeader = req.headers.authorization;
 
-  if (authHeader) {
-    const token = authHeader.split(' ')[1];
-
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-      if (err) {
-        return res.sendStatus(403);
-      }
-      req.user = user;
-      next();
-    });
-  } else {
-    // Vérification alternative via session
-    if (req.session?.token) {
-      jwt.verify(req.session.token, process.env.JWT_SECRET, (err, user) => {
-        if (err) {
-          return res.sendStatus(403);
-        }
-        req.user = user;
-        next();
-      });
-    } else {
-      res.sendStatus(401);
-    }
-  }
-};
 
 
 app.use('/api', authenticateJWT, api);
 
+app.use('/auth', auth);
 
 app.use(express.static(path.join(__dirname, 'public'), {
   etag: true,
