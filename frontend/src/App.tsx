@@ -1,6 +1,6 @@
-import Dashboard from './components/pages/Dashboard'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
+import AuthRouter from './root/autRoot';
+import { AuthProvider } from './store/AuthContext';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -14,7 +14,9 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Dashboard />
+      <AuthProvider>
+        <AuthRouter />
+      </AuthProvider>
     </QueryClientProvider>
   )
 }

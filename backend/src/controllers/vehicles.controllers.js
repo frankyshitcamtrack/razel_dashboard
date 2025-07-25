@@ -1,4 +1,4 @@
-const { getVehicles } = require('../models/vehicles.model');
+const { getVehicles, getVehicleById } = require('../models/vehicles.model');
 
 async function httpGetVehicles(req, res) {
     try {
@@ -12,5 +12,25 @@ async function httpGetVehicles(req, res) {
 }
 
 
+async function httpGetVehicleById(req, res) {
+    try {
+        const { id } = req.query;
+        if (id && isNaN(Number(id))) {
+            return res.status(400).json({
+                error: 'id doit être un nombre valide'
+            });
+        }
 
-module.exports = { httpGetVehicles }
+        const results = await getVehicleById(id);
+        return res.status(200).json(results);
+    } catch (error) {
+        console.error('Erreur dans httpGetVehicleById:', error);
+        return res.status(500).json({
+            error: 'Une erreur est survenue lors de la récupération des données'
+        });
+    }
+}
+
+
+
+module.exports = { httpGetVehicles, httpGetVehicleById }

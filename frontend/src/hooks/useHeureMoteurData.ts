@@ -5,12 +5,12 @@ import { fetchHeureMoteurData } from '../api/api'
 export const useHeureMoteurData = (params: {
     date1?: string;
     date2?: string;
-    id?: number;
+    vehicle?: number;
 }) => {
     return useQuery<DashboardData, Error>({
         queryKey: ['heureMoteur', params],
         queryFn: () => fetchHeureMoteurData(params),
-        enabled: !!params.date1 || !!params.date2 || params.id !== undefined,
+        enabled: !!params.date1 || !!params.date2 || params.vehicle !== undefined,
         staleTime: 5 * 60 * 1000,
     });
 };

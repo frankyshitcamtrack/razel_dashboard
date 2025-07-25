@@ -13,8 +13,6 @@ async function httpGetHeureMoteur(req, res) {
 }
 
 
-
-
 async function httpGetHeureMoteurByParams(req, res) {
     try {
 
@@ -42,7 +40,7 @@ async function httpGetHeureMoteurByParams(req, res) {
 
         const results = await getHmoteurByDatesAndId(date1, date2, id);
 
-        const data = formatDashboardData(results)
+        const data = await formatDashboardData(results, id)
 
         return res.status(200).json(data);
 
@@ -53,8 +51,6 @@ async function httpGetHeureMoteurByParams(req, res) {
         });
     }
 }
-
-
 
 
 module.exports = { httpGetHeureMoteur, httpGetHeureMoteurByParams }

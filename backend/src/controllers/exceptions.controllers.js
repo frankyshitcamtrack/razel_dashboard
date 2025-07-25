@@ -1,4 +1,5 @@
 const { getExceptions, getExceptionsByDatesAndId } = require('../models/exceptions.model');
+const { formatExceptionsData } = require('../utils/formatDashboardData')
 
 async function httpGetExceptions(req, res) {
     try {
@@ -39,8 +40,9 @@ async function httpGetExceptionsByParams(req, res) {
 
 
         const results = await getExceptionsByDatesAndId(date1, date2, id);
+        const formatData = await formatExceptionsData(results);
 
-        return res.status(200).json(results);
+        return res.status(200).json(formatData);
 
     } catch (error) {
         console.error('Erreur dans httpGetHeureMoteur:', error);
