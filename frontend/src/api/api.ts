@@ -29,6 +29,9 @@ export const fetchHeureMoteurData = async (
                 params: queryParams,
                 headers: {
                     'Content-Type': 'application/json',
+                    ...(localStorage.getItem('authToken') && {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                    })
                 },
             }
         );
@@ -76,6 +79,9 @@ export const fetchExeptions = async (
                 params: queryParams,
                 headers: {
                     'Content-Type': 'application/json',
+                    ...(localStorage.getItem('authToken') && {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                    })
                 },
             }
         );
@@ -108,6 +114,9 @@ export const fetchVehicles = async (
             {
                 headers: {
                     'Content-Type': 'application/json',
+                    ...(localStorage.getItem('authToken') && {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                    })
                 },
             }
         );
