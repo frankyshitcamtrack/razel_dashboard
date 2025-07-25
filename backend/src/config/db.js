@@ -12,6 +12,10 @@ const pool = new Pool(
         password: pass_db,
         database: db,
         port: 5432,
+        ssl: {
+            rejectUnauthorized: false
+
+        }
     }
 )
 
