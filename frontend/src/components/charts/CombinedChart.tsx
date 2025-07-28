@@ -1,7 +1,7 @@
 import React from "react";
 import {
     Line,
-    Bar,
+    //Bar,
     XAxis,
     YAxis,
     CartesianGrid,
@@ -42,7 +42,11 @@ const CombinedChartComponent: React.FC<CombinedChartProps> = ({
                 <ResponsiveContainer width="100%" height={300}>
                     <ComposedChart data={data}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                        <XAxis dataKey="name" axisLine={{ stroke: "#9ca3af" }} tick={{ fill: "#6b7280" }} />
+                        <XAxis
+                            dataKey="name"
+                            axisLine={{ stroke: "#9ca3af" }}
+                            tick={{ fill: "#6b7280" }}
+                        />
                         <YAxis
                             yAxisId="left"
                             tickFormatter={formatYAxis}
@@ -57,8 +61,26 @@ const CombinedChartComponent: React.FC<CombinedChartProps> = ({
                         />
                         <Tooltip />
                         <Legend />
-                        <Bar yAxisId="left" dataKey={barDataKey} name={barLabel} fill="#3b82f6" />
-                        <Line yAxisId="right" type="monotone" dataKey={lineDataKey} name={lineLabel} stroke="#ef4444" />
+                        <Line
+                            yAxisId="left"
+                            type="monotone"
+                            dataKey={barDataKey}
+                            name={barLabel}
+                            stroke="#3b82f6"
+                            strokeWidth={2}
+                            dot={{ r: 4 }}
+                            activeDot={{ r: 6 }}
+                        />
+                        <Line
+                            yAxisId="right"
+                            type="monotone"
+                            dataKey={lineDataKey}
+                            name={lineLabel}
+                            stroke="#ef4444"
+                            strokeWidth={2}
+                            dot={{ r: 4 }}
+                            activeDot={{ r: 6 }}
+                        />
                     </ComposedChart>
                 </ResponsiveContainer>
             </div>

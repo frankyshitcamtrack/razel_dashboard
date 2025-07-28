@@ -3,14 +3,16 @@ import {
     CalendarDaysIcon,
     TruckIcon,
     MagnifyingGlassIcon,
-    Squares2X2Icon
+    Squares2X2Icon,
 } from "@heroicons/react/24/outline";
 import { useVehiclesData } from "../../hooks/useVehiclesData";
+import { useVehiclesGroupData } from "../../hooks/useVehiclesGroupData";
 
 export interface Filters {
     date1?: string;
     date2?: string;
     vehicle?: number;
+    vcleGroupId?: number;
     groupBy?: "day" | "week" | "month";
 }
 
@@ -21,104 +23,133 @@ interface FilterBarProps {
 
 const GlobalFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) => {
     const [searchTerm, setSearchTerm] = useState("");
-    const { data, isLoading } = useVehiclesData();
+
+    const { data: vehicles, isLoading } = useVehiclesData();
+
+    const { data: vehicleGroups, isLoading: groupLoading } = useVehiclesGroupData();
 
     const filteredVehicles = useMemo(() => {
-        if (!data) return [];
-        return data.filter(vehicle =>
-            vehicle.names.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-    }, [data, searchTerm]);
+        if (!vehicles) return [];
+
+        return vehicles.filter(vehicle => {
+            const matchesSearch = vehicle.names.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesGroup = !filters.vcleGroupId || vehicle.groupid === filters.vcleGroupId;
+            return matchesSearch && matchesGroup;
+        });
+    }, [vehicles, searchTerm, filters.vcleGroupId]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        setFilters(prev => ({ ...prev, [name]: value }));
+
+        setFilters(prev => ({
+            ...prev,
+            [name]: ["vehicle", "vcleGroupId"].includes(name) && value
+                ? Number(value)
+                : value || undefined,
+        }));
     };
 
     return (
-        <div className="flex flex-wrap gap-4 mb-6 bg-white p-6 rounded-xl shadow-sm border">
-            {/* Recherche et sélection véhicule */}
-            <div className="flex flex-col w-full md:w-1/3">
-                <label className="flex items-center text-sm text-gray-600 mb-1">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 bg-white p-6 rounded-2xl shadow-md border">
+            {/* 🔍 Recherche véhicule */}
+            <div className="col-span-1 md:col-span-2">
+                <label className="flex items-center text-sm text-gray-700 font-medium mb-1">
                     <TruckIcon className="w-5 h-5 text-gray-500 mr-2" />
-                    Véhicule
+                    Rechercher un véhicule
                 </label>
-                <div className="relative mb-2">
+                <div className="relative mb-3">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
                     </div>
                     <input
                         type="text"
-                        placeholder="Rechercher un véhicule..."
+                        placeholder="Ex: Toyota Hiace, Camion 22T..."
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                        onChange={e => setSearchTerm(e.target.value)}
+                        className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                     />
                 </div>
 
-                {isLoading ? (
-                    <p className="text-sm text-gray-500">Chargement des véhicules...</p>
-                ) : (
+                <div className="grid grid-cols-2 gap-3">
+                    {/* Groupe véhicule */}
+                    <select
+                        name="vcleGroupId"
+                        value={filters.vcleGroupId ?? ""}
+                        onChange={handleChange}
+                        className="w-full py-2 px-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                    >
+                        <option value="">Tous les groupes</option>
+                        {groupLoading ? (
+                            <option disabled>Chargement...</option>
+                        ) : (
+                            vehicleGroups?.map(group => (
+                                <option key={group.ids} value={group.ids}>
+                                    {group.names}
+                                </option>
+                            ))
+                        )}
+                    </select>
+
+                    {/* Véhicule */}
                     <select
                         name="vehicle"
-                        value={filters.vehicle}
+                        value={filters.vehicle ?? ""}
                         onChange={handleChange}
-                        className="w-full py-2 pl-3 pr-10 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 rounded-md"
+                        className="w-full py-2 px-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        disabled={!filteredVehicles.length}
                     >
-                        {!searchTerm && <option value="">Tous les véhicules</option>}
-                        {filteredVehicles.map(item => (
-                            <option key={item.ids} value={item.ids}>
-                                {item.names}
-                            </option>
-                        ))}
+                        <option value="">Tous les véhicules</option>
+                        {
+                            isLoading ? (
+                                <option disabled>Chargement...</option>
+                            ) :
+                                (filteredVehicles.map(vehicle => (
+                                    <option key={vehicle.ids} value={vehicle.ids}>
+                                        {vehicle.names}
+                                    </option>
+                                )))}
                         {filteredVehicles.length === 0 && (
                             <option disabled>Aucun véhicule trouvé</option>
                         )}
                     </select>
-                )}
+                </div>
             </div>
 
-            {/* Date de début */}
-            <div className="flex flex-col w-full sm:w-auto">
-                <label className="flex items-center text-sm text-gray-600 mb-1">
+            {/* 📅 Dates */}
+            <div>
+                <label className="flex items-center text-sm text-gray-700 font-medium mb-1">
                     <CalendarDaysIcon className="w-5 h-5 text-gray-500 mr-2" />
-                    Date début
+                    Période
                 </label>
-                <input
-                    type="date"
-                    name="date1"
-                    value={filters.date1}
-                    onChange={handleChange}
-                    className="py-2 px-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                />
+                <div className="flex flex-col gap-2">
+                    <input
+                        type="date"
+                        name="date1"
+                        value={filters.date1 ?? ""}
+                        onChange={handleChange}
+                        className="py-2 px-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <input
+                        type="date"
+                        name="date2"
+                        value={filters.date2 ?? ""}
+                        onChange={handleChange}
+                        className="py-2 px-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                    />
+                </div>
             </div>
 
-            {/* Date de fin */}
-            <div className="flex flex-col w-full sm:w-auto">
-                <label className="flex items-center text-sm text-gray-600 mb-1">
-                    <CalendarDaysIcon className="w-5 h-5 text-gray-500 mr-2" />
-                    Date fin
-                </label>
-                <input
-                    type="date"
-                    name="date2"
-                    value={filters.date2}
-                    onChange={handleChange}
-                    className="py-2 px-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                />
-            </div>
-
-            {/* Group By */}
-            <div className="flex flex-col w-full sm:w-auto">
-                <label className="flex items-center text-sm text-gray-600 mb-1">
+            {/* 📊 Regroupement */}
+            <div>
+                <label className="flex items-center text-sm text-gray-700 font-medium mb-1">
                     <Squares2X2Icon className="w-5 h-5 text-gray-500 mr-2" />
                     Regrouper par
                 </label>
                 <select
                     name="groupBy"
-                    value={filters.groupBy}
+                    value={filters.groupBy ?? "day"}
                     onChange={handleChange}
-                    className="py-2 px-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full py-2 px-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                 >
                     <option value="day">Jour</option>
                     <option value="week">Semaine</option>

@@ -18,7 +18,7 @@ async function httpGetHeureMoteur(req, res) {
 async function httpGetHeureMoteurByParams(req, res) {
     try {
 
-        const { date1, date2, groupBy, id } = req.query;
+        const { date1, date2, groupBy, id, vcleGroupId } = req.query;
 
         if (date1 && isNaN(new Date(date1).getTime())) {
             return res.status(400).json({
@@ -40,7 +40,7 @@ async function httpGetHeureMoteurByParams(req, res) {
         }
 
 
-        const results = await getHmoteurByDatesAndId(date1, date2, id);
+        const results = await getHmoteurByDatesAndId(date1, date2, id, vcleGroupId);
 
         const data = await formatDashboardDataWithperiod(results, groupBy, id)
 

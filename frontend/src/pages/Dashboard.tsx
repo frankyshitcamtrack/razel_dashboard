@@ -15,11 +15,14 @@ const Dashboard = () => {
         date1: '2025-07-01',
         date2: '2025-07-31',
         vehicle: 68,
-        groupBy: "day"
+        groupBy: "day",
+        vcleGroupId: undefined
     });
 
     const { data, isLoading } = useHeureMoteurData(filters);
     const { data: exceptions, isLoading: exceptionsLoading } = useExceptions(filters);
+
+
 
     return (
         <div className="min-h-screen bg-gray-100 flex">

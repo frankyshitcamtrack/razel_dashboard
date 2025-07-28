@@ -7,11 +7,14 @@ async function getExceptions() {
 }
 
 
-async function getExceptionsByDatesAndId(date1, date2, id) {
-    let query = 'SELECT * FROM exceptionsnbr';
+async function getExceptionsByDatesAndId(date1, date2, vehicleId, vehicleGroupId) {
+    let query = `
+        SELECT e.* 
+        FROM exceptionsnbr e
+        JOIN vehicles v ON e.vcleid = v.ids
+    `;
     let conditions = [];
     let params = [];
-
 
     const convertToUTC = (dateStr) => {
         if (!dateStr) return null;
@@ -21,20 +24,26 @@ async function getExceptionsByDatesAndId(date1, date2, id) {
     };
 
     if (date1 && date2) {
-        conditions.push('dates BETWEEN $1 AND $2');
+        conditions.push('e.dates BETWEEN $1 AND $2');
         params.push(convertToUTC(date1), convertToUTC(date2));
     } else if (date1) {
-        conditions.push('dates >= $1');
+        conditions.push('e.dates >= $1');
         params.push(convertToUTC(date1));
     } else if (date2) {
-        conditions.push('dates <= $1');
+        conditions.push('e.dates <= $1');
         params.push(convertToUTC(date2));
     }
 
-    if (id) {
+    if (vehicleId) {
         const paramIndex = params.length + 1;
-        conditions.push(`vcleid = $${paramIndex}`);
-        params.push(id);
+        conditions.push(`e.vcleid = $${paramIndex}`);
+        params.push(vehicleId);
+    }
+
+    if (vehicleGroupId) {
+        const paramIndex = params.length + 1;
+        conditions.push(`v.groupid = $${paramIndex}`);
+        params.push(vehicleGroupId);
     }
 
     if (conditions.length > 0) {

@@ -17,7 +17,7 @@ async function httpGetExceptions(req, res) {
 async function httpGetExceptionsByParams(req, res) {
     try {
 
-        const { date1, date2, groupBy, id } = req.query;
+        const { date1, date2, groupBy, id, vcleGroupId } = req.query;
 
         if (date1 && isNaN(new Date(date1).getTime())) {
             return res.status(400).json({
@@ -39,7 +39,7 @@ async function httpGetExceptionsByParams(req, res) {
         }
 
 
-        const results = await getExceptionsByDatesAndId(date1, date2, id);
+        const results = await getExceptionsByDatesAndId(date1, date2, id, vcleGroupId);
         const formatData = await formatExceptionsDataWithperiod(results, groupBy);
 
         return res.status(200).json(formatData);

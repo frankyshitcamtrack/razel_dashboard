@@ -94,6 +94,7 @@ export type exceptions = {
 
 
 export type vehicles = {
+    groupid?: number;
     names: string,
     create_at: string,
     ids: number
@@ -103,5 +104,13 @@ export type filtersProps = {
     date1: string;
     date2: string;
     vehicle: number | string;
+    groupid?: number | undefined;
     groupBy?: "day" | "week" | "month";
+}
+
+export type vehiclesGroup = {
+    active?: boolean;
+    names: string,
+    create_at: string,
+    ids: number
 }
