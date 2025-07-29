@@ -8,7 +8,11 @@ const { httpGetVehiclesGroup } = require('../controllers/vehiclegroup.controller
 
 
 repportsRouter.get('/heuremoteur', httpGetHeureMoteurByParams);
+repportsRouter.get('/list_heuremoteur', httpGetHeureMoteur);
+
 repportsRouter.get('/exceptions', httpGetExceptionsByParams);
+repportsRouter.get('/list_exceptions', httpGetExceptions);
+
 repportsRouter.get('/vehicles', httpGetVehicles);
 repportsRouter.get('/vehicles_group', httpGetVehiclesGroup);
 

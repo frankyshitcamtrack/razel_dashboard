@@ -2,8 +2,23 @@ const { getExceptions, getExceptionsByDatesAndId } = require('../models/exceptio
 const { formatExceptionsData, formatExceptionsDataWithperiod } = require('../utils/formatDashboardData')
 
 async function httpGetExceptions(req, res) {
+    const { page, limit, dateFrom, dateTo, groupId } = req.query;
+
+
+    if (dateFrom && isNaN(new Date(dateFrom).getTime())) {
+        return res.status(400).json({
+            error: 'dateFrom doit être une date valide (format: YYYY-MM-DD)'
+        });
+    }
+
+    if (dateTo && isNaN(new Date(dateTo).getTime())) {
+        return res.status(400).json({
+            error: 'dateTo doit être une date valide (format: YYYY-MM-DD)'
+        });
+    }
+
     try {
-        return res.status(200).json(await getExceptions());
+        return res.status(200).json(await getExceptions({ page, limit, dateFrom, dateTo, groupId }));
     } catch (error) {
         console.log(error);
         return res.status(500).json({

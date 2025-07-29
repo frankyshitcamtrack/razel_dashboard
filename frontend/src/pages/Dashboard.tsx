@@ -16,7 +16,7 @@ const Dashboard = () => {
         date2: '2025-07-31',
         vehicle: 68,
         groupBy: "day",
-        vcleGroupId: undefined
+        vcleGroupId: 1
     });
 
     const { data, isLoading } = useHeureMoteurData(filters);

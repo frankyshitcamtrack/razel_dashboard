@@ -1,5 +1,5 @@
 import { useAuth } from '../store/AuthContext';
-import Dashboard from '../pages/Dashboard';
+import Router from './Rooter';
 import LoginPage from '../pages/LoginPage';
 import { VehicleLoadingSpinner } from '../components/UI/LoadingSpinner';
 
@@ -10,7 +10,7 @@ const AuthRouter = () => {
         return <VehicleLoadingSpinner />;
     }
 
-    return isAuthenticated ? <Dashboard /> : <LoginPage />;
+    return isAuthenticated ? <Router /> : <LoginPage />;
 };
 
 export default AuthRouter;

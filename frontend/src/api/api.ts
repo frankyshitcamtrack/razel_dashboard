@@ -3,6 +3,54 @@ import type { AxiosError, AxiosResponse } from 'axios';
 import type { DashboardData, vehicles, exceptions, vehiclesGroup } from '../types/ChartDataType';
 
 
+export interface PaginationParams {
+    page?: number;
+    limit?: number;
+    dateFrom?: string;
+    dateTo?: string;
+    vehicleId?: number;
+    groupId?: number;
+}
+
+export interface PaginatedResponse<T> {
+    data: T[];
+    pagination: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    };
+}
+
+export interface Exception {
+    ids: number;
+    dates: string;
+    vcleid: number;
+    nbrsp: number,
+    nbrhb: number,
+    nbha: number,
+    groupid: number
+
+}
+
+export interface HeureMoteur {
+    ids: number;
+    dates: string;
+    vcleid: number;
+    heures: number;
+    dureetotal: string,
+    dureel: string,
+    arretmoteurtournant: string,
+    distancekm: number,
+    vmax: number,
+    percentuse: number,
+    consototal: number,
+    conso100km: number,
+    consolitperhour: number,
+    groupid: number
+}
+
+
 interface ApiErrorResponse {
     error?: string;
 
@@ -182,6 +230,28 @@ export const fetchVehiclesGroup = async (
         }
     }
 };
+
+
+
+export const fetchData = async <T>(
+    endpoint: 'list_exceptions' | 'list_heuremoteur',
+    params: PaginationParams = {}
+): Promise<PaginatedResponse<T>> => {
+    const queryString = new URLSearchParams();
+
+    Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) {
+            queryString.append(key, String(value));
+        }
+    });
+
+    const response = await fetch(`/api/razel_dashboard/${endpoint}?${queryString}`);
+    if (!response.ok) throw new Error('Erreur réseau');
+    return response.json();
+};
+
+
+
 
 
 
