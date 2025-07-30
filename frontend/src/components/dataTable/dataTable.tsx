@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { fetchData } from "../../api/api";
 import type { PaginatedResponse, PaginationParams } from "../../api/api";
 import { Pagination } from "../pagination";
-
+import { exportData } from "../../utils/exportData";
 type DataType = "list_exceptions" | "list_heuremoteur";
 
 type ColumnDef<T = any> = {
@@ -16,6 +16,7 @@ const formatDateFR = (val?: string) =>
     val ? new Date(val).toLocaleDateString("fr-FR") : "-";
 
 const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
+    type ExportFormat = 'excel' | 'csv' | 'pdf';
     const [data, setData] = useState<PaginatedResponse<any>>({
         data: [],
         pagination: { total: 0, page: 1, limit: 10, totalPages: 0 },
@@ -23,7 +24,7 @@ const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // états locaux pour ne pas “écraser” une borne quand l’autre change
+
     const [startDate, setStartDate] = useState<string | undefined>(undefined);
     const [endDate, setEndDate] = useState<string | undefined>(undefined);
 
@@ -35,16 +36,16 @@ const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
     const columns: ColumnDef[] = useMemo(() => {
         if (dataType === "list_exceptions") {
             return [
-                { header: "ID", accessor: "id", width: 80 },
+                { header: "ID", accessor: "ids", width: 80 },
                 { header: "Date", accessor: "dates", format: formatDateFR, width: 120 },
                 { header: "Véhicule ID", accessor: "vcleid", width: 120 },
                 { header: "Nombre de speedings", accessor: "nbrsp", width: 160 },
                 { header: "Nombre de Hash braking", accessor: "nbrhb", width: 180 },
-                { header: "Nombre de Hash Acceleration", accessor: "nbrha", width: 200 },
+                { header: "Nombre de Hash Acceleration", accessor: "nbha", width: 200 },
                 { header: "Groupe de Véhicule", accessor: "groupid", width: 160 },
             ];
         }
-        // list_heuremoteur
+
         return [
             { header: "ID", accessor: "ids", width: 80 },
             { header: "Véhicule", accessor: "vcleid", width: 100 },
@@ -113,11 +114,11 @@ const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
         ];
     }, [dataType]);
 
-    // Id de ligne cohérent selon le type
+
     const getRowId = (row: any) =>
         dataType === "list_heuremoteur" ? row.ids ?? row.id : row.id ?? row.ids;
 
-    // Chargement des données
+
     useEffect(() => {
         let cancelled = false;
         (async () => {
@@ -138,7 +139,7 @@ const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
         };
     }, [dataType, filters]);
 
-    // Helpers de mise à jour des filtres
+
     const updateFilters = (patch: Partial<PaginationParams>, resetPage = true) =>
         setFilters((prev) => ({ ...prev, ...(resetPage ? { page: 1 } : {}), ...patch }));
 
@@ -151,7 +152,7 @@ const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
         updateFilters({ limit }, true);
     };
 
-    // Dates : on garde en local et on pousse le format AAAA-MM-JJ dans les filters
+
     const handleStartDateChange = (val: string) => {
         const iso = val ? new Date(val).toISOString().split("T")[0] : undefined;
         setStartDate(iso);
@@ -177,46 +178,109 @@ const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
         return col.format ? col.format(value, row) : value ?? "-";
     };
 
+    const handleExport = async (format: ExportFormat) => {
+        try {
+
+            const response = await fetchData(dataType, filters);
+
+            await exportData(
+                format,
+                response.data,
+                dataType,
+                `${dataType}_${new Date().toISOString().split('T')[0]}`
+            );
+        } catch (error) {
+            console.error(`Erreur lors de l'export ${format}:`, error);
+        }
+    };
+
+    // avant le return
+    const page = data.pagination.page ?? filters.page ?? 1;
+    const limit = data.pagination.limit ?? filters.limit ?? 10;
+    const safeTotalPages =
+        data.pagination.totalPages && data.pagination.totalPages > 0
+            ? data.pagination.totalPages
+            : Math.max(1, Math.ceil((data.pagination.total ?? 0) / limit));
+
     return (
         <div className="bg-white rounded-lg shadow p-6" >
-            <div className="flex flex-wrap gap-4 mb-6 items-end" >
-                <div className="flex items-center gap-2" >
-                    <label htmlFor="dateFrom" className="text-sm font-medium" >Date début: </label>
-                    < input
-                        id="dateFrom"
-                        type="date"
-                        value={startDate ?? ""
-                        }
-                        onChange={(e) => handleStartDateChange(e.target.value)}
-                        className="border rounded px-3 py-2"
-                    />
-                    <span>à </span>
-                    < label htmlFor="dateTo" className="sr-only" >
-                        Date fin
-                    </label>
-                    < input
-                        id="dateTo"
-                        type="date"
-                        value={endDate ?? ""}
-                        onChange={(e) => handleEndDateChange(e.target.value)}
-                        className="border rounded px-3 py-2"
-                    />
-                </div>
+            <div className="mb-6">
+                <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
 
-                < div className="flex items-center gap-2" >
-                    <label htmlFor="vehicle" className="text-sm font-medium" >
-                        Véhicule ID:
-                    </label>
-                    < input
-                        id="vehicle"
-                        type="number"
-                        inputMode="numeric"
-                        placeholder="ex: 42"
-                        onChange={(e) => handleVehicleChange(e.target.value)}
-                        className="border rounded px-3 py-2 w-28"
-                    />
+                    {/* Filtres (gauche) */}
+                    <div className="flex flex-wrap items-end gap-4">
+                        <div className="flex items-center gap-2">
+                            <label htmlFor="dateFrom" className="text-sm font-medium">Date début :</label>
+                            <input
+                                id="dateFrom"
+                                type="date"
+                                value={startDate ?? ""}
+                                onChange={(e) => handleStartDateChange(e.target.value)}
+                                className="h-10 w-44 border rounded-md px-3"
+                            />
+                            <span className="text-sm">à</span>
+                            <label htmlFor="dateTo" className="sr-only">Date fin</label>
+                            <input
+                                id="dateTo"
+                                type="date"
+                                value={endDate ?? ""}
+                                onChange={(e) => handleEndDateChange(e.target.value)}
+                                className="h-10 w-44 border rounded-md px-3"
+                            />
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <label htmlFor="vehicle" className="text-sm font-medium">Véhicule ID :</label>
+                            <input
+                                id="vehicle"
+                                type="number"
+                                inputMode="numeric"
+                                placeholder="ex: 42"
+                                onChange={(e) => handleVehicleChange(e.target.value)}
+                                className="h-10 w-28 border rounded-md px-3"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Boutons (droite) */}
+                    <div className="flex items-center gap-2 md:justify-end shrink-0">
+                        <button
+                            onClick={() => handleExport('excel')}
+                            className="h-10 inline-flex items-center gap-2 px-4 bg-green-600 text-white rounded-md hover:bg-green-700"
+                        >
+                            <span>Excel</span>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                        </button>
+
+                        <button
+                            onClick={() => handleExport('csv')}
+                            className="h-10 inline-flex items-center gap-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                        >
+                            <span>CSV</span>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                        </button>
+
+                        <button
+                            onClick={() => handleExport('pdf')}
+                            className="h-10 inline-flex items-center gap-2 px-4 bg-red-600 text-white rounded-md hover:bg-red-700"
+                        >
+                            <span>PDF</span>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                    d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                        </button>
+                    </div>
+
                 </div>
             </div>
+
 
             {/* Erreur */}
             {
@@ -285,68 +349,36 @@ const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
             </div>
 
             {/* Pagination */}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mt-4" >
-                <div className="flex items-center gap-2" >
-                    <span className="text-sm text-gray-700" >
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mt-4">
+                <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-700">
                         Affichage de{" "}
-                        {
-                            data.pagination.total === 0
-                                ? 0
-                                : (data.pagination.page - 1) * data.pagination.limit + 1
-                        } {" "}
+                        {data.pagination.total === 0 ? 0 : (page - 1) * limit + 1}{" "}
                         à{" "}
-                        {
-                            Math.min(
-                                data.pagination.page * data.pagination.limit,
-                                data.pagination.total
-                            )
-                        } {" "}
+                        {Math.min(page * limit, data.pagination.total)}{" "}
                         sur {data.pagination.total} éléments
                     </span>
 
-                    < label htmlFor="limit" className="text-sm text-gray-600" >
-                        / page
-                    </label>
-                    < select
+                    <label htmlFor="limit" className="text-sm text-gray-600">/ page</label>
+                    <select
                         id="limit"
                         value={filters.limit}
                         onChange={handleLimitChange}
                         className="border rounded px-2 py-1 text-sm"
                     >
-                        {
-                            [10, 20, 50, 100].map((size) => (
-                                <option key={size} value={size} >
-                                    {size}
-                                </option>
-                            ))
-                        }
+                        {[10, 20, 50, 100].map((size) => (
+                            <option key={size} value={size}>{size}</option>
+                        ))}
                     </select>
                 </div>
 
-                {/*    < div className="flex flex-wrap gap-1" >
-                    {
-                        Array.from(
-                            { length: data.pagination.totalPages || 0 },
-                            (_, i) => i + 1
-                        ).map((page) => (
-                            <button
-                                key={page}
-                                onClick={() => handlePageChange(page)}
-                                className={`px-3 py-1 rounded border text-sm ${filters.page === page
-                                    ? "bg-blue-600 text-white border-blue-600"
-                                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                                    }`}
-                            >
-                                {page}
-                            </button>
-                        ))}
-                </div> */}
                 <Pagination
-                    currentPage={data.pagination.page}
-                    totalPages={Math.ceil(data.pagination.total / data.pagination.totalPages)}
-                    onPageChange={(page) => handlePageChange(page)}
+                    currentPage={page}
+                    totalPages={safeTotalPages}
+                    onPageChange={(p) => handlePageChange(p)}
                 />
             </div>
+
         </div>
     );
 };
