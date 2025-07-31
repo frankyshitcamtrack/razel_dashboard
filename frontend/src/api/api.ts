@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { AxiosError, AxiosResponse } from 'axios';
+import type { AxiosError, AxiosResponse, AxiosRequestConfig } from 'axios';
 import type { DashboardData, vehicles, exceptions, vehiclesGroup } from '../types/ChartDataType';
 
 
@@ -56,60 +56,56 @@ interface ApiErrorResponse {
 
 }
 
+
 export const fetchHeureMoteurData = async (
     params: {
         date1?: string;
         date2?: string;
-        vehicle?: number;
+        vehicle?: number | number[];
         vcleGroupId?: number;
         groupBy?: "day" | "week" | "month";
     }
 ): Promise<DashboardData> => {
     try {
-        // Construction des query params
-        const queryParams = new URLSearchParams();
+        const config: AxiosRequestConfig = {
+            headers: {
+                'Content-Type': 'application/json',
+                ...(localStorage.getItem('authToken') && {
+                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                })
+            },
+            params: {
+                date1: params.date1,
+                date2: params.date2,
+                id: params.vehicle,
+                vcleGroupId: params.vcleGroupId,
+                groupBy: params.groupBy
+            },
+            paramsSerializer: { indexes: null } // Format id[]=1&id[]=2
+        };
 
-        if (params.date1) queryParams.append('date1', params.date1);
-        if (params.date2) queryParams.append('date2', params.date2);
-        if (params.vehicle !== undefined) queryParams.append('id', params.vehicle.toString());
-        if (params.groupBy !== undefined) queryParams.append('groupBy', params.groupBy.toString());
-        if (params.vcleGroupId !== undefined) queryParams.append('vcleGroupId', params.vcleGroupId.toString());
-
-        const response: AxiosResponse<DashboardData> = await axios.get(
+        const response = await axios.get<DashboardData>(
             `/api/razel_dashboard/heuremoteur`,
-            {
-                params: queryParams,
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(localStorage.getItem('authToken') && {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-                    })
-                },
-            }
+            config
         );
 
         return response.data;
     } catch (error) {
-        const axiosError = error as AxiosError;
+        const axiosError = error as AxiosError<ApiErrorResponse>;
 
         if (axiosError.response) {
-            switch (axiosError.response.status) {
-                case 400:
-                    const errorData = axiosError.response?.data as ApiErrorResponse;
-                    throw new Error('Paramètres invalides: ' + errorData?.error || 'Erreur inconnue');
-                case 500:
-                    throw new Error('Erreur serveur');
-                default:
-                    throw new Error(`Erreur ${axiosError.response.status}`);
-            }
+            const errorMessage = axiosError.response.data?.error ||
+                axiosError.response.statusText ||
+                `Erreur ${axiosError.response.status}`;
+
+            throw new Error(errorMessage);
         } else {
             throw new Error('Erreur réseau');
         }
     }
 };
 
-
-export const fetchExeptions = async (
+/* export const fetchExeptions = async (
     params: {
         date1?: string;
         date2?: string;
@@ -128,6 +124,73 @@ export const fetchExeptions = async (
         if (params.id !== undefined) queryParams.append('id', params.id.toString());
         if (params.vcleGroupId !== undefined) queryParams.append('vcleGroupId', params.vcleGroupId.toString());
         if (params.groupBy !== undefined) queryParams.append('groupBy', params.groupBy.toString());
+
+        const response: AxiosResponse<exceptions> = await axios.get(
+            `/api/razel_dashboard/exceptions`,
+            {
+                params: queryParams,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(localStorage.getItem('authToken') && {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                    })
+                },
+            }
+        );
+
+        return response.data;
+    } catch (error) {
+        const axiosError = error as AxiosError;
+
+        if (axiosError.response) {
+            switch (axiosError.response.status) {
+                case 400:
+                    throw new Error('Paramètres invalides');
+                case 500:
+                    throw new Error('Erreur serveur');
+                default:
+                    throw new Error(`Erreur ${axiosError.response.status}`);
+            }
+        } else {
+            throw new Error('Erreur réseau');
+        }
+    }
+}; */
+
+
+
+export const fetchExceptions = async (
+    params: {
+        date1?: string;
+        date2?: string;
+        id?: number | number[];
+        vcleGroupId?: number;
+        groupBy?: "day" | "week" | "month";
+    }
+): Promise<exceptions> => {
+    try {
+        const queryParams = new URLSearchParams();
+
+
+        if (params.date1) queryParams.append('date1', params.date1);
+        if (params.date2) queryParams.append('date2', params.date2);
+
+
+        if (params.id !== undefined) {
+            if (Array.isArray(params.id)) {
+                params.id.forEach(id => queryParams.append('id', id.toString()));
+            } else {
+                queryParams.append('id', params.id.toString());
+            }
+        }
+
+
+        if (params.vcleGroupId !== undefined) {
+            queryParams.append('vcleGroupId', params.vcleGroupId.toString());
+        }
+        if (params.groupBy !== undefined) {
+            queryParams.append('groupBy', params.groupBy);
+        }
 
         const response: AxiosResponse<exceptions> = await axios.get(
             `/api/razel_dashboard/exceptions`,

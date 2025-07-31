@@ -8,15 +8,11 @@ const pool = require('../config/db')
  * @param {number} [params.limit=10] - Éléments par page (défaut: 10)
  * @param {string} [params.dateFrom] - Date de début (format YYYY-MM-DD)
  * @param {string} [params.dateTo] - Date de fin (format YYYY-MM-DD)
- * @param {number} [params.vehicleId] - ID du véhicule
+ * @param {number|number[]} [params.vehicleId] - ID ou tableau d'IDs du véhicule
  * @param {number} [params.groupId] - ID du groupe de véhicules
  * @returns {Promise<Object>} - { data: [], pagination: { total, page, limit, totalPages } }
  */
-
-
-
 async function getHmoteur(params = {}) {
-
     const {
         page = 1,
         limit = 10,
@@ -27,8 +23,10 @@ async function getHmoteur(params = {}) {
     } = params;
 
 
-    const offset = (page - 1) * limit;
+    if (page < 1) throw new Error("Le numéro de page doit être supérieur ou égal à 1");
+    if (limit < 1) throw new Error("La limite doit être supérieure ou égale à 1");
 
+    const offset = (page - 1) * limit;
 
     let query = `
         SELECT hm.*, v.groupid 
@@ -38,7 +36,7 @@ async function getHmoteur(params = {}) {
     const values = [];
     const whereClauses = [];
 
-
+    // Filtre par dates
     if (dateFrom && dateTo) {
         whereClauses.push(`hm.dates BETWEEN $${values.length + 1} AND $${values.length + 2}`);
         values.push(dateFrom, dateTo);
@@ -50,40 +48,60 @@ async function getHmoteur(params = {}) {
         values.push(dateTo);
     }
 
-
+    // Filtre par véhicule(s)
     if (vehicleId) {
-        whereClauses.push(`hm.vcleid = $${values.length + 1}`);
-        values.push(vehicleId);
+        if (Array.isArray(vehicleId)) {
+            if (vehicleId.length === 0) {
+                throw new Error("Le tableau vehicleId ne peut pas être vide");
+            }
+            whereClauses.push(`hm.vcleid = ANY($${values.length + 1})`);
+            values.push(vehicleId);
+        } else {
+            whereClauses.push(`hm.vcleid = $${values.length + 1}`);
+            values.push(vehicleId);
+        }
     }
 
-
+    // Filtre par groupe
     if (groupId) {
         whereClauses.push(`v.groupid = $${values.length + 1}`);
         values.push(groupId);
     }
 
-
     if (whereClauses.length > 0) {
         query += ' WHERE ' + whereClauses.join(' AND ');
     }
 
-    const dataQuery = `${query} ORDER BY hm.dates DESC LIMIT $${values.length + 1} OFFSET $${values.length + 2}`;
-    const countQuery = `SELECT COUNT(*) FROM (${query}) AS total`;
+    const dataQuery = {
+        text: `${query} ORDER BY hm.dates DESC LIMIT $${values.length + 1} OFFSET $${values.length + 2}`,
+        values: [...values, limit, offset]
+    };
+
+    const countQuery = {
+        text: `SELECT COUNT(*) FROM (${query}) AS total`,
+        values: values
+    };
 
     try {
-
         const [dataResult, countResult] = await Promise.all([
-            pool.query(dataQuery, [...values, limit, offset]),
-            pool.query(countQuery, values)
+            pool.query(dataQuery),
+            pool.query(countQuery)
         ]);
+
+        const total = parseInt(countResult.rows[0].count);
+        const totalPages = Math.ceil(total / limit);
+
+        if (page > totalPages && totalPages > 0) {
+            throw new Error(`La page ${page} n'existe pas. Il y a seulement ${totalPages} pages disponibles.`);
+        }
 
         return {
             data: dataResult.rows,
             pagination: {
-                total: parseInt(countResult.rows[0].count),
+                total: total,
                 page: page,
                 limit: limit,
-                totalPages: Math.ceil(parseInt(countResult.rows[0].count) / limit)
+                totalPages: totalPages
             }
         };
     } catch (error) {
@@ -96,7 +114,14 @@ async function getHmoteur(params = {}) {
 
 
 
-
+/**
+ * Récupère les heures moteur filtrées par dates et ID(s) de véhicule(s)
+ * @param {string} [date1] - Date de début (format YYYY-MM-DD)
+ * @param {string} [date2] - Date de fin (format YYYY-MM-DD)
+ * @param {number|number[]} [vehicleId] - ID ou tableau d'IDs de véhicule(s)
+ * @param {number} [vehicleGroupId] - ID du groupe de véhicules
+ * @returns {Promise<Array>} - Tableau des résultats
+ */
 async function getHmoteurByDatesAndId(date1, date2, vehicleId, vehicleGroupId) {
     let query = `
         SELECT hm.* 
@@ -105,38 +130,58 @@ async function getHmoteurByDatesAndId(date1, date2, vehicleId, vehicleGroupId) {
     `;
     let conditions = [];
     let params = [];
+    let paramIndex = 1;
 
+    // Gestion des dates
     if (date1 && date2) {
-        conditions.push('hm.dates BETWEEN $1 AND $2');
+        conditions.push(`hm.dates BETWEEN $${paramIndex} AND $${paramIndex + 1}`);
         params.push(date1, date2);
+        paramIndex += 2;
     } else if (date1) {
-        conditions.push('hm.dates >= $1');
+        conditions.push(`hm.dates >= $${paramIndex}`);
         params.push(date1);
+        paramIndex += 1;
     } else if (date2) {
-        conditions.push('hm.dates <= $1');
+        conditions.push(`hm.dates <= $${paramIndex}`);
         params.push(date2);
+        paramIndex += 1;
     }
 
+    // Gestion des véhicules (single ID ou array)
     if (vehicleId) {
-        const paramIndex = params.length + 1;
-        conditions.push(`hm.vcleid = $${paramIndex}`);
-        params.push(vehicleId);
+        if (Array.isArray(vehicleId)) {
+            if (vehicleId.length === 0) {
+                throw new Error("Le tableau vehicleId ne peut pas être vide");
+            }
+            conditions.push(`hm.vcleid = ANY($${paramIndex})`);
+            params.push(vehicleId);
+            paramIndex += 1;
+        } else {
+            conditions.push(`hm.vcleid = $${paramIndex}`);
+            params.push(vehicleId);
+            paramIndex += 1;
+        }
     }
 
+    // Gestion du groupe de véhicules
     if (vehicleGroupId) {
-        const paramIndex = params.length + 1;
         conditions.push(`v.groupid = $${paramIndex}`);
         params.push(vehicleGroupId);
     }
 
+    // Construction de la requête finale
     if (conditions.length > 0) {
         query += ' WHERE ' + conditions.join(' AND ');
     }
+
+    // Tri par date décroissante par défaut
+    query += ' ORDER BY hm.dates DESC';
 
     try {
         const results = await pool.query(query, params);
         return results.rows;
     } catch (error) {
+        console.error('Erreur dans getHmoteurByDatesAndId:', error);
         throw error;
     }
 }

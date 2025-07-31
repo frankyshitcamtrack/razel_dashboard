@@ -2,16 +2,16 @@ const pool = require('../config/db')
 
 
 /**
- * Récupère les exceptions avec pagination, filtrage et gestion des groupes
- * @param {Object} params - Paramètres de la requête
- * @param {number} [params.page=1] - Numéro de page (défaut: 1)
- * @param {number} [params.limit=10] - Éléments par page (défaut: 10)
- * @param {string} [params.dateFrom] - Date de début (format YYYY-MM-DD)
- * @param {string} [params.dateTo] - Date de fin (format YYYY-MM-DD)
- * @param {number} [params.vehicleId] - ID du véhicule
- * @param {number} [params.groupId] - ID du groupe de véhicules
- * @returns {Promise<Object>} - { data: [], pagination: { total, page, limit, totalPages } }
- */
+* Récupère les exceptions avec pagination, filtrage et gestion des groupes
+* @param {Object} params - Paramètres de la requête
+* @param {number} [params.page=1] - Numéro de page (défaut: 1)
+* @param {number} [params.limit=10] - Éléments par page (défaut: 10)
+* @param {string} [params.dateFrom] - Date de début (format YYYY-MM-DD)
+* @param {string} [params.dateTo] - Date de fin (format YYYY-MM-DD)
+* @param {number|number[]} [params.vehicleId] - ID ou tableau d'IDs du véhicule
+* @param {number} [params.groupId] - ID du groupe de véhicules
+* @returns {Promise<Object>} - { data: [], pagination: { total, page, limit, totalPages } }
+*/
 async function getExceptions(params = {}) {
     // Paramètres par défaut
     const {
@@ -22,7 +22,6 @@ async function getExceptions(params = {}) {
         vehicleId,
         groupId
     } = params;
-
 
     // Validation des paramètres
     if (page < 1) throw new Error("Le numéro de page doit être supérieur ou égal à 1");
@@ -52,10 +51,19 @@ async function getExceptions(params = {}) {
         values.push(dateTo);
     }
 
-    // Filtre par véhicule
+    // Filtre par véhicule(s)
     if (vehicleId) {
-        whereClauses.push(`e.vcleid = $${values.length + 1}`);
-        values.push(vehicleId);
+        if (Array.isArray(vehicleId)) {
+            if (vehicleId.length === 0) {
+                throw new Error("Le tableau vehicleId ne peut pas être vide");
+            }
+            // Utilisation de ANY pour les tableaux
+            whereClauses.push(`e.vcleid = ANY($${values.length + 1})`);
+            values.push(vehicleId);
+        } else {
+            whereClauses.push(`e.vcleid = $${values.length + 1}`);
+            values.push(vehicleId);
+        }
     }
 
     // Filtre par groupe

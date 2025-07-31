@@ -7,7 +7,8 @@ import CombinedChartComponent from "../components/charts/CombinedChart";
 import StackedBarChart from "../components/charts/StackedBarChart";
 import { useHeureMoteurData } from "../hooks/useHeureMoteurData";
 import { useExceptions } from "../hooks/useExceptions";
-import CombinedChartTimeComponent from "../components/charts/CombinedChartTime";
+/* import CombinedChartTimeComponent from "../components/charts/CombinedChartTime"; */
+import CombinedBarChartTimeComponent from "../components/charts/CombinedBarChartTime";
 import type { Filters } from "../components/filters/GlobalFilterBars";
 
 const Dashboard = () => {
@@ -47,8 +48,8 @@ const Dashboard = () => {
                                         dataKey2="usage"
                                         label1="Arrêts moteur"
                                         label2="Durée d'utilisation"
-                                        color1="#3b82f6"
-                                        color2="#10b981"
+                                        color1="#F7D000"
+                                        color2="#02509D"
                                         valueType="time"
                                         title="Arrêts moteur vs Durée d'utilisation"
                                     />
@@ -60,8 +61,8 @@ const Dashboard = () => {
                                         dataKey2="usage"
                                         label1="Arrêts moteur"
                                         label2="Durée d'utilisation"
-                                        color1="#8b5cf6"
-                                        color2="#ec4899"
+                                        color1="#F7D000"
+                                        color2="#02509D"
                                         valueType="percentage"
                                         title="Arrêts moteur vs Durée d'utilisation (%)"
                                     />
@@ -84,11 +85,11 @@ const Dashboard = () => {
                         {isLoading ? (
                             <DonutSkeleton />
                         ) : (
-                            <CombinedChartTimeComponent
+                            <CombinedBarChartTimeComponent
                                 data={data?.dureeDistanceparcouru}
                                 title="Distance parcourue et durée"
-                                barLabel="Distance (km)"
-                                lineLabel="Durée (heures)"
+                                barLabel="Durée (heures)"
+                                lineLabel="Distance (km)"
                             />
                         )}
 
@@ -117,7 +118,7 @@ const Dashboard = () => {
                                     title="Consommation au 100 km"
                                     dataKey1="value"
                                     label1="Consommation (L/100km)"
-                                    color1="#3B82F6"
+                                    color1="#02509D"
                                 />
                             )
                         )}
@@ -131,7 +132,7 @@ const Dashboard = () => {
                                     title="Ratio consommation L/M"
                                     dataKey1="value"
                                     label1="L/M"
-                                    color1="#3B82F6"
+                                    color1="#02509D"
                                 />
                             )
                         )}
@@ -145,7 +146,7 @@ const Dashboard = () => {
                                     title="Excès de vitesse"
                                     dataKey1="value"
                                     label1="Nombre d'excès de vitesse"
-                                    color1="#3B82F6"
+                                    color1="#02509D"
                                 />
                             )
                         )}

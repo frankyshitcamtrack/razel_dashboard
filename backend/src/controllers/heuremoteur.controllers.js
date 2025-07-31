@@ -28,12 +28,11 @@ async function httpGetHeureMoteur(req, res) {
 
 
 
-
 async function httpGetHeureMoteurByParams(req, res) {
     try {
-
         const { date1, date2, groupBy, id, vcleGroupId } = req.query;
 
+        // Validation des dates
         if (date1 && isNaN(new Date(date1).getTime())) {
             return res.status(400).json({
                 error: 'date1 doit être une date valide (format: YYYY-MM-DD)'
@@ -46,27 +45,65 @@ async function httpGetHeureMoteurByParams(req, res) {
             });
         }
 
+        // Gestion des IDs (single number ou array)
+        let vehicleIds = null;
+        if (id) {
+            if (Array.isArray(id)) {
+                vehicleIds = id.map(id => {
+                    const num = Number(id);
+                    if (isNaN(num)) {
+                        throw new Error('Tous les IDs doivent être des nombres valides');
+                    }
+                    return num;
+                });
+            } else {
+                const num = Number(id);
+                if (isNaN(num)) {
+                    return res.status(400).json({
+                        error: 'id doit être un nombre valide ou une liste de nombres'
+                    });
+                }
+                vehicleIds = [num];
+            }
+        }
 
-        if (id && isNaN(Number(id))) {
+        // Validation du groupId si fourni
+        if (vcleGroupId && isNaN(Number(vcleGroupId))) {
             return res.status(400).json({
-                error: 'id doit être un nombre valide'
+                error: 'vcleGroupId doit être un nombre valide'
             });
         }
 
+        // Conversion des dates au format YYYY-MM-DD
+        const dateFrom = date1 ? new Date(date1).toISOString().split('T')[0] : undefined;
+        const dateTo = date2 ? new Date(date2).toISOString().split('T')[0] : undefined;
 
-        const results = await getHmoteurByDatesAndId(date1, date2, id, vcleGroupId);
+        // Appel du service
+        const results = await getHmoteurByDatesAndId(
+            dateFrom,
+            dateTo,
+            vehicleIds,
+            vcleGroupId ? Number(vcleGroupId) : undefined
+        );
 
-        const data = await formatDashboardDataWithperiod(results, groupBy, id)
+        const data = await formatDashboardDataWithperiod(results, groupBy, vehicleIds);
 
         return res.status(200).json(data);
 
     } catch (error) {
-        console.error('Erreur dans httpGetHeureMoteur:', error);
+        console.error('Erreur dans httpGetHeureMoteurByParams:', error);
+
+        if (error.message.includes('IDs doivent être')) {
+            return res.status(400).json({
+                error: error.message
+            });
+        }
+
         return res.status(500).json({
-            error: 'Une erreur est survenue lors de la récupération des données'
+            error: 'Une erreur est survenue lors de la récupération des données',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
     }
 }
-
 
 module.exports = { httpGetHeureMoteur, httpGetHeureMoteurByParams }

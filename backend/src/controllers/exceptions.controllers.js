@@ -31,9 +31,9 @@ async function httpGetExceptions(req, res) {
 
 async function httpGetExceptionsByParams(req, res) {
     try {
-
         const { date1, date2, groupBy, id, vcleGroupId } = req.query;
 
+        // Validation des dates
         if (date1 && isNaN(new Date(date1).getTime())) {
             return res.status(400).json({
                 error: 'date1 doit être une date valide (format: YYYY-MM-DD)'
@@ -47,26 +47,67 @@ async function httpGetExceptionsByParams(req, res) {
         }
 
 
-        if (id && isNaN(Number(id))) {
+        let vehicleIds = null;
+        if (id) {
+            if (Array.isArray(id)) {
+
+                vehicleIds = id.map(id => {
+                    const num = Number(id);
+                    if (isNaN(num)) {
+                        throw new Error('Tous les IDs doivent être des nombres valides');
+                    }
+                    return num;
+                });
+            } else {
+
+                const num = Number(id);
+                if (isNaN(num)) {
+                    return res.status(400).json({
+                        error: 'id doit être un nombre valide ou une liste de nombres'
+                    });
+                }
+                vehicleIds = [num];
+            }
+        }
+
+        if (vcleGroupId && isNaN(Number(vcleGroupId))) {
             return res.status(400).json({
-                error: 'id doit être un nombre valide'
+                error: 'vcleGroupId doit être un nombre valide'
             });
         }
 
 
-        const results = await getExceptionsByDatesAndId(date1, date2, id, vcleGroupId);
+        const dateFrom = date1 ? new Date(date1).toISOString().split('T')[0] : undefined;
+        const dateTo = date2 ? new Date(date2).toISOString().split('T')[0] : undefined;
+
+
+        const results = await getExceptionsByDatesAndId(
+            dateFrom,
+            dateTo,
+            vehicleIds,
+            vcleGroupId ? Number(vcleGroupId) : undefined
+        );
+
         const formatData = await formatExceptionsDataWithperiod(results, groupBy);
 
         return res.status(200).json(formatData);
 
     } catch (error) {
-        console.error('Erreur dans httpGetHeureMoteur:', error);
+        console.error('Erreur dans httpGetExceptionsByParams:', error);
+
+
+        if (error.message.includes('IDs doivent être')) {
+            return res.status(400).json({
+                error: error.message
+            });
+        }
+
         return res.status(500).json({
-            error: 'Une erreur est survenue lors de la récupération des données'
+            error: 'Une erreur est survenue lors de la récupération des données',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
     }
 }
-
 
 
 module.exports = { httpGetExceptions, httpGetExceptionsByParams }

@@ -5,7 +5,7 @@ import { fetchHeureMoteurData } from '../api/api'
 export const useHeureMoteurData = (params: {
     date1?: string;
     date2?: string;
-    vehicle?: number;
+    vehicle?: number | number[];
     vcleGroupId?: number;
     groupBy?: "day" | "week" | "month";
 }) => {
