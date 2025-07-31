@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { fetchData } from "../../api/api";
 import type { PaginatedResponse, PaginationParams } from "../../api/api";
-import { Pagination } from "../pagination";
+import Pagination from "../pagination";
 import { exportData } from "../../utils/exportData";
 
 type DataType = "list_exceptions" | "list_heuremoteur";
