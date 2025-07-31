@@ -39,60 +39,60 @@ const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
     const columns: ColumnDef[] = useMemo(() => {
         if (dataType === "list_exceptions") {
             return [
-                { header: "ID", accessor: "ids", width: 80 },
-                { header: "Date", accessor: "dates", format: formatDateFR, width: 120 },
-                { header: "Véhicule", accessor: "vehicle_name", width: 120 },
-                { header: "Nombre de speedings", accessor: "nbrsp", width: 160 },
-                { header: "Nombre de Hash braking", accessor: "nbrhb", width: 180 },
-                { header: "Nombre de Hash Acceleration", accessor: "nbha", width: 200 },
-                { header: "Groupe du Véhicule", accessor: "group_name", width: 160 },
+                { header: "ID", accessor: "ids" },
+                { header: "Date", accessor: "dates", format: formatDateFR },
+                { header: "Véhicule", accessor: "vehicle_name" },
+                { header: "Nombre de speedings", accessor: "nbrsp" },
+                { header: "Nombre de Hash braking", accessor: "nbrhb" },
+                { header: "Nombre de Hash Acceleration", accessor: "nbha" },
+                { header: "Groupe du Véhicule", accessor: "group_name" },
             ];
         }
 
         return [
-            { header: "ID", accessor: "ids", width: 80 },
-            { header: "Véhicule", accessor: "vehicle_name", width: 100 },
-            { header: "Date", accessor: "dates", format: formatDateFR, width: 120 },
-            { header: "Durée totale", accessor: "dureetotal", format: (v: string) => v || "-", width: 120 },
-            { header: "Durée en mouvement", accessor: "dureel", format: (v: string) => v || "-", width: 140 },
-            { header: "Arrêt moteur", accessor: "arretmoteurtournant", format: (v: string) => v || "-", width: 140 },
+            { header: "ID", accessor: "ids" },
+            { header: "Véhicule", accessor: "vehicle_name" },
+            { header: "Date", accessor: "dates", format: formatDateFR },
+            { header: "Durée totale", accessor: "dureetotal", format: (v: string) => v || "-" },
+            { header: "Durée en mouvement", accessor: "dureel", format: (v: string) => v || "-" },
+            { header: "Arrêt moteur", accessor: "arretmoteurtournant", format: (v: string) => v || "-" },
             {
                 header: "Distance (km)",
                 accessor: "distancekm",
                 format: (v: number) => (typeof v === "number" ? v.toFixed(2) : v ?? 0),
-                width: 120,
+
             },
             {
                 header: "Vitesse max",
                 accessor: "vmax",
                 format: (v: number) => (v != null && !Number.isNaN(v) ? `${v} km/h` : "-"),
-                width: 120,
+
             },
             {
                 header: "Utilisation (%)",
                 accessor: "percentuse",
                 format: (v: number) => (v != null && !Number.isNaN(v) ? `${v.toFixed(1)}%` : "-"),
-                width: 140,
+
             },
             {
                 header: "Consommation totale",
                 accessor: "consototal",
                 format: (v: number) => (v != null && !Number.isNaN(v) ? v.toFixed(2) : "0.00"),
-                width: 160,
+
             },
             {
                 header: "Conso/100km",
                 accessor: "conso100km",
                 format: (v: number) => (v != null && !Number.isNaN(v) ? v.toFixed(2) : "0.00"),
-                width: 140,
+
             },
             {
                 header: "Conso/h",
                 accessor: "consolitperhour",
                 format: (v: number) => (v != null && !Number.isNaN(v) ? v.toFixed(2) : "0.00"),
-                width: 120,
+
             },
-            { header: "Groupe du Véhicule", accessor: "group_name", width: 120 },
+            { header: "Groupe du Véhicule", accessor: "group_name" },
         ];
     }, [dataType]);
 
@@ -188,7 +188,7 @@ const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
     }, [safeTotalPages]);
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-lg shadow p-6">
             <div className="mb-6">
                 <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
 
