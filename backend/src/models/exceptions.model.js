@@ -1,17 +1,6 @@
 const pool = require('../config/db')
 
 
-/**
-* Récupère les exceptions avec pagination, filtrage et gestion des groupes
-* @param {Object} params - Paramètres de la requête
-* @param {number} [params.page=1] - Numéro de page (défaut: 1)
-* @param {number} [params.limit=10] - Éléments par page (défaut: 10)
-* @param {string} [params.dateFrom] - Date de début (format YYYY-MM-DD)
-* @param {string} [params.dateTo] - Date de fin (format YYYY-MM-DD)
-* @param {number|number[]} [params.vehicleId] - ID ou tableau d'IDs du véhicule
-* @param {number} [params.groupId] - ID du groupe de véhicules
-* @returns {Promise<Object>} - { data: [], pagination: { total, page, limit, totalPages } }
-*/
 async function getExceptions(params = {}) {
     // Paramètres par défaut
     const {
@@ -30,11 +19,15 @@ async function getExceptions(params = {}) {
     // Calcul de l'offset
     const offset = (page - 1) * limit;
 
-    // Construction de la requête avec jointure
+    // Construction de la requête avec jointures supplémentaires
     let query = `
-        SELECT e.*, v.groupid 
+        SELECT 
+            e.*, 
+            v.names as vehicle_name,
+            vg.names as group_name
         FROM exceptionsnbr e
         LEFT JOIN vehicles v ON e.vcleid = v.ids
+        LEFT JOIN vclegroup vg ON v.groupid = vg.ids
     `;
     const values = [];
     const whereClauses = [];
@@ -57,7 +50,6 @@ async function getExceptions(params = {}) {
             if (vehicleId.length === 0) {
                 throw new Error("Le tableau vehicleId ne peut pas être vide");
             }
-            // Utilisation de ANY pour les tableaux
             whereClauses.push(`e.vcleid = ANY($${values.length + 1})`);
             values.push(vehicleId);
         } else {
@@ -72,7 +64,6 @@ async function getExceptions(params = {}) {
         values.push(groupId);
     }
 
-    // Ajout des conditions WHERE
     if (whereClauses.length > 0) {
         query += ' WHERE ' + whereClauses.join(' AND ');
     }
@@ -117,7 +108,6 @@ async function getExceptions(params = {}) {
         throw error;
     }
 }
-
 
 async function getExceptionsByDatesAndId(date1, date2, vehicleId, vehicleGroupId) {
     let query = `

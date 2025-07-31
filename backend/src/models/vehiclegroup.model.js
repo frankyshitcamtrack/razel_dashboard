@@ -12,4 +12,14 @@ async function getVehiclesGroup() {
     }
 }
 
-module.exports = { getVehiclesGroup }
+
+async function getGroupById(id) {
+    const result = await pool.query('SELECT * FROM vclegroup WHERE ids = $1', [id]);
+    if (result.rows.length === 0) {
+        throw new Error('group non trouvé');
+    }
+
+    return result.rows[0];
+}
+
+module.exports = { getVehiclesGroup, getGroupById }

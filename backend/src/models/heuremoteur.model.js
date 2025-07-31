@@ -22,16 +22,22 @@ async function getHmoteur(params = {}) {
         groupId
     } = params;
 
-
+    // Validation des paramètres
     if (page < 1) throw new Error("Le numéro de page doit être supérieur ou égal à 1");
     if (limit < 1) throw new Error("La limite doit être supérieure ou égale à 1");
 
     const offset = (page - 1) * limit;
 
+    // Construction de la requête avec jointures supplémentaires
     let query = `
-        SELECT hm.*, v.groupid 
+        SELECT 
+            hm.*,
+            v.names as vehicle_name,
+            vg.names as group_name,
+            v.groupid
         FROM heuremoteurs hm
         LEFT JOIN vehicles v ON hm.vcleid = v.ids
+        LEFT JOIN vclegroup vg ON v.groupid = vg.ids
     `;
     const values = [];
     const whereClauses = [];
@@ -72,6 +78,7 @@ async function getHmoteur(params = {}) {
         query += ' WHERE ' + whereClauses.join(' AND ');
     }
 
+    // Requêtes
     const dataQuery = {
         text: `${query} ORDER BY hm.dates DESC LIMIT $${values.length + 1} OFFSET $${values.length + 2}`,
         values: [...values, limit, offset]
@@ -109,8 +116,6 @@ async function getHmoteur(params = {}) {
         throw error;
     }
 }
-
-
 
 
 

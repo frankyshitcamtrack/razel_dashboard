@@ -37,11 +37,11 @@ const exportToExcel = (data: any, dataType: string, fileName: string) => {
             const baseData = {
                 'ID': item.ids,
                 'Date': item.dates,
-                'Véhicule ID': item.vcleid,
+                'Véhicule': item.vehicle_name,
                 'Nombre de speedings': item.nbrsp,
                 'Nombre de Hash braking': item.nbrhb,
                 'Nombre de Hash Acceleration': item.nbha,
-                'Groupe de Véhicule': item.groupid
+                'Groupe de Véhicule': item.group_name
             };
 
             return baseData;
@@ -53,7 +53,7 @@ const exportToExcel = (data: any, dataType: string, fileName: string) => {
             const baseData = {
                 'ID': item.ids,
                 'Date': item.dates,
-                'Véhicule ID': item.vcleid,
+                'Véhicule': item.vehicle_name,
                 'Durée totale': item.dureetotal,
                 'Durée en mouvement': item.dureel,
                 'Arrêt moteur': item.arretmoteurtournant,
@@ -63,7 +63,7 @@ const exportToExcel = (data: any, dataType: string, fileName: string) => {
                 'Consommation totale': item.consototal,
                 'Conso/100km': item.conso100km,
                 'Conso/h': item.consolitperhour,
-                'Groupe de Véhicule': item.groupid
+                'Groupe de Véhicule': item.group_name
             };
 
             return baseData;
@@ -81,14 +81,14 @@ const exportToExcel = (data: any, dataType: string, fileName: string) => {
 // Export CSV
 const exportToCSV = (data: any, dataType: string, fileName: string) => {
     const headers = dataType === 'list_exceptions'
-        ? 'ID,Date,Véhicule ID,Nombre de speedings,Nombre de Hash braking,Nombre de Hash Acceleration,Groupe de Véhicule'
-        : 'ID,Date,Véhicule ID,Durée totale,Durée en mouvement,Arrêt moteur,Distance (km),Vitesse max,Utilisation (%),Consommation totale,Conso/100km,Conso/h,Groupe';
+        ? 'ID,Date,Véhicule,Nombre de speedings,Nombre de Hash braking,Nombre de Hash Acceleration,Groupe de Véhicule'
+        : 'ID,Date,Véhicule,Durée totale,Durée en mouvement,Arrêt moteur,Distance (km),Vitesse max,Utilisation (%),Consommation totale,Conso/100km,Conso/h,Groupe';
     const dataArr = dataType === 'list_exceptions' ?
         data.map((item: Exception) => {
-            const baseRow = `"${item.ids}","${item.dates}","${item.vcleid}","${item.nbrsp}","${item.nbrhb}","${item.nbha}","${item.groupid}"`;
+            const baseRow = `"${item.ids}","${item.dates}","${item.vehicle_name}","${item.nbrsp}","${item.nbrhb}","${item.nbha}","${item.group_name}"`;
             return baseRow;
         }) : data.map((item: HeureMoteur) => {
-            const baseRow = `"${item.ids}","${item.dates}","${item.vcleid}","${item.dureetotal}","${item.dureel}","${item.arretmoteurtournant}","${item.distancekm}","${item.vmax}","${item.percentuse}","${item.consototal}","${item.conso100km}","${item.consolitperhour}","${item.groupid}"`;
+            const baseRow = `"${item.ids}","${item.dates}","${item.vehicle_name}","${item.dureetotal}","${item.dureel}","${item.arretmoteurtournant}","${item.distancekm}","${item.vmax}","${item.percentuse}","${item.consototal}","${item.conso100km}","${item.consolitperhour}","${item.group_name}"`;
             return baseRow;
         })
 
@@ -117,25 +117,25 @@ const exportToPDF = (data: any, dataType: string, fileName: string) => {
 
     // En-têtes et données
     const headers = dataType === 'list_exceptions'
-        ? ['ID', 'Date', 'Véhicule ID', 'Nombre de speedings', 'Nombre de Hash braking', 'Nombre de Hash Acceleration', 'Groupe de Véhicule']
-        : ['ID', 'Date', 'Véhicule ID', 'Durée totale', 'Durée en mouvement', 'Arrêt moteur', 'Distance(km)', 'Vitesse max', 'Utilisation(%)', 'Consommation totale', 'Conso / 100km', 'Conso / h', 'Groupe'];
+        ? ['ID', 'Date', 'Véhicule', 'Nombre de speedings', 'Nombre de Hash braking', 'Nombre de Hash Acceleration', 'Groupe de Véhicule']
+        : ['ID', 'Date', 'Véhicule', 'Durée totale', 'Durée en mouvement', 'Arrêt moteur', 'Distance(km)', 'Vitesse max', 'Utilisation(%)', 'Consommation totale', 'Conso / 100km', 'Conso / h', 'Groupe'];
 
     const tableData = dataType === 'list_exceptions' ? data.map((item: Exception) => {
         const row = [
             item.ids.toString(),
             item.dates.toString(),
-            item.vcleid.toString(),
+            item.vehicle_name.toString(),
             item.nbrsp.toString(),
             item.nbrhb.toString(),
             item.nbha.toString(),
-            item.groupid.toString()
+            item.group_name.toString()
         ];
         return row;
     }) : data.map((item: HeureMoteur) => {
         const row = [
             item.ids.toString(),
             item.dates.toString(),
-            item.vcleid.toString(),
+            item.vehicle_name.toString(),
             item.dureetotal.toString(),
             item.dureel.toString(),
             item.arretmoteurtournant.toString(),
@@ -145,7 +145,7 @@ const exportToPDF = (data: any, dataType: string, fileName: string) => {
             item.consototal.toString(),
             item.conso100km.toString(),
             item.consolitperhour.toString(),
-            item.groupid.toString()
+            item.group_name.toString()
         ];
         return row;
     });

@@ -5,6 +5,7 @@ import type { PaginatedResponse, PaginationParams } from "../../api/api";
 import Pagination from "../pagination";
 import { exportData } from "../../utils/exportData";
 
+
 type DataType = "list_exceptions" | "list_heuremoteur";
 
 type ColumnDef<T = any> = {
@@ -40,17 +41,17 @@ const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
             return [
                 { header: "ID", accessor: "ids", width: 80 },
                 { header: "Date", accessor: "dates", format: formatDateFR, width: 120 },
-                { header: "Véhicule ID", accessor: "vcleid", width: 120 },
+                { header: "Véhicule", accessor: "vehicle_name", width: 120 },
                 { header: "Nombre de speedings", accessor: "nbrsp", width: 160 },
                 { header: "Nombre de Hash braking", accessor: "nbrhb", width: 180 },
                 { header: "Nombre de Hash Acceleration", accessor: "nbha", width: 200 },
-                { header: "Groupe de Véhicule", accessor: "groupid", width: 160 },
+                { header: "Groupe du Véhicule", accessor: "group_name", width: 160 },
             ];
         }
 
         return [
             { header: "ID", accessor: "ids", width: 80 },
-            { header: "Véhicule", accessor: "vcleid", width: 100 },
+            { header: "Véhicule", accessor: "vehicle_name", width: 100 },
             { header: "Date", accessor: "dates", format: formatDateFR, width: 120 },
             { header: "Durée totale", accessor: "dureetotal", format: (v: string) => v || "-", width: 120 },
             { header: "Durée en mouvement", accessor: "dureel", format: (v: string) => v || "-", width: 140 },
@@ -91,7 +92,7 @@ const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
                 format: (v: number) => (v != null && !Number.isNaN(v) ? v.toFixed(2) : "0.00"),
                 width: 120,
             },
-            { header: "Groupe", accessor: "groupid", width: 120 },
+            { header: "Groupe du Véhicule", accessor: "group_name", width: 120 },
         ];
     }, [dataType]);
 

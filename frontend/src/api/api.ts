@@ -29,7 +29,9 @@ export interface Exception {
     nbrsp: number,
     nbrhb: number,
     nbha: number,
-    groupid: number
+    groupid: number,
+    vehicle_name: string,
+    group_name: string
 
 }
 
@@ -47,7 +49,9 @@ export interface HeureMoteur {
     consototal: number,
     conso100km: number,
     consolitperhour: number,
-    groupid: number
+    groupid: number,
+    vehicle_name: string,
+    group_name: string
 }
 
 
@@ -260,6 +264,43 @@ export const fetchVehicles = async (
 };
 
 
+export const fetchVehicleById = async (
+    id: number
+): Promise<vehicles> => {
+    try {
+        const response: AxiosResponse<vehicles> = await axios.get(
+            `/api/razel_dashboard/single_vehicle?id=${id}`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(localStorage.getItem('authToken') && {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                    })
+                },
+            }
+        );
+
+        return response.data;
+    } catch (error) {
+        const axiosError = error as AxiosError;
+
+        if (axiosError.response) {
+            switch (axiosError.response.status) {
+                case 400:
+                    throw new Error('Paramètres invalides');
+                case 404:
+                    throw new Error('Véhicule non trouvé');
+                case 500:
+                    throw new Error('Erreur serveur');
+                default:
+                    throw new Error(`Erreur ${axiosError.response.status}`);
+            }
+        } else {
+            throw new Error('Erreur réseau');
+        }
+    }
+};
+
 export const fetchVehiclesGroup = async (
 ): Promise<vehicles[]> => {
     try {
@@ -283,6 +324,44 @@ export const fetchVehiclesGroup = async (
             switch (axiosError.response.status) {
                 case 400:
                     throw new Error('Paramètres invalides');
+                case 500:
+                    throw new Error('Erreur serveur');
+                default:
+                    throw new Error(`Erreur ${axiosError.response.status}`);
+            }
+        } else {
+            throw new Error('Erreur réseau');
+        }
+    }
+};
+
+
+export const fetchVehicleGroupById = async (
+    id: number
+): Promise<vehicles> => {
+    try {
+        const response: AxiosResponse<vehicles> = await axios.get(
+            `/api/razel_dashboard/single_vehicle_group?id=${id}`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(localStorage.getItem('authToken') && {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                    })
+                },
+            }
+        );
+
+        return response.data;
+    } catch (error) {
+        const axiosError = error as AxiosError;
+
+        if (axiosError.response) {
+            switch (axiosError.response.status) {
+                case 400:
+                    throw new Error('Paramètres invalides');
+                case 404:
+                    throw new Error('Véhicule non trouvé');
                 case 500:
                     throw new Error('Erreur serveur');
                 default:

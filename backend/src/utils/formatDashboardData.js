@@ -52,11 +52,11 @@ async function formatDashboardData(rawData, id = undefined) {
         });
 
 
-        id ? result.DaylyConsommationData.push({
+        result.DaylyConsommationData.push({
             name: day,
             daylyConsom: sampleData.consototal,
 
-        }) : '';
+        })
 
         result.dureeDistanceparcouru.push({
             name: day,
