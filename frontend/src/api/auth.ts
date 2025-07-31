@@ -23,6 +23,7 @@ export const login = async (username: string, password: string): Promise<{ user:
 
 
     if (data.token) {
+        console.log(data.token)
         localStorage.setItem('authToken', data.token);
     }
 
@@ -31,23 +32,27 @@ export const login = async (username: string, password: string): Promise<{ user:
 
 
 export const checkAuth = async (): Promise<{ authenticated: boolean; user?: User }> => {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        return { authenticated: false };
+    }
+
     try {
         const response = await fetch('/auth/secure/check-auth', {
             credentials: 'include',
             headers: {
-
-                ...(localStorage.getItem('authToken') && {
-                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-                })
+                'Authorization': `Bearer ${token}`
             }
         });
 
         if (!response.ok) {
+            localStorage.removeItem('authToken');
             return { authenticated: false };
         }
 
         return await response.json();
     } catch (error) {
+        localStorage.removeItem('authToken');
         console.error('Check auth error:', error);
         return { authenticated: false };
     }

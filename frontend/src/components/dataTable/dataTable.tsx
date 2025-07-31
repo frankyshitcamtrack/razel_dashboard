@@ -1,13 +1,15 @@
+// DataTable.tsx
 import React, { useEffect, useMemo, useState } from "react";
 import { fetchData } from "../../api/api";
 import type { PaginatedResponse, PaginationParams } from "../../api/api";
 import { Pagination } from "../pagination";
 import { exportData } from "../../utils/exportData";
+
 type DataType = "list_exceptions" | "list_heuremoteur";
 
 type ColumnDef<T = any> = {
     header: string;
-    accessor: keyof T | string; // string pour rester souple
+    accessor: keyof T | string;
     format?: (val: any, row?: T) => React.ReactNode;
     width?: number;
 };
@@ -16,14 +18,14 @@ const formatDateFR = (val?: string) =>
     val ? new Date(val).toLocaleDateString("fr-FR") : "-";
 
 const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
-    type ExportFormat = 'excel' | 'csv' | 'pdf';
+    type ExportFormat = "excel" | "csv" | "pdf";
+
     const [data, setData] = useState<PaginatedResponse<any>>({
         data: [],
         pagination: { total: 0, page: 1, limit: 10, totalPages: 0 },
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-
 
     const [startDate, setStartDate] = useState<string | undefined>(undefined);
     const [endDate, setEndDate] = useState<string | undefined>(undefined);
@@ -50,70 +52,48 @@ const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
             { header: "ID", accessor: "ids", width: 80 },
             { header: "Véhicule", accessor: "vcleid", width: 100 },
             { header: "Date", accessor: "dates", format: formatDateFR, width: 120 },
-            {
-                header: "Durée totale",
-                accessor: "dureetotal",
-                format: (v: string) => v || "-",
-                width: 120,
-            },
-            {
-                header: "Durée en mouvement",
-                accessor: "dureel",
-                format: (v: string) => v || "-",
-                width: 140,
-            },
-            {
-                header: "Arrêt moteur",
-                accessor: "arretmoteurtournant",
-                format: (v: string) => v || "-",
-                width: 140,
-            },
+            { header: "Durée totale", accessor: "dureetotal", format: (v: string) => v || "-", width: 120 },
+            { header: "Durée en mouvement", accessor: "dureel", format: (v: string) => v || "-", width: 140 },
+            { header: "Arrêt moteur", accessor: "arretmoteurtournant", format: (v: string) => v || "-", width: 140 },
             {
                 header: "Distance (km)",
                 accessor: "distancekm",
-                format: (v: number) =>
-                    typeof v === "number" ? v.toFixed(2) : (v ?? 0),
+                format: (v: number) => (typeof v === "number" ? v.toFixed(2) : v ?? 0),
                 width: 120,
             },
             {
                 header: "Vitesse max",
                 accessor: "vmax",
-                format: (v: number) =>
-                    v != null && !Number.isNaN(v) ? `${v} km/h` : "-",
+                format: (v: number) => (v != null && !Number.isNaN(v) ? `${v} km/h` : "-"),
                 width: 120,
             },
             {
                 header: "Utilisation (%)",
                 accessor: "percentuse",
-                format: (v: number) =>
-                    v != null && !Number.isNaN(v) ? `${v.toFixed(1)}%` : "-",
+                format: (v: number) => (v != null && !Number.isNaN(v) ? `${v.toFixed(1)}%` : "-"),
                 width: 140,
             },
             {
                 header: "Consommation totale",
                 accessor: "consototal",
-                format: (v: number) =>
-                    v != null && !Number.isNaN(v) ? v.toFixed(2) : "0.00",
+                format: (v: number) => (v != null && !Number.isNaN(v) ? v.toFixed(2) : "0.00"),
                 width: 160,
             },
             {
                 header: "Conso/100km",
                 accessor: "conso100km",
-                format: (v: number) =>
-                    v != null && !Number.isNaN(v) ? v.toFixed(2) : "0.00",
+                format: (v: number) => (v != null && !Number.isNaN(v) ? v.toFixed(2) : "0.00"),
                 width: 140,
             },
             {
                 header: "Conso/h",
                 accessor: "consolitperhour",
-                format: (v: number) =>
-                    v != null && !Number.isNaN(v) ? v.toFixed(2) : "0.00",
+                format: (v: number) => (v != null && !Number.isNaN(v) ? v.toFixed(2) : "0.00"),
                 width: 120,
             },
             { header: "Groupe", accessor: "groupid", width: 120 },
         ];
     }, [dataType]);
-
 
     const getRowId = (row: any) =>
         dataType === "list_heuremoteur" ? row.ids ?? row.id : row.id ?? row.ids;
@@ -152,7 +132,6 @@ const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
         updateFilters({ limit }, true);
     };
 
-
     const handleStartDateChange = (val: string) => {
         const iso = val ? new Date(val).toISOString().split("T")[0] : undefined;
         setStartDate(iso);
@@ -167,10 +146,7 @@ const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
 
     const handleVehicleChange = (val: string) => {
         const v = val.trim();
-        updateFilters(
-            { vehicleId: v === "" ? undefined : Number(v) },
-            true
-        );
+        updateFilters({ vehicleId: v === "" ? undefined : Number(v) }, true);
     };
 
     const renderCell = (row: any, col: ColumnDef) => {
@@ -180,21 +156,19 @@ const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
 
     const handleExport = async (format: ExportFormat) => {
         try {
-
             const response = await fetchData(dataType, filters);
-
             await exportData(
                 format,
                 response.data,
                 dataType,
-                `${dataType}_${new Date().toISOString().split('T')[0]}`
+                `${dataType}_${new Date().toISOString().split("T")[0]}`
             );
         } catch (error) {
             console.error(`Erreur lors de l'export ${format}:`, error);
         }
     };
 
-    // avant le return
+
     const page = data.pagination.page ?? filters.page ?? 1;
     const limit = data.pagination.limit ?? filters.limit ?? 10;
     const safeTotalPages =
@@ -202,8 +176,18 @@ const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
             ? data.pagination.totalPages
             : Math.max(1, Math.ceil((data.pagination.total ?? 0) / limit));
 
+
+    useEffect(() => {
+        if (page > safeTotalPages) {
+            setFilters((prev) => ({ ...prev, page: safeTotalPages }));
+        } else if (page < 1) {
+            setFilters((prev) => ({ ...prev, page: 1 }));
+        }
+
+    }, [safeTotalPages]);
+
     return (
-        <div className="bg-white rounded-lg shadow p-6" >
+        <div className="bg-white rounded-lg shadow p-6">
             <div className="mb-6">
                 <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
 
@@ -282,68 +266,56 @@ const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
             </div>
 
 
-            {/* Erreur */}
-            {
-                error && (
-                    <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700 border border-red-200" >
-                        {error}
-                    </div>
-                )
-            }
+
+            {error && (
+                <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700 border border-red-200">
+                    {error}
+                </div>
+            )}
 
             {/* Tableau */}
-            <div className="overflow-x-auto" >
-                <table className="min-w-full table-fixed divide-y divide-gray-200" >
-                    <thead className="bg-gray-50" >
+            <div className="overflow-x-auto">
+                <table className="min-w-full table-fixed divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
                         <tr>
-                            {
-                                columns.map((col) => (
-                                    <th
-                                        key={String(col.accessor)
-                                        }
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                        style={col.width ? { width: col.width } : undefined}
-                                    >
-                                        {col.header}
-                                    </th>
-                                ))}
+                            {columns.map((col) => (
+                                <th
+                                    key={String(col.accessor)}
+                                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                    style={col.width ? { width: col.width } : undefined}
+                                >
+                                    {col.header}
+                                </th>
+                            ))}
                         </tr>
                     </thead>
-                    < tbody className="bg-white divide-y divide-gray-200" >
-                        {
-                            loading ? (
-                                <tr>
-                                    <td
-                                        colSpan={columns.length}
-                                        className="px-6 py-6 text-center text-gray-500"
-                                    >
-                                        Chargement…
-                                    </td>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                        {loading ? (
+                            <tr>
+                                <td colSpan={columns.length} className="px-6 py-6 text-center text-gray-500">
+                                    Chargement…
+                                </td>
+                            </tr>
+                        ) : data.data.length === 0 ? (
+                            <tr>
+                                <td colSpan={columns.length} className="px-6 py-6 text-center text-gray-500">
+                                    Aucune donnée disponible
+                                </td>
+                            </tr>
+                        ) : (
+                            data.data.map((item: any) => (
+                                <tr key={getRowId(item)}>
+                                    {columns.map((col) => (
+                                        <td
+                                            key={`${getRowId(item)}-${String(col.accessor)}`}
+                                            className="px-6 py-3 whitespace-nowrap truncate"
+                                        >
+                                            {renderCell(item, col)}
+                                        </td>
+                                    ))}
                                 </tr>
-                            ) : data.data.length === 0 ? (
-                                <tr>
-                                    <td
-                                        colSpan={columns.length}
-                                        className="px-6 py-6 text-center text-gray-500"
-                                    >
-                                        Aucune donnée disponible
-                                    </td>
-                                </tr>
-                            ) : (
-                                data.data.map((item: any) => (
-                                    <tr key={getRowId(item)} >
-                                        {
-                                            columns.map((col) => (
-                                                <td
-                                                    key={`${getRowId(item)}-${String(col.accessor)}`}
-                                                    className="px-6 py-3 whitespace-nowrap truncate"
-                                                >
-                                                    {renderCell(item, col)}
-                                                </td>
-                                            ))}
-                                    </tr>
-                                ))
-                            )}
+                            ))
+                        )}
                     </tbody>
                 </table>
             </div>
@@ -367,7 +339,9 @@ const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
                         className="border rounded px-2 py-1 text-sm"
                     >
                         {[10, 20, 50, 100].map((size) => (
-                            <option key={size} value={size}>{size}</option>
+                            <option key={size} value={size}>
+                                {size}
+                            </option>
                         ))}
                     </select>
                 </div>
@@ -378,7 +352,6 @@ const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
                     onPageChange={(p) => handlePageChange(p)}
                 />
             </div>
-
         </div>
     );
 };

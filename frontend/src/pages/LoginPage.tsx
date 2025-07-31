@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../store/AuthContext';
+import { useNavigate, useLocation } from 'react-router';
 import { Truck, Fuel, Lock } from 'lucide-react';
 import LoadingIndicator from '../components/UI/Loader';
 
@@ -9,6 +10,8 @@ const LoginPage = () => {
     const [error, setError] = useState('');
     const { login, isLoading } = useAuth();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const navigate = useNavigate();
+    const location = useLocation();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -17,6 +20,8 @@ const LoginPage = () => {
 
         try {
             await login(username, password);
+            const from = location.state?.from?.pathname || '/dashboard';
+            navigate(from, { replace: true });
         } catch (err) {
             setError('Identifiants incorrects ou problème de connexion');
         } finally {

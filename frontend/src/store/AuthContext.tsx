@@ -25,6 +25,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     useEffect(() => {
         const verifyAuth = async () => {
+            setAuthState(prev => ({ ...prev, isLoading: true }));
+
             try {
                 const { authenticated, user } = await checkAuth();
                 setAuthState({
@@ -42,6 +44,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
 
         verifyAuth();
+
+        // Vérification périodique (optionnel)
+        const interval = setInterval(verifyAuth, 5 * 60 * 1000); // Toutes les 5 minutes
+        return () => clearInterval(interval);
     }, []);
 
     const handleLogin = async (username: string, password: string) => {

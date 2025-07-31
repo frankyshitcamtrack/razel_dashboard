@@ -7,7 +7,7 @@ const AuthRouter = () => {
     const { isAuthenticated, isLoading } = useAuth();
 
     if (isLoading) {
-        return <VehicleLoadingSpinner />;
+        return <div className='w-full h-full flex justify-center items-center'><VehicleLoadingSpinner /></div>;
     }
 
     return isAuthenticated ? <Router /> : <LoginPage />;

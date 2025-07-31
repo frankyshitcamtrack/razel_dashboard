@@ -83,7 +83,7 @@ const GlobalFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) => {
                             <option disabled>Chargement...</option>
                         ) : (
                             vehicleGroups?.map(group => (
-                                <option key={group.ids} value={group.ids}>
+                                <option key={group.ids} value={group.ids ?? ""}>
                                     {group.names}
                                 </option>
                             ))

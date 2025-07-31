@@ -1,19 +1,19 @@
 export const Pagination = ({
-    currentPage,   // 1-based
-    totalPages,    // >= 1
-    onPageChange,  // reçoit une page 1-based
+    currentPage,
+    totalPages,
+    onPageChange,
 }: {
     currentPage: number;
     totalPages: number;
     onPageChange: (page: number) => void;
 }) => {
-    const maxVisible = 5; // taille du groupe (5)
+    const maxVisible = 5;
 
     if (totalPages <= 1) {
         return <div className="text-sm text-gray-500">Page 1/1</div>;
     }
 
-    // Calcule la fenêtre [start, end] en 1-based
+
     const leftOffset = Math.floor(maxVisible / 2);
     const rightOffset = Math.ceil(maxVisible / 2) - 1;
 
@@ -41,6 +41,7 @@ export const Pagination = ({
         <nav className="flex items-center gap-1">
             {/* Précédent */}
             <button
+                type="button"
                 onClick={() => goto(currentPage - 1)}
                 disabled={currentPage === 1}
                 className="px-3 py-1 rounded border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -49,10 +50,11 @@ export const Pagination = ({
                 &lt;
             </button>
 
-            {/* Première + ellipse gauche */}
+
             {showLeftEllipsis && (
                 <>
                     <button
+                        type="button"
                         onClick={() => goto(1)}
                         className="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100"
                     >
@@ -62,11 +64,12 @@ export const Pagination = ({
                 </>
             )}
 
-            {/* Fenêtre de pages */}
+
             {pages.map((p) => {
                 const active = p === currentPage;
                 return (
                     <button
+                        type="button"
                         key={p}
                         onClick={() => goto(p)}
                         className={`px-3 py-1 rounded border text-sm ${active
@@ -80,11 +83,12 @@ export const Pagination = ({
                 );
             })}
 
-            {/* ellipse droite + Dernière */}
+
             {showRightEllipsis && (
                 <>
                     <span className="px-2 text-gray-500 select-none">…</span>
                     <button
+                        type="button"
                         onClick={() => goto(totalPages)}
                         className="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100"
                     >
@@ -93,8 +97,9 @@ export const Pagination = ({
                 </>
             )}
 
-            {/* Suivant */}
+
             <button
+                type="button"
                 onClick={() => goto(currentPage + 1)}
                 disabled={currentPage === totalPages}
                 className="px-3 py-1 rounded border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"

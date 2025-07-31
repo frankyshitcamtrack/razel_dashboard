@@ -1,17 +1,47 @@
 import { Routes, Route } from "react-router";
 import Dashboard from "../pages/Dashboard";
+import LoginPage from "../pages/LoginPage";
 import Rapport from "../pages/Rapport";
 import NotFoundPage from "../pages/NotFound";
+import { ProtectedRoute } from "./ProtectedRoute";
 
 function Router() {
 
-
     return (
         <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/reports" element={<Rapport />} />
-            <Route path="*" element={<NotFoundPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route
+                path="/dashboard"
+                element={
+                    <ProtectedRoute>
+                        <Dashboard />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/"
+                element={
+                    <ProtectedRoute>
+                        <Dashboard />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/reports"
+                element={
+                    <ProtectedRoute>
+                        <Rapport />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/*"
+                element={
+
+                    <NotFoundPage />
+
+                }
+            />
         </Routes>
     );
 }
