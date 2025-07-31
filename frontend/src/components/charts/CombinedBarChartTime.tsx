@@ -65,7 +65,7 @@ const CombinedBarChartTimeComponent: React.FC<CombinedChartProps> = ({
                                 value: lineLabel,
                                 angle: -90,
                                 position: 'insideLeft',
-                                fill: "#F7D000"
+                                fill: "#02509D"
                             }}
                             axisLine={{ stroke: "#9ca3af" }}
                             tick={{ fill: "#6b7280" }}
@@ -77,7 +77,7 @@ const CombinedBarChartTimeComponent: React.FC<CombinedChartProps> = ({
                                 value: barLabel,
                                 angle: 90,
                                 position: 'insideRight',
-                                fill: "#02509D"
+                                fill: "#F7D000"
                             }}
                             axisLine={{ stroke: "#9ca3af" }}
                             tick={{ fill: "#6b7280" }}
@@ -98,7 +98,7 @@ const CombinedBarChartTimeComponent: React.FC<CombinedChartProps> = ({
                             type="monotone"
                             dataKey="distance"
                             name={lineLabel}
-                            stroke="#F7D000"
+                            stroke="#02509D"
                             strokeWidth={2}
                             dot={{ r: 4 }}
                             activeDot={{ r: 6 }}
@@ -107,7 +107,7 @@ const CombinedBarChartTimeComponent: React.FC<CombinedChartProps> = ({
                             yAxisId="right"
                             dataKey="durationHours"
                             name={barLabel}
-                            fill="#02509D"
+                            fill="#F7D000"
                             radius={[4, 4, 0, 0]}
                         />
                     </ComposedChart>

@@ -1,12 +1,5 @@
 import React from "react";
-import {
-    Pie,
-    Cell,
-    ResponsiveContainer,
-    PieChart,
-    Tooltip,
-    Legend
-} from "recharts";
+import { Pie, Cell, ResponsiveContainer, PieChart, Tooltip, Legend } from "recharts";
 
 interface DailyConsommationData {
     name: string;
@@ -17,6 +10,7 @@ interface PieChartProps {
     data?: DailyConsommationData[];
     title: string;
     unit?: string;
+    className?: string;
 }
 
 const COLORS = [
@@ -24,15 +18,14 @@ const COLORS = [
     "#ef4444", "#ec4899", "#14b8a6", "#64748b"
 ];
 
+// PieChartComponent.tsx
+
 const PieChartComponent: React.FC<PieChartProps> = ({
-    data = [
-        { name: "dim.", daylyConsom: 16.5 },
-        { name: "lun.", daylyConsom: 18.9 }
-    ],
+    data = [],
     title,
-    unit = "", // Unité par défaut (litres)
+    unit = "",
+    className = ""
 }) => {
-    // Fonction pour formater les étiquettes avec les valeurs absolues
     const renderCustomizedLabel = ({
         cx,
         cy,
@@ -54,7 +47,7 @@ const PieChartComponent: React.FC<PieChartProps> = ({
                 fill="#333"
                 textAnchor="middle"
                 dominantBaseline="central"
-                fontSize={12}
+                fontSize={14} // un peu plus grand
             >
                 {`${name}: ${daylyConsom}${unit}`}
             </text>
@@ -62,20 +55,18 @@ const PieChartComponent: React.FC<PieChartProps> = ({
     };
 
     return (
-        <div className="bg-white rounded-lg shadow p-4 h-full flex flex-col">
-            <h3 className="text-lg font-semibold text-gray-700 mb-4">{title}</h3>
+        <div className={`bg-white rounded-xl shadow-lg p-6 h-full flex flex-col ${className}`}>
+            <h3 className="text-xl font-semibold text-gray-800 mb-4 text-center">{title}</h3>
             <div className="flex-grow flex items-center justify-center">
-                <ResponsiveContainer width="100%" height={300}>
+                <ResponsiveContainer width="100%" height={500}>
                     <PieChart>
-                        <Tooltip
-                            formatter={(value) => [`${value} ${unit}`, 'Consommation']}
-                        />
+                        <Tooltip formatter={(value) => [`${value} ${unit}`, 'Consommation']} />
                         <Pie
                             data={data}
                             cx="50%"
                             cy="50%"
-                            outerRadius={100}
-                            innerRadius={60}
+                            outerRadius={180}
+                            innerRadius={100}
                             paddingAngle={2}
                             dataKey="daylyConsom"
                             nameKey="name"
@@ -86,14 +77,18 @@ const PieChartComponent: React.FC<PieChartProps> = ({
                                 <Cell
                                     key={`cell-${index}`}
                                     fill={COLORS[index % COLORS.length]}
+                                    stroke="#fff"
+                                    strokeWidth={2}
                                 />
                             ))}
                         </Pie>
                         <Legend
+                            layout="horizontal"
+                            verticalAlign="bottom"
+                            align="center"
+                            wrapperStyle={{ paddingTop: '20px' }}
                             formatter={(value) => (
-                                <span className="text-sm text-gray-600">
-                                    {value}
-                                </span>
+                                <span className="text-sm text-gray-600">{value}</span>
                             )}
                         />
                     </PieChart>
@@ -102,5 +97,4 @@ const PieChartComponent: React.FC<PieChartProps> = ({
         </div>
     );
 };
-
 export default PieChartComponent;

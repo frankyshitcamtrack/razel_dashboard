@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
     CalendarDaysIcon,
     TruckIcon,
@@ -86,10 +86,28 @@ const GlobalFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) => {
     };
 
     const selectedVehicles = useMemo(() => {
-        const currentVehicles = Array.isArray(filters.vehicle) ? filters.vehicle :
-            filters.vehicle ? [filters.vehicle] : [];
-        return vehicles?.filter(v => currentVehicles.includes(v.ids)) || [];
+
+        if (!filters.vehicle) return [];
+
+
+        const vehicleIds = Array.isArray(filters.vehicle)
+            ? filters.vehicle
+            : [filters.vehicle];
+
+
+        return vehicles?.filter(v => vehicleIds.includes(v.ids)) || [];
     }, [filters.vehicle, vehicles]);
+
+
+    useEffect(() => {
+        if (vehicles && filters.vehicle === 68) {
+            const defaultVehicleExists = vehicles.some(v => v.ids === 68);
+            if (!defaultVehicleExists && vehicles.length > 0) {
+
+                setFilters(prev => ({ ...prev, vehicle: vehicles[0].ids }));
+            }
+        }
+    }, [vehicles, filters.vehicle]);
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 bg-white p-6 rounded-2xl shadow-md border">

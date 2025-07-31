@@ -66,17 +66,18 @@ const CombinedChartComponent: React.FC<CombinedChartProps> = ({
                             type="monotone"
                             dataKey={barDataKey}
                             name={barLabel}
-                            stroke="#3b82f6"
+                            stroke="#F7D000"
                             strokeWidth={2}
                             dot={{ r: 4 }}
                             activeDot={{ r: 6 }}
                         />
+
                         <Line
                             yAxisId="right"
                             type="monotone"
                             dataKey={lineDataKey}
                             name={lineLabel}
-                            stroke="#ef4444"
+                            stroke="#02509D"
                             strokeWidth={2}
                             dot={{ r: 4 }}
                             activeDot={{ r: 6 }}
