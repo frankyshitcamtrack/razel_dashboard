@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useAuth } from '../store/AuthContext';
 import { useNavigate, useLocation } from 'react-router';
-import { Truck, Fuel, Lock } from 'lucide-react';
+import { Truck, Fuel, Lock, Eye, EyeOff } from 'lucide-react';
 import LoadingIndicator from '../components/UI/Loader';
 
 const LoginPage = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const { login, isLoading } = useAuth();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,9 +43,6 @@ const LoginPage = () => {
                     <h2 className="mt-6 text-3xl font-bold text-gray-900">
                         Razel Fleet Management Dashboard
                     </h2>
-                    {/*  <p className="mt-2 text-gray-600">
-                        Système de suivi des consommations et mouvements
-                    </p> */}
                 </div>
 
                 {/* Carte de formulaire */}
@@ -85,13 +83,25 @@ const LoginPage = () => {
                                 <input
                                     id="password"
                                     name="password"
-                                    type="password"
+                                    type={showPassword ? "text" : "password"}
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="block w-full px-4 py-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                    className="block w-full px-4 py-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all pr-12"
                                     placeholder="••••••••"
                                 />
+                                <button
+                                    type="button"
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                                >
+                                    {showPassword ? (
+                                        <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-500" />
+                                    ) : (
+                                        <Eye className="h-5 w-5 text-gray-400 hover:text-gray-500" />
+                                    )}
+                                </button>
                             </div>
                         </div>
 
@@ -107,12 +117,6 @@ const LoginPage = () => {
                                     Maintenir la session
                                 </label>
                             </div>
-
-                            {/*   <div className="text-sm">
-                                <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
-                                    Assistance technique ?
-                                </a>
-                            </div> */}
                         </div>
 
                         <div>
@@ -135,7 +139,7 @@ const LoginPage = () => {
                 </div>
 
                 <div className="text-center text-sm text-gray-500">
-                    <p> by camtrack</p>
+                    <p> by Camtrack SAS</p>
                 </div>
             </div>
         </div>

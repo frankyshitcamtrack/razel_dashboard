@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { fetchData } from "../../api/api";
 import type { PaginatedResponse, PaginationParams } from "../../api/api";
-import { Pagination } from "../pagination";
+import Pagination from "../pagination";
 import { exportData } from "../../utils/exportData";
 
 type DataType = "list_exceptions" | "list_heuremoteur";
@@ -143,11 +143,11 @@ const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
         setEndDate(iso);
         updateFilters({ dateFrom: startDate, dateTo: iso }, true);
     };
-
-    const handleVehicleChange = (val: string) => {
-        const v = val.trim();
-        updateFilters({ vehicleId: v === "" ? undefined : Number(v) }, true);
-    };
+    /* 
+        const handleVehicleChange = (val: string) => {
+            const v = val.trim();
+            updateFilters({ vehicleId: v === "" ? undefined : Number(v) }, true);
+        }; */
 
     const renderCell = (row: any, col: ColumnDef) => {
         const value = row[col.accessor as string];
@@ -213,7 +213,7 @@ const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
                             />
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        {/*   <div className="flex items-center gap-2">
                             <label htmlFor="vehicle" className="text-sm font-medium">Véhicule ID :</label>
                             <input
                                 id="vehicle"
@@ -223,7 +223,7 @@ const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
                                 onChange={(e) => handleVehicleChange(e.target.value)}
                                 className="h-10 w-28 border rounded-md px-3"
                             />
-                        </div>
+                        </div> */}
                     </div>
 
                     {/* Boutons (droite) */}

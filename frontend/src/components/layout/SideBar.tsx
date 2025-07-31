@@ -1,7 +1,14 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../../store/AuthContext";
+import { ArrowLeftOnRectangleIcon } from "@heroicons/react/24/outline";
+
 
 const Sidebar: React.FC = () => {
+
+    const { logout } = useAuth()
+
+
     const baseLink =
         "group flex items-center px-4 py-2 rounded-md font-medium transition-colors";
 
@@ -44,7 +51,39 @@ const Sidebar: React.FC = () => {
                     </svg>
                     Rapports
                 </NavLink>
+
+                <div className="pt-7 border-t border-gray-200">
+                    <div className="flex items-center justify-center space-x-3">
+                        <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
+                            <button
+                                onClick={logout}
+                                className="p-2 text-red-600 transition-colors duration-200 rounded-full hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500"
+                                title="Déconnexion"
+                            >
+                                <ArrowLeftOnRectangleIcon className="w-6 h-6" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </nav>
+
+            {/*             <div className="p-4 border-t border-gray-200">
+                <div className="p-4 border-t border-gray-200">
+                    <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
+                            <button
+                                onClick={logout}
+                                className="p-2 text-red-600 transition-colors duration-200 rounded-full hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500"
+                                title="Déconnexion"
+                            >
+                                <ArrowLeftOnRectangleIcon className="w-6 h-6" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div> */}
+
+
         </aside>
     );
 };
