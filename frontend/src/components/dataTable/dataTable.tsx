@@ -188,7 +188,7 @@ const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
     }, [safeTotalPages]);
 
     return (
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="mb-6">
                 <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
 

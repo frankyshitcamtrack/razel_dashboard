@@ -212,12 +212,12 @@ async function formatDashboardDataWithperiod(rawData, groupBy = 'day', id) {
             usage: usagePercentage
         });
 
-        if (id) {
-            result.DaylyConsommationData.push({
-                name: displayName,
-                daylyConsom: parseFloat(totalConsumption.toFixed(2))
-            });
-        }
+
+        result.DaylyConsommationData.push({
+            name: displayName,
+            daylyConsom: parseFloat(totalConsumption.toFixed(2))
+        });
+
 
         result.dureeDistanceparcouru.push({
             name: displayName,
