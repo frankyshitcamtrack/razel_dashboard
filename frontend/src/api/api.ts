@@ -245,7 +245,16 @@ export const fetchData = async <T>(
         }
     });
 
-    const response = await fetch(`/api/razel_dashboard/${endpoint}?${queryString}`);
+    const response = await fetch(`/api/razel_dashboard/${endpoint}?${queryString}`,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                ...(localStorage.getItem('authToken') && {
+                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                })
+            },
+        }
+    );
     if (!response.ok) throw new Error('Erreur réseau');
     return response.json();
 };
