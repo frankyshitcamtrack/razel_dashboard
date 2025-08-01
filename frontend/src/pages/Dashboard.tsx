@@ -10,6 +10,7 @@ import { useExceptions } from "../hooks/useExceptions";
 /* import CombinedChartTimeComponent from "../components/charts/CombinedChartTime"; */
 import CombinedBarChartTimeComponent from "../components/charts/CombinedBarChartTime";
 import type { Filters } from "../components/filters/GlobalFilterBars";
+import LineChartComponent from "../components/charts/LineChart";
 
 const Dashboard = () => {
     const [filters, setFilters] = useState<Filters>({
@@ -161,6 +162,12 @@ const Dashboard = () => {
                                         label1="Nombre d'excès de vitesse"
                                         color1="#02509D"
                                     />
+                                    /*  <LineChartComponent
+                                         data={exceptions.speeding}
+                                         title="Excès de vitesse"
+                                         lineLabel="Nombre d'excès de vitesse"
+                                         color="#02509D"
+                                     /> */
                                 )}
                                 {exceptions?.harshAccelerationBraking && (
                                     <CombinedChartComponent

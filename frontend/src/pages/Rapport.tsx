@@ -10,16 +10,16 @@ const Rapport: React.FC = () => {
                 <main className="p-6">
                     <h1 className="text-2xl font-bold mb-6">Liste des Rapports</h1>
 
-                    <div className="space-y-8">
-                        <section>
+                    <div className="space-y-5">
+                        <div className="grid grid-cols-1  gap-6 mb-6">
                             <h2 className="text-xl font-semibold mb-4">Exceptions</h2>
                             <DataTable dataType="list_exceptions" />
-                        </section>
+                        </div>
 
-                        <section>
+                        <div className="grid grid-cols-1  gap-6 mb-6">
                             <h2 className="text-xl font-semibold mb-4">Heures Moteurs</h2>
                             <DataTable dataType="list_heuremoteur" />
-                        </section>
+                        </div>
                     </div>
                 </main>
             </div>
