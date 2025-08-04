@@ -10,7 +10,7 @@ import { useExceptions } from "../hooks/useExceptions";
 /* import CombinedChartTimeComponent from "../components/charts/CombinedChartTime"; */
 import CombinedBarChartTimeComponent from "../components/charts/CombinedBarChartTime";
 import type { Filters } from "../components/filters/GlobalFilterBars";
-import LineChartComponent from "../components/charts/LineChart";
+/* import LineChartComponent from "../components/charts/LineChart"; */
 
 const Dashboard = () => {
     const [filters, setFilters] = useState<Filters>({
@@ -62,8 +62,8 @@ const Dashboard = () => {
                                         dataKey2="usage"
                                         label1="Arrêts moteur"
                                         label2="Durée d'utilisation"
-                                        color1="#02509D"
-                                        color2="#F7D000"
+                                        color1="#F7D000"
+                                        color2="#02509D"
                                         valueType="percentage"
                                         title="Arrêts moteur vs Durée d'utilisation (%)"
                                     />
@@ -102,6 +102,7 @@ const Dashboard = () => {
                                     barLabel="Durée (heures)"
                                     lineLabel="Distance (km)"
                                 />
+
                                 <CombinedChartComponent
                                     data={data?.DistanConsommation}
                                     title="Distance & Consommation"
@@ -155,19 +156,27 @@ const Dashboard = () => {
                         ) : (
                             <>
                                 {exceptions?.speeding && (
-                                    <CustomBarChart
+                                    /*    <CustomBarChart
+                                           data={exceptions.speeding}
+                                           title="Excès de vitesse"
+                                           dataKey1="value"
+                                           label1="Nombre d'excès de vitesse"
+                                           color1="#02509D"
+                                       />
+                                        <LineChartComponent
+                                            data={exceptions.speeding}
+                                            title="Excès de vitesse"
+                                            lineLabel="Nombre d'excès de vitesse"
+                                            color="#02509D"
+                                        />  */
+                                    <CombinedChartComponent
                                         data={exceptions.speeding}
                                         title="Excès de vitesse"
-                                        dataKey1="value"
-                                        label1="Nombre d'excès de vitesse"
-                                        color1="#02509D"
+                                        barDataKey=""
+                                        barLabel=""
+                                        lineDataKey="value"
+                                        lineLabel="Nombre d'excès de vitesse"
                                     />
-                                    /*  <LineChartComponent
-                                         data={exceptions.speeding}
-                                         title="Excès de vitesse"
-                                         lineLabel="Nombre d'excès de vitesse"
-                                         color="#02509D"
-                                     /> */
                                 )}
                                 {exceptions?.harshAccelerationBraking && (
                                     <CombinedChartComponent
