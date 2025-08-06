@@ -4,6 +4,7 @@ import { fetchData } from "../../api/api";
 import type { PaginatedResponse, PaginationParams } from "../../api/api";
 import Pagination from "../pagination";
 import { exportData } from "../../utils/exportData";
+import { useVehiclesGroupData } from "../../hooks/useVehiclesGroupData";
 
 
 type DataType = "list_exceptions" | "list_heuremoteur";
@@ -19,6 +20,9 @@ const formatDateFR = (val?: string) =>
     val ? new Date(val).toLocaleDateString("fr-FR") : "-";
 
 const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
+
+    const { data: vehicleGroups, isLoading: groupLoading } = useVehiclesGroupData();
+
     type ExportFormat = "excel" | "csv" | "pdf";
 
     const [data, setData] = useState<PaginatedResponse<any>>({
@@ -35,6 +39,7 @@ const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
         page: 1,
         limit: 10,
     });
+
 
     const columns: ColumnDef[] = useMemo(() => {
         if (dataType === "list_exceptions") {
@@ -144,11 +149,11 @@ const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
         setEndDate(iso);
         updateFilters({ dateFrom: startDate, dateTo: iso }, true);
     };
-    /* 
-        const handleVehicleChange = (val: string) => {
-            const v = val.trim();
-            updateFilters({ vehicleId: v === "" ? undefined : Number(v) }, true);
-        }; */
+
+    const handleVehicleGroupChange = (val: string) => {
+        const v = val.trim();
+        updateFilters({ groupId: v === "" ? undefined : Number(v) }, true);
+    };
 
     const renderCell = (row: any, col: ColumnDef) => {
         const value = row[col.accessor as string];
@@ -215,16 +220,35 @@ const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
                         </div>
 
                         {/*   <div className="flex items-center gap-2">
-                            <label htmlFor="vehicle" className="text-sm font-medium">Véhicule ID :</label>
+                            <label htmlFor="vehicle" className="text-sm font-medium">Véhicule Group :</label>
                             <input
                                 id="vehicle"
                                 type="number"
                                 inputMode="numeric"
                                 placeholder="ex: 42"
-                                onChange={(e) => handleVehicleChange(e.target.value)}
+                                onChange={(e) => handleVehicleGroupChange(e.target.value)}
                                 className="h-10 w-28 border rounded-md px-3"
                             />
                         </div> */}
+                        <div className="flex items-center gap-2">
+                            <select
+                                name="vcleGroupId"
+                                value={filters.groupId ?? ""}
+                                onChange={(e) => handleVehicleGroupChange(e.target.value)}
+                                className="w-64 py-2 px-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                            >
+                                <option value="">Tous les groupes</option>
+                                {groupLoading ? (
+                                    <option disabled>Chargement...</option>
+                                ) : (
+                                    vehicleGroups?.map(group => (
+                                        <option key={group.ids} value={group.ids ?? ""}>
+                                            {group.names}
+                                        </option>
+                                    ))
+                                )}
+                            </select>
+                        </div>
                     </div>
 
                     {/* Boutons (droite) */}
