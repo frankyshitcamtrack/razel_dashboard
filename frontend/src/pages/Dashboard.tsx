@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Sidebar from "../components/layout/SideBar";
 import GlobalFilterBar from "../components/filters/GlobalFilterBars";
-import CustomBarChart from "../components/charts/BarChart";
+//import CustomBarChart from "../components/charts/BarChart";
 import PieChartComponent from "../components/charts/PieChart";
 import CombinedChartComponent from "../components/charts/CombinedChart";
 import StackedBarChart from "../components/charts/StackedBarChart";
@@ -18,11 +18,12 @@ const Dashboard = () => {
         date2: '2025-07-31',
         vehicle: 68,
         groupBy: "day",
-        vcleGroupId: undefined
+        vcleGroupId: undefined,
+        weekDays: []
     });
 
     const { data, isLoading } = useHeureMoteurData(filters);
-    const { data: exceptions, isLoading: exceptionsLoading } = useExceptions(filters);
+    const { data: exceptions } = useExceptions(filters);
 
 
 
@@ -30,13 +31,20 @@ const Dashboard = () => {
         <div className="min-h-screen bg-gray-100 flex">
             <Sidebar />
             <div className="w-full">
-                <main className="p-6">
+                <main className="p-4">
                     <GlobalFilterBar filters={filters} setFilters={setFilters} />
 
                     {/* Section 1 : Stack Bar Charts (2 colonnes) */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 overflow-hidden">
                         {isLoading ? (
                             <>
+                                <DonutSkeleton />
+                                <DonutSkeleton />
+                                <DonutSkeleton />
+                                <DonutSkeleton />
+                                <DonutSkeleton />
+                                <DonutSkeleton />
+                                <DonutSkeleton />
                                 <DonutSkeleton />
                                 <DonutSkeleton />
                             </>
@@ -68,107 +76,65 @@ const Dashboard = () => {
                                         title="Arrêts moteur vs Durée d'utilisation (%)"
                                     />
                                 )}
-                            </>
-                        )}
-                    </div>
 
-                    <div className="col-span-full mb-8">
-                        {isLoading ? (
-                            <div className="h-[500px] flex items-center justify-center">
-                                <DonutSkeleton />
-                            </div>
-                        ) : (
-                            <PieChartComponent
-                                title="Consommation journalière par moteur"
-                                data={data?.DaylyConsommationData}
-                                unit="L"
-                                className="h-[500px]"
-                            />
-                        )}
-                    </div>
+                                {
+                                    data?.DistanConsommation && (
+                                        <PieChartComponent
+                                            title="Consommation journalière par moteur"
+                                            data={data?.DaylyConsommationData}
+                                            unit="L"
+                                            className="h-[320px]"
+                                        />
+                                    )
+                                }
 
-                    {/* Section 3 : Combined Charts (2 colonnes) */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-                        {isLoading ? (
-                            <>
-                                <DonutSkeleton />
-                                <DonutSkeleton />
-                            </>
-                        ) : (
-                            <>
-                                <CombinedBarChartTimeComponent
-                                    data={data?.dureeDistanceparcouru}
-                                    title="Distance parcourue et durée"
-                                    barLabel="Durée (heures)"
-                                    lineLabel="Distance (km)"
-                                />
+                                {
+                                    data?.dureeDistanceparcouru && (
+                                        <CombinedBarChartTimeComponent
+                                            data={data?.dureeDistanceparcouru}
+                                            title="Distance parcourue et durée"
+                                            barLabel="Durée (heures)"
+                                            lineLabel="Distance (km)"
+                                        />
+                                    )
+                                }
 
-                                <CombinedChartComponent
-                                    data={data?.DistanConsommation}
-                                    title="Distance & Consommation"
-                                    barDataKey="distance"
-                                    barLabel="Distance (km)"
-                                    lineDataKey="consumption"
-                                    lineLabel="Consommation (L)"
-                                />
-                            </>
-                        )}
-                    </div>
+                                {
+                                    data?.DistanConsommation && (
+                                        <CombinedChartComponent
+                                            data={data?.DistanConsommation}
+                                            title="Distance & Consommation"
+                                            barDataKey="distance"
+                                            barLabel="Distance (km)"
+                                            lineDataKey="consumption"
+                                            lineLabel="Consommation (L)"
+                                        />
+                                    )
+                                }
 
-                    {/* Section 4 : Autres graphiques (2 colonnes) */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-                        {isLoading ? (
-                            <>
-                                <DonutSkeleton />
-                                <DonutSkeleton />
-                            </>
-                        ) : (
-                            <>
-                                {data?.hundredKmConsumption && (
-                                    <CustomBarChart
-                                        data={data.hundredKmConsumption}
-                                        title="Consommation au 100 km"
-                                        dataKey1="value"
-                                        label1="Consommation (L/100km)"
-                                        color1="#02509D"
-                                    />
-                                )}
-                                {data?.ratioConsumption && (
-                                    <CustomBarChart
-                                        data={data.ratioConsumption}
-                                        title="Ratio consommation L/M"
-                                        dataKey1="value"
-                                        label1="L/M"
-                                        color1="#02509D"
-                                    />
-                                )}
-                            </>
-                        )}
-                    </div>
-
-                    {/* Section 5 : Exceptions (2 colonnes) */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        {exceptionsLoading ? (
-                            <>
-                                <DonutSkeleton />
-                                <DonutSkeleton />
-                            </>
-                        ) : (
-                            <>
                                 {exceptions?.speeding && (
-                                    /*    <CustomBarChart
-                                           data={exceptions.speeding}
-                                           title="Excès de vitesse"
-                                           dataKey1="value"
-                                           label1="Nombre d'excès de vitesse"
-                                           color1="#02509D"
-                                       />
-                                        <LineChartComponent
-                                            data={exceptions.speeding}
-                                            title="Excès de vitesse"
-                                            lineLabel="Nombre d'excès de vitesse"
-                                            color="#02509D"
-                                        />  */
+
+                                    <CombinedChartComponent
+                                        data={exceptions.speeding}
+                                        title="Excès de vitesse"
+                                        barDataKey=""
+                                        barLabel=""
+                                        lineDataKey="value"
+                                        lineLabel="Nombre d'excès de vitesse"
+                                    />
+                                )}
+                                {exceptions?.harshAccelerationBraking && (
+                                    <CombinedChartComponent
+                                        data={exceptions.harshAccelerationBraking}
+                                        title="Freinage & Acceleration"
+                                        barDataKey="acceleration"
+                                        barLabel="Somme des Accelerations"
+                                        lineDataKey="braking"
+                                        lineLabel="Somme de Freinage"
+                                    />
+                                )}
+                                {exceptions?.speeding && (
+
                                     <CombinedChartComponent
                                         data={exceptions.speeding}
                                         title="Excès de vitesse"

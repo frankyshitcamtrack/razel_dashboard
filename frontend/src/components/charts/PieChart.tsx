@@ -55,18 +55,18 @@ const PieChartComponent: React.FC<PieChartProps> = ({
     };
 
     return (
-        <div className={`bg-white rounded-xl shadow-lg p-6 h-full flex flex-col ${className}`}>
+        <div className={`bg-white rounded-xl shadow-lg p-2 flex flex-col ${className}`}>
             <h3 className="text-xl font-semibold text-gray-800 mb-4 text-center">{title}</h3>
             <div className="flex-grow flex items-center justify-center">
-                <ResponsiveContainer width="100%" height={500}>
+                <ResponsiveContainer width="100%" height={250}>
                     <PieChart>
                         <Tooltip formatter={(value) => [`${value} ${unit}`, 'Consommation']} />
                         <Pie
                             data={data}
                             cx="50%"
                             cy="50%"
-                            outerRadius={180}
-                            innerRadius={100}
+                            outerRadius={80}
+                            innerRadius={70}
                             paddingAngle={2}
                             dataKey="daylyConsom"
                             nameKey="name"
