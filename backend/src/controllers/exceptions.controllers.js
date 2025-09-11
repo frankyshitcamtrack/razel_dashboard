@@ -1,5 +1,6 @@
 const { getExceptions, getExceptionsByDatesAndId } = require('../models/exceptions.model');
-const { formatExceptionsData, formatExceptionsDataWithperiod } = require('../utils/formatDashboardData')
+const { formatExceptionsData, formatExceptionsDataWithperiod } = require('../utils/formatDashboardData');
+const { reverseAllArrays } = require('../utils/reverse')
 
 async function httpGetExceptions(req, res) {
     const { page, limit, dateFrom, dateTo, groupId } = req.query;
@@ -31,49 +32,64 @@ async function httpGetExceptions(req, res) {
 
 async function httpGetExceptionsByParams(req, res) {
     try {
-        const { date1, date2, groupBy, id, vcleGroupId } = req.query;
+        const { date1, date2, groupBy, vehicle, vcleGroupId, weekDays } = req.query;
 
-        // Validation des dates
         if (date1 && isNaN(new Date(date1).getTime())) {
             return res.status(400).json({
-                error: 'date1 doit être une date valide (format: YYYY-MM-DD)'
+                error: 'date1 doit être une date valide (format: YYYY-MM-DD)',
             });
         }
-
         if (date2 && isNaN(new Date(date2).getTime())) {
             return res.status(400).json({
-                error: 'date2 doit être une date valide (format: YYYY-MM-DD)'
+                error: 'date2 doit être une date valide (format: YYYY-MM-DD)',
             });
         }
 
 
         let vehicleIds = null;
-        if (id) {
-            if (Array.isArray(id)) {
-
-                vehicleIds = id.map(id => {
-                    const num = Number(id);
-                    if (isNaN(num)) {
-                        throw new Error('Tous les IDs doivent être des nombres valides');
-                    }
+        if (vehicle) {
+            const parsed = JSON.parse(vehicle);
+            if (Array.isArray(parsed)) {
+                vehicleIds = parsed.map((idVal) => {
+                    const num = Number(idVal);
+                    if (isNaN(num)) throw new Error('Tous les IDs doivent être des nombres valides');
                     return num;
                 });
             } else {
-
-                const num = Number(id);
+                const num = Number(vehicle);
                 if (isNaN(num)) {
                     return res.status(400).json({
-                        error: 'id doit être un nombre valide ou une liste de nombres'
+                        error: 'id doit être un nombre valide ou une liste de nombres',
                     });
                 }
                 vehicleIds = [num];
             }
         }
 
-        if (vcleGroupId && isNaN(Number(vcleGroupId))) {
+        const groupId = vcleGroupId ? Number(vcleGroupId) : undefined;
+        if (vcleGroupId && isNaN(groupId)) {
             return res.status(400).json({
-                error: 'vcleGroupId doit être un nombre valide'
+                error: 'vcleGroupId doit être un nombre valide',
             });
+        }
+
+
+        let weekDaysArray = null;
+        if (weekDays) {
+            try {
+                const parsed = JSON.parse(weekDays);
+                if (!Array.isArray(parsed)) {
+                    throw new Error();
+                }
+                if (!parsed.every(d => d >= 1 && d <= 7)) {
+                    throw new Error('Les jours doivent être entre 1 (lundi) et 7 (dimanche)');
+                }
+                weekDaysArray = parsed;
+            } catch (err) {
+                return res.status(400).json({
+                    error: 'weekDaysThisWeek doit être un tableau de nombres (ex: [1,3,5])',
+                });
+            }
         }
 
 
@@ -81,30 +97,29 @@ async function httpGetExceptionsByParams(req, res) {
         const dateTo = date2 ? new Date(date2).toISOString().split('T')[0] : undefined;
 
 
-        const results = await getExceptionsByDatesAndId(
+        const results = await getExceptions({
             dateFrom,
             dateTo,
-            vehicleIds,
-            vcleGroupId ? Number(vcleGroupId) : undefined
-        );
+            vehicleId: vehicleIds,
+            groupId,
+            weekDaysThisWeek: weekDaysArray,
+            //page: 1, 
+            //limit: 1000,
+        });
 
-        const formatData = await formatExceptionsDataWithperiod(results, groupBy);
+        const formatData = await formatExceptionsDataWithperiod(results.data, groupBy);
 
-        return res.status(200).json(formatData);
-
+        return res.status(200).json(reverseAllArrays(formatData));
     } catch (error) {
         console.error('Erreur dans httpGetExceptionsByParams:', error);
 
-
-        if (error.message.includes('IDs doivent être')) {
-            return res.status(400).json({
-                error: error.message
-            });
+        if (error.message.includes('IDs doivent être') || error.message.includes('jours')) {
+            return res.status(400).json({ error: error.message });
         }
 
         return res.status(500).json({
             error: 'Une erreur est survenue lors de la récupération des données',
-            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined,
         });
     }
 }

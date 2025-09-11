@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { AxiosError, AxiosResponse, AxiosRequestConfig } from 'axios';
+import type { AxiosError, AxiosResponse } from 'axios';
 import type { DashboardData, vehicles, exceptions, vehiclesGroup } from '../types/ChartDataType';
 
 
@@ -54,12 +54,6 @@ export interface HeureMoteur {
     group_name: string
 }
 
-
-interface ApiErrorResponse {
-    error?: string;
-
-}
-
 //const BASE_URL = 'http://localhost:8000'
 
 
@@ -67,44 +61,67 @@ export const fetchHeureMoteurData = async (
     params: {
         date1?: string;
         date2?: string;
-        vehicle?: number | number[];
+        vehicle?: number | number[] | null;
         vcleGroupId?: number;
         groupBy?: "day" | "week" | "month";
+        weekDays?: number[];
     }
 ): Promise<DashboardData> => {
     try {
-        const config: AxiosRequestConfig = {
-            headers: {
-                'Content-Type': 'application/json',
-                ...(localStorage.getItem('authToken') && {
-                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-                })
-            },
-            params: {
-                date1: params.date1,
-                date2: params.date2,
-                id: params.vehicle,
-                vcleGroupId: params.vcleGroupId,
-                groupBy: params.groupBy
-            },
-            paramsSerializer: { indexes: null } // Format id[]=1&id[]=2
-        };
+        const queryParams = new URLSearchParams();
+
+        // Ajout des paramètres de date
+        if (params.date1) queryParams.append('date1', params.date1);
+        if (params.date2) queryParams.append('date2', params.date2);
+
+        // Ajout des paramètres de véhicule
+        if (params.vehicle !== undefined) {
+            if (Array.isArray(params.vehicle) && params.vehicle.length > 0) {
+                queryParams.append('vehicle', JSON.stringify(params.vehicle));
+            } else if (typeof params.vehicle === 'number') {
+                queryParams.append('vehicle', params?.vehicle?.toString());
+            }
+        }
+
+        // Ajout des autres paramètres
+        if (params.vcleGroupId !== undefined) {
+            queryParams.append('vcleGroupId', params.vcleGroupId.toString());
+        }
+        if (params.groupBy !== undefined) {
+            queryParams.append('groupBy', params.groupBy);
+        }
+
+        // CORRECTION: Envoyer weekDays comme tableau JSON stringifié
+        if (params.weekDays !== undefined && Array.isArray(params.weekDays) && params.weekDays.length > 0) {
+            queryParams.append('weekDays', JSON.stringify(params.weekDays));
+        }
 
         const response = await axios.get<DashboardData>(
             `/api/razel_dashboard/heuremoteur`,
-            config
+            {
+                params: queryParams,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(localStorage.getItem('authToken') && {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                    })
+                }
+            }
         );
 
         return response.data;
     } catch (error) {
-        const axiosError = error as AxiosError<ApiErrorResponse>;
+        const axiosError = error as AxiosError;
 
         if (axiosError.response) {
-            const errorMessage = axiosError.response.data?.error ||
-                axiosError.response.statusText ||
-                `Erreur ${axiosError.response.status}`;
-
-            throw new Error(errorMessage);
+            switch (axiosError.response.status) {
+                case 400:
+                    throw new Error('Paramètres invalides');
+                case 500:
+                    throw new Error('Erreur serveur');
+                default:
+                    throw new Error(`Erreur ${axiosError.response.status}`);
+            }
         } else {
             throw new Error('Erreur réseau');
         }
@@ -169,33 +186,39 @@ export const fetchExceptions = async (
     params: {
         date1?: string;
         date2?: string;
-        id?: number | number[];
+        vehicle?: number | number[] | null;
         vcleGroupId?: number;
         groupBy?: "day" | "week" | "month";
+        weekDays?: number[];
     }
 ): Promise<exceptions> => {
     try {
         const queryParams = new URLSearchParams();
 
-
+        // Ajout des paramètres de date
         if (params.date1) queryParams.append('date1', params.date1);
         if (params.date2) queryParams.append('date2', params.date2);
 
-
-        if (params.id !== undefined) {
-            if (Array.isArray(params.id)) {
-                params.id.forEach(id => queryParams.append('id', id.toString()));
-            } else {
-                queryParams.append('id', params.id.toString());
+        // Ajout des paramètres d'ID
+        if (params.vehicle !== undefined) {
+            if (Array.isArray(params.vehicle) && params.vehicle.length > 0) {
+                queryParams.append('vehicle', JSON.stringify(params.vehicle));
+            } else if (typeof params.vehicle === 'number') {
+                queryParams.append('vehicle', params?.vehicle?.toString());
             }
         }
 
-
+        // Ajout des autres paramètres
         if (params.vcleGroupId !== undefined) {
             queryParams.append('vcleGroupId', params.vcleGroupId.toString());
         }
         if (params.groupBy !== undefined) {
             queryParams.append('groupBy', params.groupBy);
+        }
+
+        // AJOUT: Envoyer weekDays comme tableau JSON stringifié
+        if (params.weekDays !== undefined && Array.isArray(params.weekDays) && params.weekDays.length > 0) {
+            queryParams.append('weekDays', JSON.stringify(params.weekDays));
         }
 
         const response: AxiosResponse<exceptions> = await axios.get(

@@ -14,17 +14,16 @@ import type { Filters } from "../components/filters/GlobalFilterBars";
 
 const Dashboard = () => {
     const [filters, setFilters] = useState<Filters>({
-        date1: '2025-07-01',
-        date2: '2025-07-31',
-        vehicle: 68,
-        groupBy: "day",
+        date1: undefined,
+        date2: undefined,
+        vehicle: undefined,
+        groupBy: undefined,
         vcleGroupId: undefined,
-        weekDays: []
+        weekDays: [1]
     });
 
     const { data, isLoading } = useHeureMoteurData(filters);
     const { data: exceptions } = useExceptions(filters);
-
 
 
     return (

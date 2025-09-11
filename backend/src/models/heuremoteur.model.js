@@ -12,23 +12,16 @@ const pool = require('../config/db')
  * @param {number} [params.groupId] - ID du groupe de véhicules
  * @returns {Promise<Object>} - { data: [], pagination: { total, page, limit, totalPages } }
  */
+
 async function getHmoteur(params = {}) {
     const {
-        page = 1,
-        limit = 10,
         dateFrom,
         dateTo,
-        vehicleId,
-        groupId
+        vehicleId = null,
+        groupId,
+        weekDaysThisWeek
     } = params;
 
-    // Validation des paramètres
-    if (page < 1) throw new Error("Le numéro de page doit être supérieur ou égal à 1");
-    if (limit < 1) throw new Error("La limite doit être supérieure ou égale à 1");
-
-    const offset = (page - 1) * limit;
-
-    // Construction de la requête avec jointures supplémentaires
     let query = `
         SELECT 
             hm.*,
@@ -39,10 +32,11 @@ async function getHmoteur(params = {}) {
         LEFT JOIN vehicles v ON hm.vcleid = v.ids
         LEFT JOIN vclegroup vg ON v.groupid = vg.ids
     `;
+
     const values = [];
     const whereClauses = [];
 
-    // Filtre par dates
+    // Filtrage par dates
     if (dateFrom && dateTo) {
         whereClauses.push(`hm.dates BETWEEN $${values.length + 1} AND $${values.length + 2}`);
         values.push(dateFrom, dateTo);
@@ -54,7 +48,7 @@ async function getHmoteur(params = {}) {
         values.push(dateTo);
     }
 
-    // Filtre par véhicule(s)
+    // Filtrage par véhicule(s)
     if (vehicleId) {
         if (Array.isArray(vehicleId)) {
             if (vehicleId.length === 0) {
@@ -68,56 +62,77 @@ async function getHmoteur(params = {}) {
         }
     }
 
-    // Filtre par groupe
+    // Filtrage par groupe
     if (groupId) {
         whereClauses.push(`v.groupid = $${values.length + 1}`);
         values.push(groupId);
     }
 
+
+
+    // OPTIMISATION: Filtrage par jours de la semaine
+    if (weekDaysThisWeek && Array.isArray(weekDaysThisWeek) && weekDaysThisWeek.length > 0) {
+        if (!weekDaysThisWeek.every(d => d >= 1 && d <= 7)) {
+            throw new Error("Les jours doivent être entre 1 (lundi) et 7 (dimanche)");
+        }
+
+        // Conversion vers les codes PostgreSQL DOW
+        const postgresDays = weekDaysThisWeek.map(dayNum => dayNum === 7 ? 0 : dayNum);
+
+        // Créer les conditions avec les bons index
+        const dayConditions = postgresDays.map((postgresDay, index) => {
+            return `EXTRACT(DOW FROM hm.dates) = $${values.length + index + 1}`;
+        });
+
+        // Ajouter les valeurs converties
+        values.push(...postgresDays);
+
+        // Si pas de plage de dates, on limite à la semaine en cours
+        if (!dateFrom && !dateTo) {
+            const today = new Date();
+            const dayOfWeek = today.getDay(); // 0=dimanche, 1=lundi, ..., 6=samedi
+
+            // Trouver le lundi de cette semaine
+            const monday = new Date(today);
+            monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+            monday.setHours(0, 0, 0, 0);
+
+            // Trouver le dimanche de cette semaine
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+            sunday.setHours(23, 59, 59, 999);
+
+            // Ajouter la condition de la semaine en cours
+            whereClauses.push(`hm.dates BETWEEN $${values.length + 1} AND $${values.length + 2}`);
+            values.push(monday.toISOString().split('T')[0], sunday.toISOString().split('T')[0]);
+        }
+
+        whereClauses.push(`(${dayConditions.join(' OR ')})`);
+    }
+
+
     if (whereClauses.length > 0) {
         query += ' WHERE ' + whereClauses.join(' AND ');
     }
 
-    // Requêtes
-    const dataQuery = {
-        text: `${query} ORDER BY hm.dates DESC LIMIT $${values.length + 1} OFFSET $${values.length + 2}`,
-        values: [...values, limit, offset]
-    };
 
-    const countQuery = {
-        text: `SELECT COUNT(*) FROM (${query}) AS total`,
-        values: values
-    };
+    query += ' ORDER BY hm.dates DESC';
 
     try {
-        const [dataResult, countResult] = await Promise.all([
-            pool.query(dataQuery),
-            pool.query(countQuery)
-        ]);
-
-        const total = parseInt(countResult.rows[0].count);
-        const totalPages = Math.ceil(total / limit);
-
-        if (page > totalPages && totalPages > 0) {
-            throw new Error(`La page ${page} n'existe pas. Il y a seulement ${totalPages} pages disponibles.`);
-        }
+        const result = await pool.query({
+            text: query,
+            values: values
+        });
 
         return {
-            data: dataResult.rows,
-            pagination: {
-                total: total,
-                page: page,
-                limit: limit,
-                totalPages: totalPages
-            }
+            data: result.rows,
+            total: result.rows.length
         };
     } catch (error) {
         console.error('Erreur getHmoteur:', error);
         throw error;
     }
 }
-
-
 
 /**
  * Récupère les heures moteur filtrées par dates et ID(s) de véhicule(s)

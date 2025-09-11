@@ -5,7 +5,7 @@ import { fetchExceptions } from '../api/api'
 export const useExceptions = (params: {
     date1?: string;
     date2?: string;
-    vehicle?: number | number[];
+    vehicle?: number | number[] | null;
     vcleGroupId?: number;
     groupBy?: "day" | "week" | "month";
 }) => {

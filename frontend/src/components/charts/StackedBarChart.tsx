@@ -94,6 +94,8 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
             [dataKey2]: this.normalizeValue(item[dataKey2], dataKey2),
         }));
 
+
+
         return (
             <div className="bg-white rounded-lg shadow p-2 flex flex-col h-[320px]">
                 <h3 className="text-lg font-semibold text-gray-700 mb-4">{title}</h3>

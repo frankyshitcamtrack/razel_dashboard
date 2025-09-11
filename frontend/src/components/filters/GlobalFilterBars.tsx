@@ -3,11 +3,11 @@ import {
     CalendarDaysIcon,
     TruckIcon,
     Squares2X2Icon,
-    XMarkIcon,
     CheckIcon,
     ChevronDownIcon,
     ChevronUpIcon,
     MagnifyingGlassIcon,
+    ArrowPathIcon, // Icône pour le reset
 } from "@heroicons/react/24/outline";
 import { useVehiclesData } from "../../hooks/useVehiclesData";
 import { useVehiclesGroupData } from "../../hooks/useVehiclesGroupData";
@@ -15,7 +15,7 @@ import { useVehiclesGroupData } from "../../hooks/useVehiclesGroupData";
 export interface Filters {
     date1?: string;
     date2?: string;
-    vehicle?: number | number[];
+    vehicle?: number | number[] | null;
     vcleGroupId?: number;
     groupBy?: "day" | "week" | "month";
     weekDays?: number[]
@@ -54,6 +54,15 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
             return matchesSearch && matchesGroup;
         });
     }, [vehicles, searchTerm, filters.vcleGroupId]);
+
+    useEffect(() => {
+        // Au chargement initial, si aucun véhicule n'est sélectionné, sélectionner tous les véhicules
+        if (vehicles && vehicles.length > 0 && !filters.vehicle) {
+            // Créer un tableau avec tous les IDs de véhicules
+            const allVehicleIds = vehicles.map(v => v.ids);
+            setFilters((prev) => ({ ...prev, vehicle: allVehicleIds }));
+        }
+    }, [vehicles, filters.vehicle]);
 
 
     const handleVehicleChange = (vehicleId: number) => {
@@ -97,23 +106,26 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
         setFilters((prev) => ({ ...prev, weekDays: newDays }));
     }
 
-    const removeVehicle = (vehicleId: number) => {
-        setFilters((prev) => {
-            const currentVehicles = Array.isArray(prev.vehicle) ? prev.vehicle : prev.vehicle ? [prev.vehicle] : [];
-            const newVehicles = currentVehicles.filter((id) => id !== vehicleId);
-            return {
-                ...prev,
-                vehicle: newVehicles.length ? newVehicles : undefined,
-            };
-        });
-    };
+    /*   const removeVehicle = (vehicleId: number) => {
+          setFilters((prev) => {
+              const currentVehicles = Array.isArray(prev.vehicle) ? prev.vehicle : prev.vehicle ? [prev.vehicle] : [];
+              const newVehicles = currentVehicles.filter((id) => id !== vehicleId);
+              return {
+                  ...prev,
+                  vehicle: newVehicles.length ? newVehicles : undefined,
+              };
+          });
+      };
+   */
 
-    const selectedVehicles = useMemo(() => {
-        if (!filters.vehicle) return [];
-        const vehicleIds = Array.isArray(filters.vehicle) ? filters.vehicle : [filters.vehicle];
-        return vehicles?.filter((v) => vehicleIds.includes(v.ids)) || [];
-    }, [filters.vehicle, vehicles]);
 
+    /*  const selectedVehicles = useMemo(() => {
+         if (!filters.vehicle) return [];
+         const vehicleIds = Array.isArray(filters.vehicle) ? filters.vehicle : [filters.vehicle];
+         return vehicles?.filter((v) => vehicleIds.includes(v.ids)) || [];
+     }, [filters.vehicle, vehicles]);
+ 
+  */
     useEffect(() => {
         if (vehicles && filters.vehicle === 68) {
             const defaultVehicleExists = vehicles.some((v) => v.ids === 68);
@@ -122,6 +134,7 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
             }
         }
     }, [vehicles, filters.vehicle]);
+
 
     return (
         <>
@@ -152,7 +165,7 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
                             </label>
 
 
-                            <div className="flex flex-wrap gap-2 mb-2">
+                            {/*      <div className="flex flex-wrap gap-2 mb-2">
                                 {selectedVehicles.map((vehicle) => (
                                     <span
                                         key={vehicle.ids}
@@ -167,7 +180,7 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
                                         </button>
                                     </span>
                                 ))}
-                            </div>
+                            </div> */}
 
                             <div className="relative mb-3">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -291,18 +304,33 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
             </div>
 
             <div className="mb-2 bg-white p-4 rounded-2xl shadow-md border">
-                <div
-                    className="flex items-center justify-between cursor-pointer"
-                    onClick={() => setIsExpanded(!isExpanded)}
-                >
-                    <h3 className="text-lg font-semibold text-gray-800">
-                        Filtres : Jour & Véhicule
-                    </h3>
-                    {isExpanded ? (
-                        <ChevronUpIcon className="w-5 h-5 text-gray-500" />
-                    ) : (
-                        <ChevronDownIcon className="w-5 h-5 text-gray-500" />
-                    )}
+                <div className="flex items-center justify-between mb-4">
+                    <div
+                        className="flex items-center justify-between cursor-pointer flex-1"
+                        onClick={() => setIsExpanded(!isExpanded)}
+                    >
+                        <h3 className="text-lg font-semibold text-gray-800">
+                            Filtres : Jour & Véhicule
+                        </h3>
+                        {isExpanded ? (
+                            <ChevronUpIcon className="w-5 h-5 text-gray-500" />
+                        ) : (
+                            <ChevronDownIcon className="w-5 h-5 text-gray-500" />
+                        )}
+                    </div>
+
+                    {/* Bouton Reset pour cette section aussi si vous voulez */}
+                    <button
+                        onClick={() => {
+                            setFilters(prev => ({ ...prev, weekDays: [1], vehicle: 68 }));
+                            setSearchTerm("");
+                        }}
+                        className="ml-4 flex items-center px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                        title="Réinitialiser les filtres jours/véhicules"
+                    >
+                        <ArrowPathIcon className="w-4 h-4 mr-1" />
+                        Reset
+                    </button>
                 </div>
                 <ul className="divide-y divide-gray-200"></ul>
 
