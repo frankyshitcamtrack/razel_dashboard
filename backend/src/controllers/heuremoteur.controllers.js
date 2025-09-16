@@ -4,8 +4,7 @@ const { reverseAllArrays } = require('../utils/reverse')
 
 
 async function httpGetHeureMoteur(req, res) {
-    const { page, limit, dateFrom, dateTo, groupId } = req.query;
-
+    const { dateFrom, dateTo, vehicleId, groupId, page = 1, limit = 10 } = req.query;
 
     if (dateFrom && isNaN(new Date(dateFrom).getTime())) {
         return res.status(400).json({
@@ -18,13 +17,38 @@ async function httpGetHeureMoteur(req, res) {
             error: 'dateTo doit être une date valide (format: YYYY-MM-DD)'
         });
     }
+
+
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+
+    if (isNaN(pageNum) || pageNum < 1) {
+        return res.status(400).json({
+            error: 'page doit être un nombre entier positif'
+        });
+    }
+
+    if (isNaN(limitNum) || limitNum < 1 || limitNum > 100) {
+        return res.status(400).json({
+            error: 'limit doit être un nombre entre 1 et 100'
+        });
+    }
+
     try {
-        return res.status(200).json(await getHmoteur({ page, limit, dateFrom, dateTo, groupId }));
+        const result = await getHmoteurByDatesAndId(
+            dateFrom,
+            dateTo,
+            vehicleId,
+            groupId,
+            pageNum,
+            limitNum
+        );
+        return res.status(200).json(result);
     } catch (error) {
         console.log(error);
         return res.status(500).json({
             error: 'something went wrong with the server'
-        })
+        });
     }
 }
 

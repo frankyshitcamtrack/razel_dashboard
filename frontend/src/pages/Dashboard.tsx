@@ -19,7 +19,7 @@ const Dashboard = () => {
         vehicle: undefined,
         groupBy: undefined,
         vcleGroupId: undefined,
-        weekDays: [1]
+        weekDays: []
     });
 
     const { data, isLoading } = useHeureMoteurData(filters);

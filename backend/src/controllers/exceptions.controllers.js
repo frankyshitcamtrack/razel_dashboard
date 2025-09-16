@@ -2,29 +2,47 @@ const { getExceptions, getExceptionsByDatesAndId } = require('../models/exceptio
 const { formatExceptionsData, formatExceptionsDataWithperiod } = require('../utils/formatDashboardData');
 const { reverseAllArrays } = require('../utils/reverse')
 
+
+
 async function httpGetExceptions(req, res) {
-    const { page, limit, dateFrom, dateTo, groupId } = req.query;
+    const { date1, date2, vehicleId, vehicleGroupId, page = 1, limit = 10 } = req.query;
 
-
-    if (dateFrom && isNaN(new Date(dateFrom).getTime())) {
+    if (date1 && isNaN(new Date(date1).getTime())) {
         return res.status(400).json({
-            error: 'dateFrom doit être une date valide (format: YYYY-MM-DD)'
+            error: 'date1 doit être une date valide (format: YYYY-MM-DD)'
         });
     }
 
-    if (dateTo && isNaN(new Date(dateTo).getTime())) {
+    if (date2 && isNaN(new Date(date2).getTime())) {
         return res.status(400).json({
-            error: 'dateTo doit être une date valide (format: YYYY-MM-DD)'
+            error: 'date2 doit être une date valide (format: YYYY-MM-DD)'
+        });
+    }
+
+
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+
+    if (isNaN(pageNum) || pageNum < 1) {
+        return res.status(400).json({
+            error: 'page doit être un nombre entier positif'
+        });
+    }
+
+    if (isNaN(limitNum) || limitNum < 1 || limitNum > 100) {
+        return res.status(400).json({
+            error: 'limit doit être un nombre entre 1 et 100'
         });
     }
 
     try {
-        return res.status(200).json(await getExceptions({ page, limit, dateFrom, dateTo, groupId }));
+        const result = await getExceptionsByDatesAndId(date1, date2, vehicleId, vehicleGroupId, pageNum, limitNum);
+        return res.status(200).json(result);
     } catch (error) {
         console.log(error);
         return res.status(500).json({
             error: 'something went wrong with the server'
-        })
+        });
     }
 }
 

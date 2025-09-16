@@ -142,9 +142,14 @@ async function getHmoteur(params = {}) {
  * @param {number} [vehicleGroupId] - ID du groupe de véhicules
  * @returns {Promise<Array>} - Tableau des résultats
  */
-async function getHmoteurByDatesAndId(date1, date2, vehicleId, vehicleGroupId) {
+async function getHmoteurByDatesAndId(date1, date2, vehicleId, vehicleGroupId, page = 1, limit = 10) {
     let query = `
         SELECT hm.* 
+        FROM heuremoteurs hm
+        JOIN vehicles v ON hm.vcleid = v.ids
+    `;
+    let countQuery = `
+        SELECT COUNT(*) as total
         FROM heuremoteurs hm
         JOIN vehicles v ON hm.vcleid = v.ids
     `;
@@ -152,7 +157,6 @@ async function getHmoteurByDatesAndId(date1, date2, vehicleId, vehicleGroupId) {
     let params = [];
     let paramIndex = 1;
 
-    // Gestion des dates
     if (date1 && date2) {
         conditions.push(`hm.dates BETWEEN $${paramIndex} AND $${paramIndex + 1}`);
         params.push(date1, date2);
@@ -167,7 +171,7 @@ async function getHmoteurByDatesAndId(date1, date2, vehicleId, vehicleGroupId) {
         paramIndex += 1;
     }
 
-    // Gestion des véhicules (single ID ou array)
+
     if (vehicleId) {
         if (Array.isArray(vehicleId)) {
             if (vehicleId.length === 0) {
@@ -183,23 +187,49 @@ async function getHmoteurByDatesAndId(date1, date2, vehicleId, vehicleGroupId) {
         }
     }
 
-    // Gestion du groupe de véhicules
+
     if (vehicleGroupId) {
         conditions.push(`v.groupid = $${paramIndex}`);
         params.push(vehicleGroupId);
+        paramIndex += 1;
     }
 
-    // Construction de la requête finale
+
     if (conditions.length > 0) {
-        query += ' WHERE ' + conditions.join(' AND ');
+        const whereClause = ' WHERE ' + conditions.join(' AND ');
+        query += whereClause;
+        countQuery += whereClause;
     }
 
-    // Tri par date décroissante par défaut
+
     query += ' ORDER BY hm.dates DESC';
 
+
+    const offset = (page - 1) * limit;
+    query += ` LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
+    params.push(limit, offset);
+
     try {
-        const results = await pool.query(query, params);
-        return results.rows;
+
+        const [results, countResult] = await Promise.all([
+            pool.query(query, params),
+            pool.query(countQuery, params.slice(0, -2))
+        ]);
+
+        const total = parseInt(countResult.rows[0].total);
+        const totalPages = Math.ceil(total / limit);
+
+        return {
+            data: results.rows,
+            pagination: {
+                currentPage: page,
+                totalPages: totalPages,
+                totalItems: total,
+                itemsPerPage: limit,
+                hasNext: page < totalPages,
+                hasPrev: page > 1
+            }
+        };
     } catch (error) {
         console.error('Erreur dans getHmoteurByDatesAndId:', error);
         throw error;

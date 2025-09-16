@@ -121,9 +121,17 @@ async function getExceptions(params = {}) {
         throw error;
     }
 }
-async function getExceptionsByDatesAndId(date1, date2, vehicleId, vehicleGroupId) {
+
+
+
+async function getExceptionsByDatesAndId(date1, date2, vehicleId, vehicleGroupId, page = 1, limit = 10) {
     let query = `
         SELECT e.* 
+        FROM exceptionsnbr e
+        JOIN vehicles v ON e.vcleid = v.ids
+    `;
+    let countQuery = `
+        SELECT COUNT(*) as total
         FROM exceptionsnbr e
         JOIN vehicles v ON e.vcleid = v.ids
     `;
@@ -160,18 +168,42 @@ async function getExceptionsByDatesAndId(date1, date2, vehicleId, vehicleGroupId
         params.push(vehicleGroupId);
     }
 
+
     if (conditions.length > 0) {
-        query += ' WHERE ' + conditions.join(' AND ');
+        const whereClause = ' WHERE ' + conditions.join(' AND ');
+        query += whereClause;
+        countQuery += whereClause;
     }
 
+
+    const offset = (page - 1) * limit;
+    query += ` ORDER BY e.dates DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+    params.push(limit, offset);
+
     try {
-        const results = await pool.query(query, params);
-        return results.rows;
+
+        const [results, countResult] = await Promise.all([
+            pool.query(query, params),
+            pool.query(countQuery, params.slice(0, -2))
+        ]);
+
+        const total = parseInt(countResult.rows[0].total);
+        const totalPages = Math.ceil(total / limit);
+
+        return {
+            data: results.rows,
+            pagination: {
+                currentPage: page,
+                totalPages: totalPages,
+                totalItems: total,
+                itemsPerPage: limit,
+                hasNext: page < totalPages,
+                hasPrev: page > 1
+            }
+        };
     } catch (error) {
         throw error;
     }
 }
-
-
 
 module.exports = { getExceptions, getExceptionsByDatesAndId }

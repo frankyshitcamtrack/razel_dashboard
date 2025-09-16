@@ -8,7 +8,17 @@ interface ContextType {
     updateStartDate: (id: string) => void;
     updateEndDate: (id: string) => void;
     updateVehicleImmat: (id: string) => void;
+    updateUser: (user: User) => void;
+    user: User | null;
 }
+
+interface User {
+    ids: string | null;
+    username: string | Date | null;
+    isadmin: boolean;
+
+}
+
 
 
 const Context = createContext<ContextType | undefined>(undefined);
@@ -17,7 +27,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const [vehicleImmat, setvehicleImmat] = useState<string | null>(null);
     const [startDate, setStartDate] = useState<string | Date | null>(null);
     const [endDate, setEndDate] = useState<string | Date | null>(null);
-    //const [data, setData] = useState<dashboardType | {}>({});
+    const [user, setUser] = useState<User | null>(null);
 
     const updateVehicleImmat = (immat: string) => {
         setvehicleImmat(immat);
@@ -31,11 +41,13 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
         setEndDate(id);
     };
 
-
+    const updateUser = (user: User) => {
+        setUser(user)
+    }
 
 
     return (
-        <Context.Provider value={{ vehicleImmat, startDate, endDate, updateStartDate, updateEndDate, updateVehicleImmat }}>
+        <Context.Provider value={{ vehicleImmat, startDate, endDate, updateStartDate, updateEndDate, updateVehicleImmat, updateUser, user }}>
             {children}
         </Context.Provider>
     );

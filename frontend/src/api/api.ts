@@ -3,22 +3,26 @@ import type { AxiosError, AxiosResponse } from 'axios';
 import type { DashboardData, vehicles, exceptions, vehiclesGroup } from '../types/ChartDataType';
 
 
+// api.ts
 export interface PaginationParams {
     page?: number;
     limit?: number;
-    dateFrom?: string;
-    dateTo?: string;
-    vehicleId?: number;
-    groupId?: number;
+    date1?: string;
+    date2?: string;
+    vehicleId?: number | number[];
+    vehicleGroupId?: number;
+    [key: string]: any;
 }
 
-export interface PaginatedResponse<T> {
+export interface PaginatedResponse<T = any> {
     data: T[];
     pagination: {
-        total: number;
-        page: number;
-        limit: number;
-        totalPages: number;
+        currentPage?: number;
+        totalPages?: number;
+        totalItems?: number;
+        itemsPerPage?: number;
+        hasNext?: boolean;
+        hasPrev?: boolean;
     };
 }
 
@@ -402,27 +406,39 @@ export const fetchVehicleGroupById = async (
 
 export const fetchData = async <T>(
     endpoint: 'list_exceptions' | 'list_heuremoteur',
-    params: PaginationParams = {}
+    params: PaginationParams = {},
+    signal?: AbortSignal
 ): Promise<PaginatedResponse<T>> => {
     const queryString = new URLSearchParams();
 
     Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined) {
-            queryString.append(key, String(value));
+        if (value !== undefined && value !== null) {
+            if (Array.isArray(value)) {
+                // Pour les tableaux (comme vehicleId), envoyer chaque valeur séparément
+                value.forEach(item => {
+                    queryString.append(key, String(item));
+                });
+            } else {
+                queryString.append(key, String(value));
+            }
         }
     });
 
-    const response = await fetch(`/api/razel_dashboard/${endpoint}?${queryString}`,
-        {
-            headers: {
-                'Content-Type': 'application/json',
-                ...(localStorage.getItem('authToken') && {
-                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-                })
-            },
-        }
-    );
-    if (!response.ok) throw new Error('Erreur réseau');
+    const response = await fetch(`/api/razel_dashboard/${endpoint}?${queryString}`, {
+        headers: {
+            'Content-Type': 'application/json',
+            ...(localStorage.getItem('authToken') && {
+                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+            })
+        },
+        signal
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Erreur réseau');
+    }
+
     return response.json();
 };
 
