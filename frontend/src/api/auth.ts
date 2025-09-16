@@ -9,10 +9,10 @@ interface User {
 }
 
 
-const BASE_URL = 'http://localhost:8000'
+//const BASE_URL = 'http://localhost:8000'
 
 export const login = async (username: string, password: string): Promise<{ user: User; token: string }> => {
-    const response = await fetch(`${BASE_URL}/auth/secure/login`, {
+    const response = await fetch(`/auth/secure/login`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -45,7 +45,7 @@ export const checkAuth = async (): Promise<{ authenticated: boolean; user?: User
     }
 
     try {
-        const response = await fetch(`${BASE_URL}/auth/secure/check-auth`, {
+        const response = await fetch(`/auth/secure/check-auth`, {
             credentials: 'include',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -68,7 +68,7 @@ export const checkAuth = async (): Promise<{ authenticated: boolean; user?: User
 
 
 export const logout = async (): Promise<void> => {
-    await fetch(`${BASE_URL}/api/razel_dashboard/logout`, {
+    await fetch(`/api/razel_dashboard/logout`, {
         method: 'POST',
         credentials: 'include'
     });

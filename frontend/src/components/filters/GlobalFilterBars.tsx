@@ -56,8 +56,7 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
             const matchesGroup = !filters.vcleGroupId || vehicle?.groupid === user?.groupid || vehicle?.groupid === filters?.vcleGroupId;
             return matchesSearch && matchesGroup;
         });
-    }, [vehicles, searchTerm, filters.vcleGroupId, user]);
-
+    }, [vehicles, searchTerm, filters.vcleGroupId, user?.groupid]);
 
 
     useEffect(() => {

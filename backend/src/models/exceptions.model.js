@@ -38,7 +38,7 @@ async function getExceptions(params = {}) {
 
 
     if (vehicleId) {
-        console.log(vehicleId)
+        //console.log(vehicleId)
         if (Array.isArray(vehicleId)) {
             if (vehicleId.length === 0) {
                 throw new Error("Le tableau vehicleId ne peut pas être vide");
