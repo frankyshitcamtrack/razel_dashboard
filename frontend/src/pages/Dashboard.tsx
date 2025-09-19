@@ -83,6 +83,7 @@ const Dashboard = () => {
                                             data={data?.DaylyConsommationData}
                                             unit="L"
                                             className="h-[320px]"
+                                            variant="pie"
                                         />
                                     )
                                 }

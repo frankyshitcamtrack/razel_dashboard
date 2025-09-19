@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router";
 import Dashboard from "../pages/Dashboard";
 import LoginPage from "../pages/LoginPage";
 import Rapport from "../pages/Rapport";
+import ActiviteBase from "../pages/ActiviteBase";
 import NotFoundPage from "../pages/NotFound";
 import { ProtectedRoute } from "./ProtectedRoute";
 
@@ -31,6 +32,14 @@ function Router() {
                 element={
                     <ProtectedRoute>
                         <Rapport />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/activity_base"
+                element={
+                    <ProtectedRoute>
+                        <ActiviteBase />
                     </ProtectedRoute>
                 }
             />

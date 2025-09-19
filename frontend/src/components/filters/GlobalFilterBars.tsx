@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useAuth } from "../../store/AuthContext";
+
 import {
     CalendarDaysIcon,
     TruckIcon,
@@ -46,42 +47,74 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const { data: vehicles, isLoading } = useVehiclesData();
     const { data: vehicleGroups, isLoading: groupLoading } = useVehiclesGroupData();
-
-
-
+    /* 
+        const filteredVehicles = useMemo(() => {
+            if (!vehicles) return [];
+            return vehicles.filter((vehicle) => {
+                const matchesSearch = vehicle.names.toLowerCase().includes(searchTerm.toLowerCase());
+                const matchesGroup = !filters.vcleGroupId || vehicle?.groupid === user?.groupid || vehicle?.groupid === filters?.vcleGroupId;
+                return matchesSearch && matchesGroup;
+            });
+        }, [vehicles, searchTerm, filters.vcleGroupId, user?.groupid]);
+    
+     */
     const filteredVehicles = useMemo(() => {
         if (!vehicles) return [];
+
         return vehicles.filter((vehicle) => {
             const matchesSearch = vehicle.names.toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesGroup = !filters.vcleGroupId || vehicle?.groupid === user?.groupid || vehicle?.groupid === filters?.vcleGroupId;
+
+            // Logique de filtrage par groupe
+            let matchesGroup = true;
+            if (filters.vcleGroupId) {
+                matchesGroup = vehicle.groupid === filters.vcleGroupId;
+            } else if (user?.isadmin === false) {
+                // Pour les non-admins, filtrer par défaut sur leur groupe
+                matchesGroup = vehicle.groupid === user?.groupid;
+            }
+
             return matchesSearch && matchesGroup;
         });
     }, [vehicles, searchTerm, filters.vcleGroupId, user?.groupid]);
 
+    /*     useEffect(() => {
+            // Au chargement initial, si aucun véhicule n'est sélectionné, sélectionner tous les véhicules
+            if (user?.isadmin === true && vehicles) {
+                // Créer un tableau avec tous les IDs de véhicules
+                const allVehicleIds = vehicles?.map(v => v.ids);
+                setFilters((prev) => ({ ...prev, weekDays: [1], vehicle: allVehicleIds }));
+            }
+    
+            if (user?.isadmin === false && vehicles) {
+                const vehiclebygroups = vehicles?.filter(item => item.groupid === user?.groupid);
+                const selectedVecle = vehiclebygroups?.map(v => v.ids);
+                setFilters((prev) => ({ ...prev, weekDays: [1], vehicle: selectedVecle }));
+            }
+        }, []); */
 
     useEffect(() => {
-        // Au chargement initial, si aucun véhicule n'est sélectionné, sélectionner tous les véhicules
-        if (user?.isadmin === true && vehicles) {
-            // Créer un tableau avec tous les IDs de véhicules
-            const allVehicleIds = vehicles?.map(v => v.ids);
-            setFilters((prev) => ({ ...prev, weekDays: [1], vehicle: allVehicleIds }));
+        if (vehicles && user) {
+            if (user.isadmin === true) {
+                const allVehicleIds = vehicles.map(v => v.ids);
+                setFilters((prev) => ({
+                    ...prev,
+                    weekDays: [1],
+                    vehicle: allVehicleIds,
+                    vcleGroupId: undefined
+                }));
+            } else {
+                const vehiclebygroups = vehicles.filter(item => item.groupid === user.groupid);
+                const selectedVecle = vehiclebygroups.map(v => v.ids);
+                setFilters((prev) => ({
+                    ...prev,
+                    weekDays: [1],
+                    vehicle: selectedVecle,
+                    vcleGroupId: user.groupid
+                }));
+            }
         }
+    }, [vehicles, user]);
 
-        if (user?.isadmin === false && vehicles) {
-            const vehiclebygroups = vehicles?.filter(item => item.groupid === user?.groupid);
-            const selectedVecle = vehiclebygroups?.map(v => v.ids);
-            setFilters((prev) => ({ ...prev, weekDays: [1], vehicle: selectedVecle }));
-        }
-    }, []);
-
-    /*    useEffect(() => {
-           if (vehicles && filters.vehicle === 68) {
-               const defaultVehicleExists = vehicles.some((v) => v.ids === 68);
-               if (!defaultVehicleExists && vehicles.length > 0) {
-                   setFilters((prev) => ({ ...prev, vehicle: vehicles[0].ids }));
-               }
-           }
-       }, [vehicles, filters.vehicle]); */
 
 
     const handleVehicleChange = (vehicleId: number) => {
