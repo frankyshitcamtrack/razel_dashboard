@@ -16,7 +16,7 @@ async function httpGettransitbase(req, res) {
 
 async function httpGetTransitDashboards(req, res) {
     try {
-        const { date1, date2, vehicle, weekDays } = req.query;
+        const { date1, date2, vehicle, groupBy, weekDays } = req.query;
 
         // Validation des dates
         if (date1 && isNaN(new Date(date1).getTime())) {

@@ -58,7 +58,7 @@ export interface HeureMoteur {
     group_name: string
 }
 
-const BASE_URL = 'http://localhost:8000'
+//const BASE_URL = 'http://localhost:8000'
 
 
 export const fetchHeureMoteurData = async (
@@ -106,7 +106,7 @@ export const fetchHeureMoteurData = async (
         }
 
         const response = await axios.get<DashboardData>(
-            `${BASE_URL}/api/razel_dashboard/heuremoteur`,
+            `/api/razel_dashboard/heuremoteur`,
             {
                 params: queryParams,
                 headers: {
@@ -232,7 +232,7 @@ export const fetchTrajets = async (
         }
 
         const response = await axios.get<DashboardTrajet>(
-            `${BASE_URL}/api/razel_dashboard/trajets`,
+            `/api/razel_dashboard/trajets`,
             {
                 params: queryParams,
                 headers: {
@@ -307,7 +307,7 @@ export const fetchTransitData = async (
         }
 
         const response = await axios.get<DashboardTransitData>(
-            `${BASE_URL}/api/razel_dashboard/transit_dashboard`,
+            `/api/razel_dashboard/transit_dashboard`,
             {
                 params: queryParams,
                 headers: {
@@ -384,7 +384,7 @@ export const fetchExceptions = async (
         }
 
         const response: AxiosResponse<exceptions> = await axios.get(
-            `${BASE_URL}/api/razel_dashboard/exceptions`,
+            `/api/razel_dashboard/exceptions`,
             {
                 params: queryParams,
                 headers: {
@@ -420,7 +420,7 @@ export const fetchVehicles = async (
 ): Promise<vehicles[]> => {
     try {
         const response: AxiosResponse<vehicles[]> = await axios.get(
-            `${BASE_URL}/api/razel_dashboard/vehicles`,
+            `/api/razel_dashboard/vehicles`,
             {
                 headers: {
                     'Content-Type': 'application/json',
@@ -456,7 +456,7 @@ export const fetchVehicleById = async (
 ): Promise<vehicles> => {
     try {
         const response: AxiosResponse<vehicles> = await axios.get(
-            `${BASE_URL}/api/razel_dashboard/single_vehicle?id=${id}`,
+            `/api/razel_dashboard/single_vehicle?id=${id}`,
             {
                 headers: {
                     'Content-Type': 'application/json',
@@ -492,7 +492,7 @@ export const fetchVehiclesGroup = async (
 ): Promise<vehicles[]> => {
     try {
         const response: AxiosResponse<vehiclesGroup[]> = await axios.get(
-            `${BASE_URL}/api/razel_dashboard/vehicles_group`,
+            `/api/razel_dashboard/vehicles_group`,
             {
                 headers: {
                     'Content-Type': 'application/json',
@@ -528,7 +528,7 @@ export const fetchVehicleGroupById = async (
 ): Promise<vehicles> => {
     try {
         const response: AxiosResponse<vehicles> = await axios.get(
-            `${BASE_URL}/api/razel_dashboard/single_vehicle_group?id=${id}`,
+            `/api/razel_dashboard/single_vehicle_group?id=${id}`,
             {
                 headers: {
                     'Content-Type': 'application/json',
@@ -582,7 +582,7 @@ export const fetchData = async <T>(
         }
     });
 
-    const response = await fetch(`${BASE_URL}/api/razel_dashboard/${endpoint}?${queryString}`, {
+    const response = await fetch(`/api/razel_dashboard/${endpoint}?${queryString}`, {
         headers: {
             'Content-Type': 'application/json',
             ...(localStorage.getItem('authToken') && {
