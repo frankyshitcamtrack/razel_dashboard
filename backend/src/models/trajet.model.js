@@ -36,7 +36,7 @@ async function getTrajets(params = {}) {
     const hasValidWeekDays = !!(weekDaysThisWeek?.length > 0);
 
     // Si aucun paramètre valide n'est présent, ne pas exécuter la requête
-    if (!hasValidDateRange && !hasValidVehicleFilter && !hasValidGroupFilter && !hasValidWeekDays) {
+    if (!hasValidDateRange && !hasValidGroupFilter && !hasValidWeekDays) {
         console.log('Aucun filtre valide spécifié - requête annulée');
         return {
             data: [],

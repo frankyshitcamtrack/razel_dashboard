@@ -105,12 +105,24 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
 
     const handleGroupChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const value = e.target.value ? Number(e.target.value) : undefined;
-        setFilters((prev) => ({
-            ...prev,
-            vcleGroupId: value,
-            vehicle: undefined,
-        }));
+        setFilters((prev) => {
+            const newFilters = { ...prev, vcleGroupId: value };
+
+            if (value && vehicles) {
+
+                const vehiclesInGroup = vehicles.filter(v => v.groupid === value);
+                newFilters.vehicle = vehiclesInGroup.map(v => v.ids);
+            } else if (!value && vehicles) {
+
+                newFilters.vehicle = vehicles.map(v => v.ids);
+            } else {
+                newFilters.vehicle = [];
+            }
+
+            return newFilters;
+        });
     };
+
 
     const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -384,15 +396,23 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
 
                     <button
                         onClick={() => {
-                            setFilters(prev => ({ ...prev, weekDays: [], vehicle: [] }));
+                            setFilters({
+                                date1: undefined,
+                                date2: undefined,
+                                vehicle: [],
+                                vcleGroupId: undefined,
+                                groupBy: "day",
+                                weekDays: [],
+                            });
                             setSearchTerm("");
                         }}
                         className="ml-4 flex items-center px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                        title="Réinitialiser les filtres jours/véhicules"
+                        title="Réinitialiser tous les filtres"
                     >
                         <ArrowPathIcon className="w-4 h-4 mr-1" />
                         Reset
                     </button>
+
                 </div>
                 <ul className="divide-y divide-gray-200"></ul>
 
@@ -430,15 +450,44 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
 
                         {/* Droite : Véhicules */}
                         <div className="border rounded-lg p-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-3 flex items-center">
-                                <TruckIcon className="w-5 h-5 mr-2 text-green-500" />
-                                Sélectionner les véhicules
-                                {/*   {filters.vehicleIds.length > 0 && (
+                            <div className="flex items-center justify-between  mb-2">
+                                <label className="block text-sm font-medium text-gray-700 flex items-center">
+                                    <TruckIcon className="w-5 h-5 mr-2 text-green-500" />
+                                    Sélectionner les véhicules
+                                    {/*   {filters.vehicleIds.length > 0 && (
                                                 <span className="ml-2 px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">
                                                     {filters.vehicleIds.length} sélectionné(s)
                                                 </span>
                                             )} */}
-                            </label>
+                                </label>
+                                <div>
+                                    <input
+                                        type="checkbox"
+                                        id="selectAllVehicles"
+                                        checked={
+                                            filteredVehicles.length > 0 &&
+                                            filteredVehicles.every(v =>
+                                                Array.isArray(filters.vehicle)
+                                                    ? filters.vehicle.includes(v.ids)
+                                                    : filters.vehicle === v.ids
+                                            )
+                                        }
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                const allIds = filteredVehicles.map(v => v.ids);
+                                                setFilters(prev => ({ ...prev, vehicle: allIds }));
+                                            } else {
+                                                setFilters(prev => ({ ...prev, vehicle: [] }));
+                                            }
+                                        }}
+                                        className="mr-2"
+                                    />
+                                    <label htmlFor="selectAllVehicles" className="text-sm text-gray-700">
+                                        Sélectionner Tous les véhicules
+                                    </label>
+                                </div>
+
+                            </div>
 
                             {/* Barre de recherche */}
                             {/*     <div className="relative mb-3">

@@ -459,7 +459,7 @@ async function getDureeTransitMax(params = {}) {
     const hasValidWeekDays = !!(weekDaysThisWeek?.length > 0);
 
     // Si aucun paramètre valide n'est présent, ne pas exécuter la requête
-    if (!hasValidDateRange && !hasValidVehicleFilter && !hasValidWeekDays) {
+    if (!hasValidDateRange && !hasValidWeekDays) {
         console.log('Aucun filtre valide spécifié - requête annulée');
         return {
             data: [],
