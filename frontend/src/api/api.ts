@@ -66,7 +66,7 @@ export const fetchHeureMoteurData = async (
         date1?: string;
         date2?: string;
         vehicle?: number | number[] | null;
-        vcleGroupId?: number;
+        //vcleGroupId?: number;
         groupBy?: "day" | "week" | "month";
         weekDays?: number[];
     }
@@ -91,9 +91,11 @@ export const fetchHeureMoteurData = async (
         }
 
         // Ajout des autres paramètres
-        if (params.vcleGroupId !== undefined) {
-            queryParams.append('vcleGroupId', params.vcleGroupId.toString());
-        }
+
+        /*    if (params.vcleGroupId !== undefined) {
+               queryParams.append('vcleGroupId', params.vcleGroupId.toString());
+           } */
+
         if (params.groupBy !== undefined) {
             queryParams.append('groupBy', params.groupBy);
         }
@@ -217,9 +219,9 @@ export const fetchTrajets = async (
         }
 
         // Ajout des autres paramètres
-        if (params.vcleGroupId !== undefined) {
-            queryParams.append('vcleGroupId', params.vcleGroupId.toString());
-        }
+        /*         if (params.vcleGroupId !== undefined) {
+                    queryParams.append('vcleGroupId', params.vcleGroupId.toString());
+                } */
         if (params.groupBy !== undefined) {
             queryParams.append('groupBy', params.groupBy);
         }
@@ -292,9 +294,9 @@ export const fetchTransitData = async (
         }
 
         // Ajout des autres paramètres
-        if (params.vcleGroupId !== undefined) {
-            queryParams.append('vcleGroupId', params.vcleGroupId.toString());
-        }
+        /*    if (params.vcleGroupId !== undefined) {
+               queryParams.append('vcleGroupId', params.vcleGroupId.toString());
+           } */
         if (params.groupBy !== undefined) {
             queryParams.append('groupBy', params.groupBy);
         }
@@ -368,9 +370,10 @@ export const fetchExceptions = async (
         }
 
         // Ajout des autres paramètres
-        if (params.vcleGroupId !== undefined) {
-            queryParams.append('vcleGroupId', params.vcleGroupId.toString());
-        }
+        /*         if (params.vcleGroupId !== undefined) {
+                    queryParams.append('vcleGroupId', params.vcleGroupId.toString());
+                }
+         */
         if (params.groupBy !== undefined) {
             queryParams.append('groupBy', params.groupBy);
         }

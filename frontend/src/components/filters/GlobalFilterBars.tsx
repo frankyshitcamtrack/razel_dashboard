@@ -107,9 +107,7 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
         const value = e.target.value ? Number(e.target.value) : undefined;
         setFilters((prev) => {
             const newFilters = { ...prev, vcleGroupId: value };
-
             if (value && vehicles) {
-
                 const vehiclesInGroup = vehicles.filter(v => v.groupid === value);
                 newFilters.vehicle = vehiclesInGroup.map(v => v.ids);
             } else if (!value && vehicles) {
@@ -140,25 +138,7 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
     };
 
     const handleGroupByChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const value = e.target.value ? Number(e.target.value) : undefined;
-        setFilters((prev) => {
-            const newFilters = {
-                ...prev,
-                vcleGroupId: value,
-            };
-
-            if (value && vehicles) {
-                const vehiclesInGroup = vehicles.filter(v => v.groupid === value);
-                const vehicleIds = vehiclesInGroup.map(v => v.ids);
-                newFilters.vehicle = vehicleIds.length > 0 ? vehicleIds : undefined;
-            } else if (vehicles && !value) {
-                const vehicleIds = vehicles.map(v => v.ids);
-                newFilters.vehicle = vehicleIds.length > 0 ? vehicleIds : undefined;
-            } else {
-                newFilters.vehicle = undefined;
-            }
-            return newFilters;
-        });
+        setFilters((prev) => ({ ...prev, groupBy: e.target.value as "day" | "week" | "month" }));
     };
 
     /*     const handleGroupChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

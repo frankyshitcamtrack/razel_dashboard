@@ -12,7 +12,7 @@ export const useExceptions = (params: {
     return useQuery<exceptions, Error>({
         queryKey: ['exceptions values', params],
         queryFn: () => fetchExceptions(params),
-        enabled: !!params.date2 || params.vehicle !== undefined || params.groupBy !== undefined || params.vcleGroupId !== undefined,
+        enabled: !!params.date2 || params.vehicle !== undefined || params.groupBy !== undefined,
         staleTime: 5 * 60 * 1000,
     });
 };

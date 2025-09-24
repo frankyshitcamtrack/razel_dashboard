@@ -12,7 +12,7 @@ export const useTransitData = (params: {
     return useQuery<DashboardTransitData, Error>({
         queryKey: ['transit data', params],
         queryFn: () => fetchTransitData(params),
-        enabled: (!!params.date2 && params.date2.length > 0) || params.vehicle !== undefined || params.groupBy !== undefined || params.vcleGroupId !== undefined,
+        enabled: (!!params.date2 && params.date2.length > 0) || params.vehicle !== undefined || params.groupBy !== undefined,
         staleTime: 5 * 60 * 1000,
     });
 };
