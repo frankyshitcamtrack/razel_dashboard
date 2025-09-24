@@ -1,14 +1,15 @@
 import { useState } from "react";
 import Sidebar from "../components/layout/SideBar";
 import GlobalFilterBar from "../components/filters/GlobalFilterBars";
-import VerticalStackedBarChart from "../components/charts/VerticalStakedBarChart";
+//import VerticalStackedBarChart from "../components/charts/VerticalStakedBarChart";
+import StackedBarChart from "../components/charts/StackedBarChart";
 import CustomBarChart from "../components/charts/BarChart"
 import { useTrajetData } from "../hooks/useTrajet";
 import { useExceptions } from "../hooks/useExceptions";
 import type { Filters } from "../components/filters/GlobalFilterBars";
 
 
-const ActiviteBase = () => {
+const Trajet = () => {
     const [filters, setFilters] = useState<Filters>({
         date1: undefined,
         date2: undefined,
@@ -41,9 +42,9 @@ const ActiviteBase = () => {
                         ) : (
                             <>
                                 {exceptions?.speeding && (
-                                    <VerticalStackedBarChart
-                                        data={exceptions.speeding}
-                                        dataKey1="duree_totale"
+                                    <StackedBarChart
+                                        data={exceptions?.speeding}
+                                        dataKey1="value"
                                         //dataKey2="usage"
                                         label1="survitesse"
                                         //label2="Durée"
@@ -55,7 +56,7 @@ const ActiviteBase = () => {
                                 )}
                                 {data?.SommeDistances && (
                                     <CustomBarChart
-                                        data={data.SommeDistances}
+                                        data={data?.SommeDistances}
                                         dataKey1="value"
                                         //dataKey2="usage"
                                         label1="Somme de distance(KM)"
@@ -65,9 +66,9 @@ const ActiviteBase = () => {
                                         title="KM Journalier"
                                     />
                                 )}
-                                {data?.TempsMoteur && (
-                                    <VerticalStackedBarChart
-                                        data={data.TempsMoteur}
+                                {data?.tempsMoteur && (
+                                    <StackedBarChart
+                                        data={data?.tempsMoteur}
                                         dataKey1="value"
                                         //dataKey2="usage"
                                         label1="Sommes de durée utilisation"
@@ -93,4 +94,4 @@ const DonutSkeleton = () => (
     </div>
 );
 
-export default ActiviteBase;
+export default Trajet;

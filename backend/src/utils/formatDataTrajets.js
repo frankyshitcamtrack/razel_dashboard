@@ -1,6 +1,8 @@
 /**
  * Version avec format de nom personnalisable
  */
+
+const { secondsToHms } = require("../utils/SecTohhmmss")
 async function getTrajetsStatsDetails(data) {
 
     const groupedData = {};
@@ -39,7 +41,7 @@ async function getTrajetsStatsDetails(data) {
     return {
         tempsMoteur: sortedData.map(item => ({
             name: item.name,
-            value: item.tempsMoteur
+            value: secondsToHms(item.tempsMoteur)
         })),
         SommeDistances: sortedData.map(item => ({
             name: item.name,

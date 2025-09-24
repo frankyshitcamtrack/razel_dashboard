@@ -121,7 +121,7 @@ export type HarshAccelerationBrakingUsageData = HarshAccelerationBraking[];
 
 
 export type DashboardTrajet = {
-    TempsMoteur: TempsMoteurData,
+    tempsMoteur: TempsMoteurData,
     SommeDistances: SommeDistancesData
 }
 

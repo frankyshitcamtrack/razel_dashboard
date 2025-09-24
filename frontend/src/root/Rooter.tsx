@@ -3,6 +3,7 @@ import Dashboard from "../pages/Dashboard";
 import LoginPage from "../pages/LoginPage";
 import Rapport from "../pages/Rapport";
 import ActiviteBase from "../pages/ActiviteBase";
+import Trajet from "../pages/Trajet";
 import NotFoundPage from "../pages/NotFound";
 import { ProtectedRoute } from "./ProtectedRoute";
 
@@ -40,6 +41,14 @@ function Router() {
                 element={
                     <ProtectedRoute>
                         <ActiviteBase />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/utilisation_tracteurs"
+                element={
+                    <ProtectedRoute>
+                        <Trajet />
                     </ProtectedRoute>
                 }
             />
