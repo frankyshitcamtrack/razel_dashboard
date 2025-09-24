@@ -9,7 +9,7 @@ import {
     ChevronDownIcon,
     ChevronUpIcon,
     MagnifyingGlassIcon,
-    ArrowPathIcon, // Icône pour le reset
+    ArrowPathIcon,
 } from "@heroicons/react/24/outline";
 import { useVehiclesData } from "../../hooks/useVehiclesData";
 import { useVehiclesGroupData } from "../../hooks/useVehiclesGroupData";
@@ -47,50 +47,22 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const { data: vehicles, isLoading } = useVehiclesData();
     const { data: vehicleGroups, isLoading: groupLoading } = useVehiclesGroupData();
-    /* 
-        const filteredVehicles = useMemo(() => {
-            if (!vehicles) return [];
-            return vehicles.filter((vehicle) => {
-                const matchesSearch = vehicle.names.toLowerCase().includes(searchTerm.toLowerCase());
-                const matchesGroup = !filters.vcleGroupId || vehicle?.groupid === user?.groupid || vehicle?.groupid === filters?.vcleGroupId;
-                return matchesSearch && matchesGroup;
-            });
-        }, [vehicles, searchTerm, filters.vcleGroupId, user?.groupid]);
-    
-     */
+
     const filteredVehicles = useMemo(() => {
         if (!vehicles) return [];
 
         return vehicles.filter((vehicle) => {
             const matchesSearch = vehicle.names.toLowerCase().includes(searchTerm.toLowerCase());
-
-            // Logique de filtrage par groupe
             let matchesGroup = true;
             if (filters.vcleGroupId) {
                 matchesGroup = vehicle.groupid === filters.vcleGroupId;
             } else if (user?.isadmin === false) {
-                // Pour les non-admins, filtrer par défaut sur leur groupe
                 matchesGroup = vehicle.groupid === user?.groupid;
             }
-
             return matchesSearch && matchesGroup;
         });
     }, [vehicles, searchTerm, filters.vcleGroupId, user?.groupid]);
 
-    /*     useEffect(() => {
-            // Au chargement initial, si aucun véhicule n'est sélectionné, sélectionner tous les véhicules
-            if (user?.isadmin === true && vehicles) {
-                // Créer un tableau avec tous les IDs de véhicules
-                const allVehicleIds = vehicles?.map(v => v.ids);
-                setFilters((prev) => ({ ...prev, weekDays: [1], vehicle: allVehicleIds }));
-            }
-    
-            if (user?.isadmin === false && vehicles) {
-                const vehiclebygroups = vehicles?.filter(item => item.groupid === user?.groupid);
-                const selectedVecle = vehiclebygroups?.map(v => v.ids);
-                setFilters((prev) => ({ ...prev, weekDays: [1], vehicle: selectedVecle }));
-            }
-        }, []); */
 
     useEffect(() => {
         if (vehicles && user) {
@@ -142,13 +114,64 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
 
     const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setFilters((prev) => ({ ...prev, [name]: value || undefined }));
+        setFilters((prev) => {
+            const newFilters = {
+                ...prev,
+                [name]: value || undefined
+            };
+            if ((name === "date1" && !value) || (name === "date2" && !value)) {
+                newFilters.date1 = undefined;
+                newFilters.date2 = undefined;
+            }
+            return newFilters;
+        });
     };
 
     const handleGroupByChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setFilters((prev) => ({ ...prev, groupBy: e.target.value as "day" | "week" | "month" }));
+        const value = e.target.value ? Number(e.target.value) : undefined;
+        setFilters((prev) => {
+            const newFilters = {
+                ...prev,
+                vcleGroupId: value,
+            };
+
+            if (value && vehicles) {
+                const vehiclesInGroup = vehicles.filter(v => v.groupid === value);
+                const vehicleIds = vehiclesInGroup.map(v => v.ids);
+                newFilters.vehicle = vehicleIds.length > 0 ? vehicleIds : undefined;
+            } else if (vehicles && !value) {
+                const vehicleIds = vehicles.map(v => v.ids);
+                newFilters.vehicle = vehicleIds.length > 0 ? vehicleIds : undefined;
+            } else {
+                newFilters.vehicle = undefined;
+            }
+            return newFilters;
+        });
     };
 
+    /*     const handleGroupChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+            const value = e.target.value ? Number(e.target.value) : undefined;
+    
+            setFilters((prev) => {
+                const newFilters = {
+                    ...prev,
+                    vcleGroupId: value,
+                };
+    
+                // Si un groupe est sélectionné, on sélectionne automatiquement tous ses véhicules
+                if (value && vehicles) {
+                    const vehiclesInGroup = vehicles.filter(v => v.groupid === value);
+                    const vehicleIds = vehiclesInGroup.map(v => v.ids);
+                    newFilters.vehicle = vehicleIds.length > 0 ? vehicleIds : undefined;
+                } else {
+                    // Si aucun groupe, on vide la sélection véhicules
+                    newFilters.vehicle = undefined;
+                }
+    
+                return newFilters;
+            });
+        };
+     */
     const toggleWeekday = (day: number) => {
         if (!filters?.weekDays) return [];
         const newDays = filters?.weekDays?.includes(day)
@@ -158,28 +181,18 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
         setFilters((prev) => ({ ...prev, weekDays: newDays }));
     }
 
-    /*   const removeVehicle = (vehicleId: number) => {
-          setFilters((prev) => {
-              const currentVehicles = Array.isArray(prev.vehicle) ? prev.vehicle : prev.vehicle ? [prev.vehicle] : [];
-              const newVehicles = currentVehicles.filter((id) => id !== vehicleId);
-              return {
-                  ...prev,
-                  vehicle: newVehicles.length ? newVehicles : undefined,
-              };
-          });
-      };
-   */
+    const isVehicleSelectedByGroup = (vehicleId: number) => {
+        if (!filters.vcleGroupId || !vehicles) return false;
+        const vehiclesInSelectedGroup = vehicles.filter(v => v.groupid === filters.vcleGroupId);
+        return vehiclesInSelectedGroup.some(v => v.ids === vehicleId);
+    };
 
 
-    /*  const selectedVehicles = useMemo(() => {
-         if (!filters.vehicle) return [];
-         const vehicleIds = Array.isArray(filters.vehicle) ? filters.vehicle : [filters.vehicle];
-         return vehicles?.filter((v) => vehicleIds.includes(v.ids)) || [];
-     }, [filters.vehicle, vehicles]);
- 
-  */
-
-
+    const isVehicleIndividuallySelected = (vehicleId: number) => {
+        return Array.isArray(filters.vehicle)
+            ? filters.vehicle.includes(vehicleId)
+            : filters.vehicle === vehicleId;
+    };
     return (
         <>
             <div className="mb-2 bg-white p-4 rounded-2xl shadow-md border">
@@ -369,7 +382,6 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
                         )}
                     </div>
 
-                    {/* Bouton Reset pour cette section aussi si vous voulez */}
                     <button
                         onClick={() => {
                             setFilters(prev => ({ ...prev, weekDays: [], vehicle: [] }));
@@ -459,22 +471,26 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
                                 ) : filteredVehicles.length === 0 ? (
                                     <div className="text-center text-gray-500 py-4">Aucun véhicule trouvé</div>
                                 ) : (
+
                                     filteredVehicles.map((vehicle) => {
-                                        const isSelected = Array.isArray(filters.vehicle)
-                                            ? filters.vehicle.includes(vehicle.ids)
-                                            : filters.vehicle === vehicle.ids;
+                                        const isGroupSelected = isVehicleSelectedByGroup(vehicle.ids);
+                                        const isIndividuallySelected = isVehicleIndividuallySelected(vehicle.ids);
+                                        const isActive = isGroupSelected || isIndividuallySelected;
+
                                         return (
                                             <button
                                                 key={vehicle.ids}
                                                 type="button"
                                                 onClick={() => handleVehicleChange(vehicle.ids)}
-                                                className={`w-full px-2 py-1 rounded text-sm transition-all ${isSelected
+                                                className={`w-full px-2 py-1 rounded text-sm transition-all ${isActive
                                                     ? "bg-[#F7D000] text-white shadow-sm"
                                                     : "bg-white text-gray-700 hover:bg-gray-100"
+                                                    } ${isGroupSelected && !isIndividuallySelected
+                                                        ? "bg-[#F7D000] text - white shadow - sm"// Style différent pour les véhicules sélectionnés par groupe
+                                                        : ""
                                                     }`}
                                             >
                                                 <span>{vehicle.names.split('-')[0]}</span>
-
                                             </button>
                                         );
                                     })

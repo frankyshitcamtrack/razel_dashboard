@@ -9,7 +9,21 @@ async function getExceptions(params = {}) {
         weekDaysThisWeek
     } = params;
 
+    // Vérification stricte des paramètres requis
+    const hasValidDateRange = !!(dateFrom && dateTo);
+    const hasValidVehicleFilter = !!(vehicleId && (Array.isArray(vehicleId) ? vehicleId.length > 0 : true));
+    const hasValidGroupFilter = !!groupId;
+    const hasValidWeekDays = !!(weekDaysThisWeek?.length > 0);
 
+    // Si aucun paramètre valide n'est présent, ne pas exécuter la requête
+    if (!hasValidDateRange && !hasValidVehicleFilter && !hasValidGroupFilter && !hasValidWeekDays) {
+        console.log('Aucun filtre valide spécifié - requête annulée');
+        return {
+            data: [],
+            total: 0,
+            message: "Aucun filtre valide spécifié. Veuillez fournir au moins un des critères suivants : plage de dates complète, véhicule(s), groupe ou jours de la semaine."
+        };
+    }
 
     let query = `
         SELECT 
@@ -24,21 +38,17 @@ async function getExceptions(params = {}) {
     const values = [];
     const whereClauses = [];
 
-    // Filtrage par dates
+    // Filtrage par dates (STRICT : les deux dates doivent être présentes)
     if (dateFrom && dateTo) {
         whereClauses.push(`e.dates BETWEEN $${values.length + 1} AND $${values.length + 2}`);
         values.push(dateFrom, dateTo);
-    } else if (dateFrom) {
-        whereClauses.push(`e.dates >= $${values.length + 1}`);
-        values.push(dateFrom);
-    } else if (dateTo) {
-        whereClauses.push(`e.dates <= $${values.length + 1}`);
-        values.push(dateTo);
+    } else if (dateFrom || dateTo) {
+        // Si une seule date est fournie, on ignore (comportement strict)
+        console.warn('Plage de dates incomplète ignorée : dateFrom et dateTo doivent être fournies ensemble');
     }
 
-
+    // Filtrage par véhicule(s) (STRICT : doit être non vide)
     if (vehicleId) {
-        //console.log(vehicleId)
         if (Array.isArray(vehicleId)) {
             if (vehicleId.length === 0) {
                 throw new Error("Le tableau vehicleId ne peut pas être vide");
@@ -51,14 +61,14 @@ async function getExceptions(params = {}) {
         }
     }
 
-    // Filtrage par groupe
+    // Filtrage par groupe (STRICT : doit être défini)
     if (groupId) {
         whereClauses.push(`v.groupid = $${values.length + 1}`);
         values.push(groupId);
     }
 
-    // OPTIMISATION: Filtrage par jours de la semaine (même logique que getHmoteur)
-    if (weekDaysThisWeek && Array.isArray(weekDaysThisWeek) && weekDaysThisWeek.length > 0) {
+    // Filtrage par jours de la semaine (STRICT : doit avoir au moins un jour)
+    if (weekDaysThisWeek?.length > 0) {
         if (!weekDaysThisWeek.every(d => d >= 1 && d <= 7)) {
             throw new Error("Les jours doivent être entre 1 (lundi) et 7 (dimanche)");
         }
@@ -74,7 +84,7 @@ async function getExceptions(params = {}) {
         // Ajouter les valeurs converties
         values.push(...postgresDays);
 
-        // Si pas de plage de dates, on limite à la semaine en cours
+        // Si pas de plage de dates, limiter à la semaine en cours (uniquement si weekDays est spécifié)
         if (!dateFrom && !dateTo) {
             const today = new Date();
             const dayOfWeek = today.getDay(); // 0=dimanche, 1=lundi, ..., 6=samedi
@@ -97,13 +107,25 @@ async function getExceptions(params = {}) {
         whereClauses.push(`(${dayConditions.join(' OR ')})`);
     }
 
-    // Ajout des clauses WHERE
+    // Vérification finale : au moins une clause WHERE doit être présente
+    if (whereClauses.length === 0) {
+        console.log('Aucune clause WHERE valide générée - requête annulée');
+        return {
+            data: [],
+            total: 0,
+            message: "Les paramètres fournis sont insuffisants pour exécuter la requête."
+        };
+    }
+
+    // Construction de la requête WHERE
     if (whereClauses.length > 0) {
         query += ' WHERE ' + whereClauses.join(' AND ');
     }
 
     // Tri par date
     query += ' ORDER BY e.dates DESC';
+
+    console.log('Requête getExceptions exécutée avec filtres :', whereClauses);
 
     try {
         // Exécution unique de la requête
@@ -114,14 +136,14 @@ async function getExceptions(params = {}) {
 
         return {
             data: result.rows,
-            total: result.rows.length
+            total: result.rows.length,
+            message: `${result.rows.length} exceptions trouvées`
         };
     } catch (error) {
         console.error('Erreur getExceptions:', error);
         throw error;
     }
 }
-
 
 
 async function getExceptionsByDatesAndId(date1, date2, vehicleId, vehicleGroupId, page = 1, limit = 10) {

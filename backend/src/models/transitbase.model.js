@@ -44,6 +44,21 @@ async function getDureeParBase(params = {}) {
         weekDaysThisWeek
     } = params;
 
+    // Vérification stricte des paramètres requis
+    const hasValidDateRange = !!(dateFrom && dateTo);
+    const hasValidVehicleFilter = !!(vehicleId && (Array.isArray(vehicleId) ? vehicleId.length > 0 : true));
+    const hasValidWeekDays = !!(weekDaysThisWeek?.length > 0);
+
+    // Si aucun paramètre valide n'est présent, ne pas exécuter la requête
+    if (!hasValidDateRange && !hasValidVehicleFilter && !hasValidWeekDays) {
+        console.log('Aucun filtre valide spécifié - requête annulée');
+        return {
+            data: [],
+            total: 0,
+            message: "Aucun filtre valide spécifié. Veuillez fournir au moins un des critères suivants : plage de dates complète, véhicule(s) ou jours de la semaine."
+        };
+    }
+
     let query = `
         SELECT 
             v.names as vehicle_name,
@@ -60,22 +75,17 @@ async function getDureeParBase(params = {}) {
     const whereClauses = [];
     let paramIndex = 1;
 
-    // Filtrage par dates
+    // Filtrage par dates (STRICT : les deux dates doivent être présentes)
     if (dateFrom && dateTo) {
         whereClauses.push(`tb.dates BETWEEN $${paramIndex} AND $${paramIndex + 1}`);
         values.push(dateFrom, dateTo);
         paramIndex += 2;
-    } else if (dateFrom) {
-        whereClauses.push(`tb.dates >= $${paramIndex}`);
-        values.push(dateFrom);
-        paramIndex += 1;
-    } else if (dateTo) {
-        whereClauses.push(`tb.dates <= $${paramIndex}`);
-        values.push(dateTo);
-        paramIndex += 1;
+    } else if (dateFrom || dateTo) {
+        // Si une seule date est fournie, on ignore (comportement strict)
+        console.warn('Plage de dates incomplète ignorée : dateFrom et dateTo doivent être fournies ensemble');
     }
 
-    // Filtrage par véhicule(s)
+    // Filtrage par véhicule(s) (STRICT : doit être non vide)
     if (vehicleId) {
         if (Array.isArray(vehicleId)) {
             if (vehicleId.length === 0) {
@@ -91,24 +101,24 @@ async function getDureeParBase(params = {}) {
         }
     }
 
-    // Filtrage par jours de la semaine
-    if (weekDaysThisWeek && Array.isArray(weekDaysThisWeek) && weekDaysThisWeek.length > 0) {
+    // Filtrage par jours de la semaine (STRICT : doit avoir au moins un jour)
+    if (weekDaysThisWeek?.length > 0) {
         if (!weekDaysThisWeek.every(d => d >= 1 && d <= 7)) {
             throw new Error("Les jours doivent être entre 1 (lundi) et 7 (dimanche)");
         }
 
         const postgresDays = weekDaysThisWeek.map(dayNum => dayNum === 7 ? 0 : dayNum);
 
-        let weekStart, weekEnd;
+        // Si pas de plage de dates, limiter à la semaine en cours (uniquement si weekDays est spécifié)
         if (!dateFrom && !dateTo) {
             const today = new Date();
             const dayOfWeek = today.getDay();
 
-            weekStart = new Date(today);
+            const weekStart = new Date(today);
             weekStart.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
             weekStart.setHours(0, 0, 0, 0);
 
-            weekEnd = new Date(weekStart);
+            const weekEnd = new Date(weekStart);
             weekEnd.setDate(weekStart.getDate() + 6);
             weekEnd.setHours(23, 59, 59, 999);
 
@@ -126,11 +136,23 @@ async function getDureeParBase(params = {}) {
         paramIndex += postgresDays.length;
     }
 
+    // Vérification finale : au moins une clause WHERE doit être présente
+    if (whereClauses.length === 0) {
+        console.log('Aucune clause WHERE valide générée - requête annulée');
+        return {
+            data: [],
+            total: 0,
+            message: "Les paramètres fournis sont insuffisants pour exécuter la requête."
+        };
+    }
+
     if (whereClauses.length > 0) {
         query += ' WHERE ' + whereClauses.join(' AND ');
     }
 
     query += ' GROUP BY v.names, b.names, tb.baseinit, tb.dates ORDER BY tb.dates DESC, duree_totale DESC';
+
+    console.log('Requête getDureeParBase exécutée avec filtres :', whereClauses);
 
     try {
         const result = await pool.query({
@@ -140,7 +162,8 @@ async function getDureeParBase(params = {}) {
 
         return {
             data: result.rows,
-            total: result.rows.length
+            total: result.rows.length,
+            message: `${result.rows.length} durée(s) par base trouvée(s)`
         };
     } catch (error) {
         console.error('Erreur getDureeParBase:', error);
@@ -156,6 +179,21 @@ async function getToursParBase(params = {}) {
         vehicleId = null,
         weekDaysThisWeek
     } = params;
+
+    // Vérification stricte des paramètres requis
+    const hasValidDateRange = !!(dateFrom && dateTo);
+    const hasValidVehicleFilter = !!(vehicleId && (Array.isArray(vehicleId) ? vehicleId.length > 0 : true));
+    const hasValidWeekDays = !!(weekDaysThisWeek?.length > 0);
+
+    // Si aucun paramètre valide n'est présent, ne pas exécuter la requête
+    if (!hasValidDateRange && !hasValidVehicleFilter && !hasValidWeekDays) {
+        console.log('Aucun filtre valide spécifié - requête annulée');
+        return {
+            data: [],
+            total: 0,
+            message: "Aucun filtre valide spécifié. Veuillez fournir au moins un des critères suivants : plage de dates complète, véhicule(s) ou jours de la semaine."
+        };
+    }
 
     let query = `
         SELECT 
@@ -173,22 +211,16 @@ async function getToursParBase(params = {}) {
     const whereClauses = [];
     let paramIndex = 1;
 
-    // Filtrage par dates
+    // Filtrage par dates (STRICT : les deux dates doivent être présentes)
     if (dateFrom && dateTo) {
         whereClauses.push(`tb.dates BETWEEN $${paramIndex} AND $${paramIndex + 1}`);
         values.push(dateFrom, dateTo);
         paramIndex += 2;
-    } else if (dateFrom) {
-        whereClauses.push(`tb.dates >= $${paramIndex}`);
-        values.push(dateFrom);
-        paramIndex += 1;
-    } else if (dateTo) {
-        whereClauses.push(`tb.dates <= $${paramIndex}`);
-        values.push(dateTo);
-        paramIndex += 1;
+    } else if (dateFrom || dateTo) {
+        console.warn('Plage de dates incomplète ignorée : dateFrom et dateTo doivent être fournies ensemble');
     }
 
-    // Filtrage par véhicule(s)
+    // Filtrage par véhicule(s) (STRICT : doit être non vide)
     if (vehicleId) {
         if (Array.isArray(vehicleId)) {
             if (vehicleId.length === 0) {
@@ -204,24 +236,23 @@ async function getToursParBase(params = {}) {
         }
     }
 
-    // Filtrage par jours de la semaine
-    if (weekDaysThisWeek && Array.isArray(weekDaysThisWeek) && weekDaysThisWeek.length > 0) {
+    // Filtrage par jours de la semaine (STRICT : doit avoir au moins un jour)
+    if (weekDaysThisWeek?.length > 0) {
         if (!weekDaysThisWeek.every(d => d >= 1 && d <= 7)) {
             throw new Error("Les jours doivent être entre 1 (lundi) et 7 (dimanche)");
         }
 
         const postgresDays = weekDaysThisWeek.map(dayNum => dayNum === 7 ? 0 : dayNum);
 
-        let weekStart, weekEnd;
         if (!dateFrom && !dateTo) {
             const today = new Date();
             const dayOfWeek = today.getDay();
 
-            weekStart = new Date(today);
+            const weekStart = new Date(today);
             weekStart.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
             weekStart.setHours(0, 0, 0, 0);
 
-            weekEnd = new Date(weekStart);
+            const weekEnd = new Date(weekStart);
             weekEnd.setDate(weekStart.getDate() + 6);
             weekEnd.setHours(23, 59, 59, 999);
 
@@ -239,11 +270,23 @@ async function getToursParBase(params = {}) {
         paramIndex += postgresDays.length;
     }
 
+    // Vérification finale
+    if (whereClauses.length === 0) {
+        console.log('Aucune clause WHERE valide générée - requête annulée');
+        return {
+            data: [],
+            total: 0,
+            message: "Les paramètres fournis sont insuffisants pour exécuter la requête."
+        };
+    }
+
     if (whereClauses.length > 0) {
         query += ' WHERE ' + whereClauses.join(' AND ');
     }
 
     query += ' GROUP BY v.names, b.names, tb.baseinit, tb.dates ORDER BY tb.dates DESC, nombre_tours DESC';
+
+    console.log('Requête getToursParBase exécutée avec filtres :', whereClauses);
 
     try {
         const result = await pool.query({
@@ -253,7 +296,8 @@ async function getToursParBase(params = {}) {
 
         return {
             data: result.rows,
-            total: result.rows.length
+            total: result.rows.length,
+            message: `${result.rows.length} tour(s) par base trouvé(s)`
         };
     } catch (error) {
         console.error('Erreur getToursParBase:', error);
@@ -269,6 +313,21 @@ async function getHistoriqueTransit(params = {}) {
         vehicleId = null,
         weekDaysThisWeek
     } = params;
+
+    // Vérification stricte des paramètres requis
+    const hasValidDateRange = !!(dateFrom && dateTo);
+    const hasValidVehicleFilter = !!(vehicleId && (Array.isArray(vehicleId) ? vehicleId.length > 0 : true));
+    const hasValidWeekDays = !!(weekDaysThisWeek?.length > 0);
+
+    // Si aucun paramètre valide n'est présent, ne pas exécuter la requête
+    if (!hasValidDateRange && !hasValidVehicleFilter && !hasValidWeekDays) {
+        console.log('Aucun filtre valide spécifié - requête annulée');
+        return {
+            data: [],
+            total: 0,
+            message: "Aucun filtre valide spécifié. Veuillez fournir au moins un des critères suivants : plage de dates complète, véhicule(s) ou jours de la semaine."
+        };
+    }
 
     let query = `
         SELECT 
@@ -292,22 +351,16 @@ async function getHistoriqueTransit(params = {}) {
     const whereClauses = [];
     let paramIndex = 1;
 
-    // Filtrage par dates
+    // Filtrage par dates (STRICT : les deux dates doivent être présentes)
     if (dateFrom && dateTo) {
         whereClauses.push(`tb.dates BETWEEN $${paramIndex} AND $${paramIndex + 1}`);
         values.push(dateFrom, dateTo);
         paramIndex += 2;
-    } else if (dateFrom) {
-        whereClauses.push(`tb.dates >= $${paramIndex}`);
-        values.push(dateFrom);
-        paramIndex += 1;
-    } else if (dateTo) {
-        whereClauses.push(`tb.dates <= $${paramIndex}`);
-        values.push(dateTo);
-        paramIndex += 1;
+    } else if (dateFrom || dateTo) {
+        console.warn('Plage de dates incomplète ignorée : dateFrom et dateTo doivent être fournies ensemble');
     }
 
-    // Filtrage par véhicule(s)
+    // Filtrage par véhicule(s) (STRICT : doit être non vide)
     if (vehicleId) {
         if (Array.isArray(vehicleId)) {
             if (vehicleId.length === 0) {
@@ -323,24 +376,23 @@ async function getHistoriqueTransit(params = {}) {
         }
     }
 
-    // Filtrage par jours de la semaine
-    if (weekDaysThisWeek && Array.isArray(weekDaysThisWeek) && weekDaysThisWeek.length > 0) {
+    // Filtrage par jours de la semaine (STRICT : doit avoir au moins un jour)
+    if (weekDaysThisWeek?.length > 0) {
         if (!weekDaysThisWeek.every(d => d >= 1 && d <= 7)) {
             throw new Error("Les jours doivent être entre 1 (lundi) et 7 (dimanche)");
         }
 
         const postgresDays = weekDaysThisWeek.map(dayNum => dayNum === 7 ? 0 : dayNum);
 
-        let weekStart, weekEnd;
         if (!dateFrom && !dateTo) {
             const today = new Date();
             const dayOfWeek = today.getDay();
 
-            weekStart = new Date(today);
+            const weekStart = new Date(today);
             weekStart.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
             weekStart.setHours(0, 0, 0, 0);
 
-            weekEnd = new Date(weekStart);
+            const weekEnd = new Date(weekStart);
             weekEnd.setDate(weekStart.getDate() + 6);
             weekEnd.setHours(23, 59, 59, 999);
 
@@ -358,11 +410,23 @@ async function getHistoriqueTransit(params = {}) {
         paramIndex += postgresDays.length;
     }
 
+    // Vérification finale
+    if (whereClauses.length === 0) {
+        console.log('Aucune clause WHERE valide générée - requête annulée');
+        return {
+            data: [],
+            total: 0,
+            message: "Les paramètres fournis sont insuffisants pour exécuter la requête."
+        };
+    }
+
     if (whereClauses.length > 0) {
         query += ' WHERE ' + whereClauses.join(' AND ');
     }
 
     query += ' ORDER BY tb.dates DESC, tb.datexitbase1 DESC';
+
+    console.log('Requête getHistoriqueTransit exécutée avec filtres :', whereClauses);
 
     try {
         const result = await pool.query({
@@ -372,7 +436,8 @@ async function getHistoriqueTransit(params = {}) {
 
         return {
             data: result.rows,
-            total: result.rows.length
+            total: result.rows.length,
+            message: `${result.rows.length} historique(s) de transit trouvé(s)`
         };
     } catch (error) {
         console.error('Erreur getHistoriqueTransit:', error);
@@ -387,6 +452,21 @@ async function getDureeTransitMax(params = {}) {
         vehicleId = null,
         weekDaysThisWeek
     } = params;
+
+    // Vérification stricte des paramètres requis
+    const hasValidDateRange = !!(dateFrom && dateTo);
+    const hasValidVehicleFilter = !!(vehicleId && (Array.isArray(vehicleId) ? vehicleId.length > 0 : true));
+    const hasValidWeekDays = !!(weekDaysThisWeek?.length > 0);
+
+    // Si aucun paramètre valide n'est présent, ne pas exécuter la requête
+    if (!hasValidDateRange && !hasValidVehicleFilter && !hasValidWeekDays) {
+        console.log('Aucun filtre valide spécifié - requête annulée');
+        return {
+            data: [],
+            total: 0,
+            message: "Aucun filtre valide spécifié. Veuillez fournir au moins un des critères suivants : plage de dates complète, véhicule(s) ou jours de la semaine."
+        };
+    }
 
     let query = `
         SELECT DISTINCT ON (tb.vcleid, tb.baseinit)
@@ -404,22 +484,16 @@ async function getDureeTransitMax(params = {}) {
     const whereClauses = [];
     let paramIndex = 1;
 
-    // Filtrage par dates
+    // Filtrage par dates (STRICT : les deux dates doivent être présentes)
     if (dateFrom && dateTo) {
         whereClauses.push(`tb.dates BETWEEN $${paramIndex} AND $${paramIndex + 1}`);
         values.push(dateFrom, dateTo);
         paramIndex += 2;
-    } else if (dateFrom) {
-        whereClauses.push(`tb.dates >= $${paramIndex}`);
-        values.push(dateFrom);
-        paramIndex += 1;
-    } else if (dateTo) {
-        whereClauses.push(`tb.dates <= $${paramIndex}`);
-        values.push(dateTo);
-        paramIndex += 1;
+    } else if (dateFrom || dateTo) {
+        console.warn('Plage de dates incomplète ignorée : dateFrom et dateTo doivent être fournies ensemble');
     }
 
-    // Filtrage par véhicule(s)
+    // Filtrage par véhicule(s) (STRICT : doit être non vide)
     if (vehicleId) {
         if (Array.isArray(vehicleId)) {
             if (vehicleId.length === 0) {
@@ -435,24 +509,23 @@ async function getDureeTransitMax(params = {}) {
         }
     }
 
-    // Filtrage par jours de la semaine
-    if (weekDaysThisWeek && Array.isArray(weekDaysThisWeek) && weekDaysThisWeek.length > 0) {
+    // Filtrage par jours de la semaine (STRICT : doit avoir au moins un jour)
+    if (weekDaysThisWeek?.length > 0) {
         if (!weekDaysThisWeek.every(d => d >= 1 && d <= 7)) {
             throw new Error("Les jours doivent être entre 1 (lundi) et 7 (dimanche)");
         }
 
         const postgresDays = weekDaysThisWeek.map(dayNum => dayNum === 7 ? 0 : dayNum);
 
-        let weekStart, weekEnd;
         if (!dateFrom && !dateTo) {
             const today = new Date();
             const dayOfWeek = today.getDay();
 
-            weekStart = new Date(today);
+            const weekStart = new Date(today);
             weekStart.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
             weekStart.setHours(0, 0, 0, 0);
 
-            weekEnd = new Date(weekStart);
+            const weekEnd = new Date(weekStart);
             weekEnd.setDate(weekStart.getDate() + 6);
             weekEnd.setHours(23, 59, 59, 999);
 
@@ -470,12 +543,24 @@ async function getDureeTransitMax(params = {}) {
         paramIndex += postgresDays.length;
     }
 
+    // Vérification finale
+    if (whereClauses.length === 0) {
+        console.log('Aucune clause WHERE valide générée - requête annulée');
+        return {
+            data: [],
+            total: 0,
+            message: "Les paramètres fournis sont insuffisants pour exécuter la requête."
+        };
+    }
+
     if (whereClauses.length > 0) {
         query += ' WHERE ' + whereClauses.join(' AND ');
     }
 
-    // Ordonner pour obtenir le transit max par véhicule et base
     query += ' ORDER BY tb.vcleid, tb.baseinit, tb.dureetransit DESC';
+
+    console.log('Requête getDureeTransitMax exécutée avec filtres :', whereClauses);
+
     try {
         const result = await pool.query({
             text: query,
@@ -484,11 +569,13 @@ async function getDureeTransitMax(params = {}) {
 
         return {
             data: result.rows,
-            total: result.rows.length
+            total: result.rows.length,
+            message: `${result.rows.length} durée(s) de transit max trouvée(s)`
         };
     } catch (error) {
         console.error('Erreur getDureeTransitMax:', error);
         throw error;
     }
 }
+
 module.exports = { gettransitbase, getAllDashboards }

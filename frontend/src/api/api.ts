@@ -58,7 +58,7 @@ export interface HeureMoteur {
     group_name: string
 }
 
-//const BASE_URL = 'http://localhost:8000'
+const BASE_URL = 'http://localhost:8000'
 
 
 export const fetchHeureMoteurData = async (
@@ -75,8 +75,11 @@ export const fetchHeureMoteurData = async (
         const queryParams = new URLSearchParams();
 
         // Ajout des paramètres de date
-        if (params.date1) queryParams.append('date1', params.date1);
-        if (params.date2) queryParams.append('date2', params.date2);
+        if (params.date1 && params.date2) {
+            queryParams.append('date1', params.date1);
+            queryParams.append('date2', params.date2);
+        }
+
 
         // Ajout des paramètres de véhicule
         if (params.vehicle !== undefined) {
@@ -101,7 +104,7 @@ export const fetchHeureMoteurData = async (
         }
 
         const response = await axios.get<DashboardData>(
-            `/api/razel_dashboard/heuremoteur`,
+            `${BASE_URL}/api/razel_dashboard/heuremoteur`,
             {
                 params: queryParams,
                 headers: {
@@ -199,8 +202,10 @@ export const fetchTrajets = async (
         const queryParams = new URLSearchParams();
 
         // Ajout des paramètres de date
-        if (params.date1) queryParams.append('date1', params.date1);
-        if (params.date2) queryParams.append('date2', params.date2);
+        if (params.date1 && params.date2) {
+            queryParams.append('date1', params.date1);
+            queryParams.append('date2', params.date2)
+        }
 
         // Ajout des paramètres de véhicule
         if (params.vehicle !== undefined) {
@@ -225,7 +230,7 @@ export const fetchTrajets = async (
         }
 
         const response = await axios.get<DashboardTrajet>(
-            `/api/razel_dashboard/trajets`,
+            `${BASE_URL}/api/razel_dashboard/trajets`,
             {
                 params: queryParams,
                 headers: {
@@ -272,8 +277,10 @@ export const fetchTransitData = async (
         const queryParams = new URLSearchParams();
 
         // Ajout des paramètres de date
-        if (params.date1) queryParams.append('date1', params.date1);
-        if (params.date2) queryParams.append('date2', params.date2);
+        if (params.date1 && params.date2) {
+            queryParams.append('date1', params.date1);
+            queryParams.append('date2', params.date2)
+        }
 
         // Ajout des paramètres de véhicule
         if (params.vehicle !== undefined) {
@@ -298,7 +305,7 @@ export const fetchTransitData = async (
         }
 
         const response = await axios.get<DashboardTransitData>(
-            `/api/razel_dashboard/transit_dashboard`,
+            `${BASE_URL}/api/razel_dashboard/transit_dashboard`,
             {
                 params: queryParams,
                 headers: {
@@ -346,8 +353,10 @@ export const fetchExceptions = async (
         const queryParams = new URLSearchParams();
 
         // Ajout des paramètres de date
-        if (params.date1) queryParams.append('date1', params.date1);
-        if (params.date2) queryParams.append('date2', params.date2);
+        if (params.date1 && params.date2) {
+            queryParams.append('date1', params.date1);
+            queryParams.append('date2', params.date2)
+        }
 
         // Ajout des paramètres d'ID
         if (params.vehicle !== undefined) {
@@ -372,7 +381,7 @@ export const fetchExceptions = async (
         }
 
         const response: AxiosResponse<exceptions> = await axios.get(
-            `/api/razel_dashboard/exceptions`,
+            `${BASE_URL}/api/razel_dashboard/exceptions`,
             {
                 params: queryParams,
                 headers: {
@@ -408,7 +417,7 @@ export const fetchVehicles = async (
 ): Promise<vehicles[]> => {
     try {
         const response: AxiosResponse<vehicles[]> = await axios.get(
-            `/api/razel_dashboard/vehicles`,
+            `${BASE_URL}/api/razel_dashboard/vehicles`,
             {
                 headers: {
                     'Content-Type': 'application/json',
@@ -444,7 +453,7 @@ export const fetchVehicleById = async (
 ): Promise<vehicles> => {
     try {
         const response: AxiosResponse<vehicles> = await axios.get(
-            `/api/razel_dashboard/single_vehicle?id=${id}`,
+            `${BASE_URL}/api/razel_dashboard/single_vehicle?id=${id}`,
             {
                 headers: {
                     'Content-Type': 'application/json',
@@ -480,7 +489,7 @@ export const fetchVehiclesGroup = async (
 ): Promise<vehicles[]> => {
     try {
         const response: AxiosResponse<vehiclesGroup[]> = await axios.get(
-            `/api/razel_dashboard/vehicles_group`,
+            `${BASE_URL}/api/razel_dashboard/vehicles_group`,
             {
                 headers: {
                     'Content-Type': 'application/json',
@@ -516,7 +525,7 @@ export const fetchVehicleGroupById = async (
 ): Promise<vehicles> => {
     try {
         const response: AxiosResponse<vehicles> = await axios.get(
-            `/api/razel_dashboard/single_vehicle_group?id=${id}`,
+            `${BASE_URL}/api/razel_dashboard/single_vehicle_group?id=${id}`,
             {
                 headers: {
                     'Content-Type': 'application/json',
@@ -570,7 +579,7 @@ export const fetchData = async <T>(
         }
     });
 
-    const response = await fetch(`/api/razel_dashboard/${endpoint}?${queryString}`, {
+    const response = await fetch(`${BASE_URL}/api/razel_dashboard/${endpoint}?${queryString}`, {
         headers: {
             'Content-Type': 'application/json',
             ...(localStorage.getItem('authToken') && {

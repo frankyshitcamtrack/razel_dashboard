@@ -22,6 +22,22 @@ async function getHmoteur(params = {}) {
         weekDaysThisWeek
     } = params;
 
+    // Vérification stricte des paramètres requis
+    const hasValidDateRange = !!(dateFrom && dateTo);
+    const hasValidVehicleFilter = !!(vehicleId && (Array.isArray(vehicleId) ? vehicleId.length > 0 : true));
+    const hasValidGroupFilter = !!groupId;
+    const hasValidWeekDays = !!(weekDaysThisWeek?.length > 0);
+
+    // Si aucun paramètre valide n'est présent, ne pas exécuter la requête
+    if (!hasValidDateRange && !hasValidVehicleFilter && !hasValidGroupFilter && !hasValidWeekDays) {
+        console.log('Aucun filtre valide spécifié - requête annulée');
+        return {
+            data: [],
+            total: 0,
+            message: "Aucun filtre valide spécifié. Veuillez fournir au moins un des critères suivants : plage de dates complète, véhicule(s), groupe ou jours de la semaine."
+        };
+    }
+
     let query = `
         SELECT 
             hm.*,
@@ -36,19 +52,16 @@ async function getHmoteur(params = {}) {
     const values = [];
     const whereClauses = [];
 
-    // Filtrage par dates
+    // Filtrage par dates (STRICT : les deux dates doivent être présentes)
     if (dateFrom && dateTo) {
         whereClauses.push(`hm.dates BETWEEN $${values.length + 1} AND $${values.length + 2}`);
         values.push(dateFrom, dateTo);
-    } else if (dateFrom) {
-        whereClauses.push(`hm.dates >= $${values.length + 1}`);
-        values.push(dateFrom);
-    } else if (dateTo) {
-        whereClauses.push(`hm.dates <= $${values.length + 1}`);
-        values.push(dateTo);
+    } else if (dateFrom || dateTo) {
+        // Si une seule date est fournie, on ignore (comportement strict)
+        console.warn('Plage de dates incomplète ignorée : dateFrom et dateTo doivent être fournies ensemble');
     }
 
-    // Filtrage par véhicule(s)
+    // Filtrage par véhicule(s) (STRICT : doit être non vide)
     if (vehicleId) {
         if (Array.isArray(vehicleId)) {
             if (vehicleId.length === 0) {
@@ -62,16 +75,14 @@ async function getHmoteur(params = {}) {
         }
     }
 
-    // Filtrage par groupe
+    // Filtrage par groupe (STRICT : doit être défini)
     if (groupId) {
         whereClauses.push(`v.groupid = $${values.length + 1}`);
         values.push(groupId);
     }
 
-
-
-    // OPTIMISATION: Filtrage par jours de la semaine
-    if (weekDaysThisWeek && Array.isArray(weekDaysThisWeek) && weekDaysThisWeek.length > 0) {
+    // Filtrage par jours de la semaine (STRICT : doit avoir au moins un jour)
+    if (weekDaysThisWeek?.length > 0) {
         if (!weekDaysThisWeek.every(d => d >= 1 && d <= 7)) {
             throw new Error("Les jours doivent être entre 1 (lundi) et 7 (dimanche)");
         }
@@ -87,7 +98,7 @@ async function getHmoteur(params = {}) {
         // Ajouter les valeurs converties
         values.push(...postgresDays);
 
-        // Si pas de plage de dates, on limite à la semaine en cours
+        // Si pas de plage de dates, limiter à la semaine en cours (uniquement si weekDays est spécifié)
         if (!dateFrom && !dateTo) {
             const today = new Date();
             const dayOfWeek = today.getDay(); // 0=dimanche, 1=lundi, ..., 6=samedi
@@ -110,13 +121,23 @@ async function getHmoteur(params = {}) {
         whereClauses.push(`(${dayConditions.join(' OR ')})`);
     }
 
-
-    if (whereClauses.length > 0) {
-        query += ' WHERE ' + whereClauses.join(' AND ');
+    // Vérification finale : au moins une clause WHERE doit être présente
+    if (whereClauses.length === 0) {
+        console.log('Aucune clause WHERE valide générée - requête annulée');
+        return {
+            data: [],
+            total: 0,
+            message: "Les paramètres fournis sont insuffisants pour exécuter la requête."
+        };
     }
 
+    // Construction de la requête WHERE
+    query += ' WHERE ' + whereClauses.join(' AND ');
 
+    // Tri par date décroissante
     query += ' ORDER BY hm.dates DESC';
+
+    console.log('Requête getHmoteur exécutée avec filtres :', whereClauses);
 
     try {
         const result = await pool.query({
@@ -126,7 +147,8 @@ async function getHmoteur(params = {}) {
 
         return {
             data: result.rows,
-            total: result.rows.length
+            total: result.rows.length,
+            message: `${result.rows.length} heures moteur trouvées`
         };
     } catch (error) {
         console.error('Erreur getHmoteur:', error);
