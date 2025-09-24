@@ -377,12 +377,8 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
                     <button
                         onClick={() => {
                             setFilters({
-                                date1: undefined,
-                                date2: undefined,
                                 vehicle: [],
-                                vcleGroupId: undefined,
-                                groupBy: "day",
-                                weekDays: [],
+                                weekDays: []
                             });
                             setSearchTerm("");
                         }}
@@ -515,7 +511,7 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
                                                     ? "bg-[#F7D000] text-white shadow-sm"
                                                     : "bg-white text-gray-700 hover:bg-gray-100"
                                                     } ${isGroupSelected && !isIndividuallySelected
-                                                        ? "bg-[#F7D000] text - white shadow - sm"// Style différent pour les véhicules sélectionnés par groupe
+                                                        ? "bg-[#F7D000] text - white shadow - sm"
                                                         : ""
                                                     }`}
                                             >
