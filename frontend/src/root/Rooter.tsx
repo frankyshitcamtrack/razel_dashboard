@@ -6,6 +6,7 @@ import ActiviteBase from "../pages/ActiviteBase";
 import Trajet from "../pages/Trajet";
 import NotFoundPage from "../pages/NotFound";
 import { ProtectedRoute } from "./ProtectedRoute";
+import { FilterProvider } from "../store/GlobalFiltersContext";
 
 function Router() {
 
@@ -16,7 +17,10 @@ function Router() {
                 path="/dashboard"
                 element={
                     <ProtectedRoute>
-                        <Dashboard />
+                        <FilterProvider>
+                            <Dashboard />
+                        </FilterProvider>
+
                     </ProtectedRoute>
                 }
             />
@@ -24,7 +28,10 @@ function Router() {
                 path="/"
                 element={
                     <ProtectedRoute>
-                        <Dashboard />
+                        <FilterProvider>
+                            <Dashboard />
+                        </FilterProvider>
+
                     </ProtectedRoute>
                 }
             />
@@ -32,7 +39,10 @@ function Router() {
                 path="/reports"
                 element={
                     <ProtectedRoute>
-                        <Rapport />
+                        <FilterProvider>
+                            <Rapport />
+                        </FilterProvider>
+
                     </ProtectedRoute>
                 }
             />
@@ -40,7 +50,9 @@ function Router() {
                 path="/activity_base"
                 element={
                     <ProtectedRoute>
-                        <ActiviteBase />
+                        <FilterProvider>
+                            <ActiviteBase />
+                        </FilterProvider>
                     </ProtectedRoute>
                 }
             />
@@ -48,7 +60,10 @@ function Router() {
                 path="/utilisation_tracteurs"
                 element={
                     <ProtectedRoute>
-                        <Trajet />
+                        <FilterProvider>
+                            <Trajet />
+                        </FilterProvider>
+
                     </ProtectedRoute>
                 }
             />
