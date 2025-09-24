@@ -1,10 +1,10 @@
 import { useState } from "react";
 import Sidebar from "../components/layout/SideBar";
 import GlobalFilterBar from "../components/filters/GlobalFilterBars";
-import StackedBarChart from "../components/charts/StackedBarChart";
 import VerticalStackedBarChart from "../components/charts/VerticalStakedBarChart";
 import CustomBarChart from "../components/charts/BarChart"
-import { useTransitData } from "../hooks/useTransitData";
+import { useTrajetData } from "../hooks/useTrajet";
+import { useExceptions } from "../hooks/useExceptions";
 import type { Filters } from "../components/filters/GlobalFilterBars";
 
 
@@ -18,7 +18,8 @@ const ActiviteBase = () => {
         weekDays: []
     });
 
-    const { data, isLoading } = useTransitData(filters);
+    const { data, isLoading } = useTrajetData(filters);
+    const { data: exceptions, isLoading: exceptionsLoading } = useExceptions(filters);
 
     //console.log(data);
 
@@ -31,70 +32,52 @@ const ActiviteBase = () => {
 
                     {/* Section 1 : Stack Bar Charts (2 colonnes) */}
                     <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 overflow-hidden">
-                        {isLoading ? (
+                        {(isLoading && exceptionsLoading) ? (
                             <>
-                                <DonutSkeleton />
                                 <DonutSkeleton />
                                 <DonutSkeleton />
                                 <DonutSkeleton />
                             </>
                         ) : (
                             <>
-                                {data?.DureeParBase && (
+                                {exceptions?.speeding && (
                                     <VerticalStackedBarChart
-                                        data={data.DureeParBase}
+                                        data={exceptions.speeding}
                                         dataKey1="duree_totale"
                                         //dataKey2="usage"
-                                        label1="Sommes de durée"
+                                        label1="survitesse"
                                         //label2="Durée"
-                                        //color1="#02509D"
-                                        color1="#f3992bff"
-                                        valueType="time"
-                                        title="Durée/Base"
-                                    />
-                                )}
-                                {data?.ToursParBase && (
-                                    <CustomBarChart
-                                        data={data.ToursParBase}
-                                        dataKey1="nombre_tours"
-                                        //dataKey2="usage"
-                                        label1="Nombre de tours"
-                                        //label2="Durée d'utilisation"
-                                        color1="#f3992bff"
-                                        //color2="#02509D"
-
-                                        title="Nbre de tours/Bases
-"
-                                    />
-                                )}
-                                {data?.HistoriqueTransit && (
-                                    <StackedBarChart
-                                        data={data.HistoriqueTransit}
-                                        dataKey1="duree_base_depart"
-                                        dataKey2="duree_transit"
-                                        label1="duree base depart"
-                                        label2="duree de transit"
                                         color1="#02509D"
-                                        color2="#f3992bff"
-                                        valueType="time"
-                                        title="Historique Transit"
+                                        //color1="#f3992bff"
+                                        valueType="number"
+                                        title="Nombre de survitesses"
                                     />
                                 )}
-                                {data?.DureeTransitMax && (
-                                    <StackedBarChart
-                                        data={data?.DureeTransitMax}
-                                        dataKey1="duree_transit_max"
-                                        //dataKey2=""
-                                        label1="Max duree transit"
-                                        //label2=""
-                                        color1="#f3992bff"
-                                        //color2="#02509D"
-                                        // valueType="percentage"
-                                        title="Duree Transit"
-                                        valueType="time"
+                                {data?.SommeDistances && (
+                                    <CustomBarChart
+                                        data={data.SommeDistances}
+                                        dataKey1="value"
+                                        //dataKey2="usage"
+                                        label1="Somme de distance(KM)"
+                                        //label2="Durée d'utilisation"
+                                        //color1="#f3992bff"
+                                        color1="#02509D"
+                                        title="KM Journalier"
                                     />
                                 )}
-
+                                {data?.TempsMoteur && (
+                                    <VerticalStackedBarChart
+                                        data={data.TempsMoteur}
+                                        dataKey1="value"
+                                        //dataKey2="usage"
+                                        label1="Sommes de durée utilisation"
+                                        //label2="Durée"
+                                        color1="#02509D"
+                                        //color1="#f3992bff"
+                                        valueType="time"
+                                        title="Temps d'utilisation"
+                                    />
+                                )}
                             </>
                         )}
                     </div>

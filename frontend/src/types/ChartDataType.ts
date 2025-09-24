@@ -59,13 +59,54 @@ export interface SpeedingItem extends BaseChartItem {
     value: number; // Nombre d'excès de vitesse
 }
 
+
+// 7.Acceleration exetives
 export interface HarshAccelerationBraking extends BaseChartItem {
     name: string,
     acceleration: number,
     braking: number
 }
 
+//---------------------------------transit base---------------------------\\
+// 8.duree par base
+export interface DureeParBase extends BaseChartItem {
+    duree_totale: string,
+}
 
+//9.tours par base
+export interface NbrsToursParBase extends BaseChartItem {
+    nombre_tours: number,
+}
+
+//10.Historique Transit
+export interface HistoriqueTransit extends BaseChartItem {
+    duree_base_depart: string,
+    duree_transit: string
+}
+
+//11.Duree transit
+export interface DureeTransit extends BaseChartItem {
+    duree_transit_max: string
+}
+
+//---------------------------------trajet---------------------------\\
+// 12.temps moteur
+export interface tempsMoteur extends BaseChartItem {
+    value: string,
+}
+
+//13.sommes des distances
+export interface SommeDistances extends BaseChartItem {
+    value: number,
+}
+
+export type TempsMoteurData = tempsMoteur[];
+export type SommeDistancesData = SommeDistances[];
+
+export type DureeParBaseData = DureeParBase[];
+export type NbrsToursParBaseData = NbrsToursParBase[];
+export type HistoriqueTransitData = HistoriqueTransit[];
+export type DureeTransitData = DureeTransit[];
 
 export type EngineUsageData = EngineUsageItem[];
 export type EngineUsagePercentageData = EngineUsagePercentageItem[];
@@ -77,6 +118,14 @@ export type RatioConsumptionData = RatioConsumptionItem[];
 export type SpeedingUsageData = SpeedingItem[];
 export type HarshAccelerationBrakingUsageData = HarshAccelerationBraking[];
 
+
+
+export type DashboardTrajet = {
+    TempsMoteur: TempsMoteurData,
+    SommeDistances: SommeDistancesData
+}
+
+
 export type DashboardData = {
     engineData: EngineUsageData,
     engineDataPercentage: EngineUsagePercentageData,
@@ -84,8 +133,17 @@ export type DashboardData = {
     dureeDistanceparcouru: DurationDistanceData,
     DistanConsommation: DistanceConsumptionData,
     hundredKmConsumption: HundredKmConsumptionData,
-    ratioConsumption: RatioConsumptionData,
+    ratioConsumption: RatioConsumptionData
 }
+
+
+export type DashboardTransitData = {
+    DureeParBase: DureeParBaseData,
+    ToursParBase: NbrsToursParBaseData,
+    HistoriqueTransit: HistoriqueTransitData,
+    DureeTransitMax: DureeTransitData
+}
+
 
 export type exceptions = {
     speeding: SpeedingUsageData,

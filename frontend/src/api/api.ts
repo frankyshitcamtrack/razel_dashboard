@@ -1,6 +1,6 @@
 import axios from 'axios';
 import type { AxiosError, AxiosResponse } from 'axios';
-import type { DashboardData, vehicles, exceptions, vehiclesGroup } from '../types/ChartDataType';
+import type { DashboardData, vehicles, exceptions, vehiclesGroup, DashboardTransitData, DashboardTrajet } from '../types/ChartDataType';
 
 
 // api.ts
@@ -184,6 +184,152 @@ export const fetchHeureMoteurData = async (
     }
 }; */
 
+
+export const fetchTrajets = async (
+    params: {
+        date1?: string;
+        date2?: string;
+        vehicle?: number | number[] | null;
+        vcleGroupId?: number;
+        groupBy?: "day" | "week" | "month";
+        weekDays?: number[]
+    }
+): Promise<DashboardTrajet> => {
+    try {
+        const queryParams = new URLSearchParams();
+
+        // Ajout des paramètres de date
+        if (params.date1) queryParams.append('date1', params.date1);
+        if (params.date2) queryParams.append('date2', params.date2);
+
+        // Ajout des paramètres de véhicule
+        if (params.vehicle !== undefined) {
+            if (Array.isArray(params.vehicle) && params.vehicle.length > 0) {
+                queryParams.append('vehicle', JSON.stringify(params.vehicle));
+            } else if (typeof params.vehicle === 'number') {
+                queryParams.append('vehicle', params?.vehicle?.toString());
+            }
+        }
+
+        // Ajout des autres paramètres
+        if (params.vcleGroupId !== undefined) {
+            queryParams.append('vcleGroupId', params.vcleGroupId.toString());
+        }
+        if (params.groupBy !== undefined) {
+            queryParams.append('groupBy', params.groupBy);
+        }
+
+        // CORRECTION: Envoyer weekDays comme tableau JSON stringifié
+        if (params.weekDays !== undefined && Array.isArray(params.weekDays) && params.weekDays.length > 0) {
+            queryParams.append('weekDays', JSON.stringify(params.weekDays));
+        }
+
+        const response = await axios.get<DashboardTrajet>(
+            `/api/razel_dashboard/trajets`,
+            {
+                params: queryParams,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(localStorage.getItem('authToken') && {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                    })
+                }
+            }
+        );
+
+        return response.data;
+    } catch (error) {
+        const axiosError = error as AxiosError;
+
+        if (axiosError.response) {
+            switch (axiosError.response.status) {
+                case 400:
+                    throw new Error('Paramètres invalides');
+                case 500:
+                    throw new Error('Erreur serveur');
+                default:
+                    throw new Error(`Erreur ${axiosError.response.status}`);
+            }
+        } else {
+            throw new Error('Erreur réseau');
+        }
+    }
+};
+
+
+
+export const fetchTransitData = async (
+    params: {
+        date1?: string;
+        date2?: string;
+        vehicle?: number | number[] | null;
+        vcleGroupId?: number;
+        groupBy?: "day" | "week" | "month";
+        weekDays?: number[];
+    }
+): Promise<DashboardTransitData> => {
+    try {
+        const queryParams = new URLSearchParams();
+
+        // Ajout des paramètres de date
+        if (params.date1) queryParams.append('date1', params.date1);
+        if (params.date2) queryParams.append('date2', params.date2);
+
+        // Ajout des paramètres de véhicule
+        if (params.vehicle !== undefined) {
+            if (Array.isArray(params.vehicle) && params.vehicle.length > 0) {
+                queryParams.append('vehicle', JSON.stringify(params.vehicle));
+            } else if (typeof params.vehicle === 'number') {
+                queryParams.append('vehicle', params?.vehicle?.toString());
+            }
+        }
+
+        // Ajout des autres paramètres
+        if (params.vcleGroupId !== undefined) {
+            queryParams.append('vcleGroupId', params.vcleGroupId.toString());
+        }
+        if (params.groupBy !== undefined) {
+            queryParams.append('groupBy', params.groupBy);
+        }
+
+        // CORRECTION: Envoyer weekDays comme tableau JSON stringifié
+        if (params.weekDays !== undefined && Array.isArray(params.weekDays) && params.weekDays.length > 0) {
+            queryParams.append('weekDays', JSON.stringify(params.weekDays));
+        }
+
+        const response = await axios.get<DashboardTransitData>(
+            `/api/razel_dashboard/transit_dashboard`,
+            {
+                params: queryParams,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(localStorage.getItem('authToken') && {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                    })
+                }
+            }
+        );
+
+
+
+        return response.data;
+    } catch (error) {
+        const axiosError = error as AxiosError;
+
+        if (axiosError.response) {
+            switch (axiosError.response.status) {
+                case 400:
+                    throw new Error('Paramètres invalides');
+                case 500:
+                    throw new Error('Erreur serveur');
+                default:
+                    throw new Error(`Erreur ${axiosError.response.status}`);
+            }
+        } else {
+            throw new Error('Erreur réseau');
+        }
+    }
+};
 
 
 export const fetchExceptions = async (

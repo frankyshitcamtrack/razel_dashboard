@@ -89,11 +89,7 @@ async function httpGetTransitDashboards(req, res) {
         // Formatage des données pour les graphiques avec jours individuels
         const formattedData = formatDashboardDataForCharts(results);
 
-        return res.status(200).json({
-            success: true,
-            data: formattedData,
-            timestamp: new Date().toISOString()
-        });
+        return res.status(200).json(formattedData);
 
     } catch (error) {
         console.error('Erreur dans httpGetTransitDashboards:', error);

@@ -7,6 +7,7 @@ const { httpGetVehicles, httpGetVehicleById } = require('../controllers/vehicles
 const { httpGetVehiclesGroup, httpGetVehiclesGroupByID } = require('../controllers/vehiclegroup.controllers');
 const { httpGetbases } = require('../controllers/base.controllers');
 const { httpGettransitbase, httpGetTransitDashboards } = require('../controllers/transitbase.controllers');
+const { httpGetTrajet, httpGetTrajetsByParams } = require('../controllers/trajet.controllers');
 
 
 repportsRouter.get('/heuremoteur', httpGetHeureMoteurByParams);
@@ -25,6 +26,8 @@ repportsRouter.get('/bases', httpGetbases);
 repportsRouter.get('/transit', httpGettransitbase);
 repportsRouter.get('/transit_dashboard', httpGetTransitDashboards);
 
+//repportsRouter.get('/trajet', httpGetTrajet);
+repportsRouter.get('/trajets', httpGetTrajetsByParams);
 
 
 

@@ -1,3 +1,5 @@
+const { secondsToHms } = require('./SecTohhmmss')
+
 function formatDureeParBase(data) {
     return data.map(item => {
         const day = item.dates ? getFrenchDayName(item.dates) : 'Période';
@@ -6,12 +8,12 @@ function formatDureeParBase(data) {
 
         return {
             name: name,
-            day: day,
-            base_name: item.base_name,
-            vehicle_name: item.vehicle_name,
-            base_id: item.base_id,
-            duree_totale: item.duree_totale,
-            dates: item.dates,
+            //day: day,
+            //base_name: item.base_name,
+            //vehicle_name: item.vehicle_name,
+            //base_id: item.base_id,
+            duree_totale: secondsToHms(item.duree_totale),
+            //dates: item.dates,
             key: `${day}-${item.base_id}-${item.vehicle_name}`
         };
     });
@@ -19,7 +21,6 @@ function formatDureeParBase(data) {
 
 
 function formatToursParBase(data) {
-    console.log(data);
     return data.map(item => {
         const day = item.dates ? getFrenchDayName(item.dates) : 'Période';
 
@@ -27,12 +28,11 @@ function formatToursParBase(data) {
 
         return {
             name: name,
-            day: day,
-            base_name: item.base_name,
-            vehicle_name: item.vehicle_name,
-            base_id: item.base_id,
+            //day: day,
+            //base_name: item.base_name,
+            //vehicle_name: item.vehicle_name,
             nombre_tours: item.nombre_tours,
-            dates: item.dates,
+            //dates: item.dates,
             key: `${day}-${item.base_id}-${item.vehicle_name}`
         };
     });
@@ -47,12 +47,12 @@ function formatDureeTransitMax(data) {
 
         return {
             name: name,
-            day: day,
-            base_name: item.base_name,
-            vehicle_name: item.vehicle_name,
-            base_id: item.base_id,
-            duree_transit_max: item.duree_transit_max,
-            dates: item.dates,
+            //day: day,
+            //base_name: item.base_name,
+            //vehicle_name: item.vehicle_name,
+            //base_id: item.base_id,
+            duree_transit_max: secondsToHms(item.duree_transit_max),
+            //dates: item.dates,
             key: `${day}-${item.base_id}-${item.vehicle_name}`
         };
     });
@@ -67,17 +67,17 @@ function formatHistoriqueTransit(data) {
 
         return {
             name: name,
-            day: day,
+            //day: day,
             vehicle_name: item.vehicle_name,
             base_depart: item.base_depart,
             base_arrivee: item.base_arrivee,
-            base_depart_id: item.base_depart_id,
-            base_arrivee_id: item.base_arrivee_id,
+            //base_depart_id: item.base_depart_id,
+            //base_arrivee_id: item.base_arrivee_id,
             date_depart: item.date_depart,
             date_arrivee: item.date_arrivee,
-            duree_base_depart: item.duree_base_depart,
-            duree_transit: item.duree_transit,
-            dates: item.dates,
+            duree_base_depart: secondsToHms(item.duree_base_depart),
+            duree_transit: secondsToHms(item.duree_transit),
+            //dates: item.dates,
             key: `${day}-${item.vehicle_name}-${item.base_depart_id}-${item.base_arrivee_id}`
         };
     });

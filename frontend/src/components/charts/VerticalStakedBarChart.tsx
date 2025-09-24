@@ -11,19 +11,20 @@ import {
     LabelList,
 } from "recharts";
 
-interface StackedBarChartProps {
+interface VerticalStackedBarChartProps {
     data: any[];
     dataKey1: string;
-    dataKey2?: string; // Maintenant optionnel
+    dataKey2?: string;
     label1: string;
-    label2?: string; // Optionnel aussi car dépend de dataKey2
+    label2?: string;
     color1?: string;
     color2?: string;
     valueType?: 'number' | 'time' | 'percentage';
     title?: string;
+    orientation?: 'vertical' | 'horizontal'; // Nouvelle prop pour l'orientation
 }
 
-export default class StackedBarChart extends PureComponent<StackedBarChartProps> {
+export default class VerticalStackedBarChart extends PureComponent<VerticalStackedBarChartProps> {
     // Détecte automatiquement le type de valeur
     detectValueType = (value: any): 'number' | 'time' | 'percentage' => {
         if (typeof value === 'string') {
@@ -85,7 +86,9 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
             label2,
             color1 = "#3b82f6",
             color2 = "#10b981",
-            title = "Graphique",
+            // valueType = "time",
+            title = "Graphique empilé vertical",
+            orientation = 'vertical', // Par défaut vertical
         } = this.props;
 
         // Vérification des données
@@ -107,7 +110,6 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                 [dataKey1]: this.normalizeValue(item[dataKey1], dataKey1),
             };
 
-            // Normalise dataKey2 seulement s'il est présent
             if (dataKey2 && item[dataKey2] !== undefined) {
                 normalizedItem[dataKey2] = this.normalizeValue(item[dataKey2], dataKey2);
             }
@@ -118,11 +120,14 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
         // Formatteur pour le tooltip
         const formatTooltip = (value: number, name: string) => {
             let dataKey = dataKey1;
-            if (dataKey2 && name === label2) {
+            if (dataKey2 && name === (label2 || dataKey2)) {
                 dataKey = dataKey2;
             }
             return [this.formatValue(value, dataKey), name];
         };
+
+        // Configuration basée sur l'orientation
+        const isVertical = orientation === 'vertical';
 
         return (
             <div className="bg-white rounded-lg shadow p-2 flex flex-col h-[320px]">
@@ -131,26 +136,39 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                     <ResponsiveContainer width="100%" height={250}>
                         <BarChart
                             data={chartData}
-                            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                            layout={isVertical ? "vertical" : "horizontal"}
+                            margin={{ top: 20, right: 30, left: 40, bottom: 5 }}
                         >
                             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+
+                            {/* Axe X - dépend de l'orientation */}
                             <XAxis
-                                dataKey="name"
+                                type={isVertical ? "number" : "category"}
+                                dataKey={isVertical ? undefined : "name"}
                                 axisLine={{ stroke: "#9ca3af" }}
-                                tick={{ fontSize: 11 }}
+                                tick={{ fill: "#6b7280", fontSize: 11 }}
+                                tickFormatter={isVertical ? (value) => this.formatValue(value, dataKey1) : undefined}
                             />
+
+                            {/* Axe Y - dépend de l'orientation */}
                             <YAxis
-                                tickFormatter={(value) => this.formatValue(value, dataKey1)}
+                                type={isVertical ? "category" : "number"}
+                                dataKey={isVertical ? "name" : undefined}
+                                width={isVertical ? 100 : 60}
                                 axisLine={{ stroke: "#9ca3af" }}
-                                tick={{ fill: "#6b7280" }}
+                                tick={{ fill: "#6b7280", fontSize: 11 }}
+                                tickFormatter={!isVertical ? (value) => this.formatValue(value, dataKey1) : undefined}
                             />
+
                             <Tooltip
                                 formatter={formatTooltip}
-                                labelFormatter={(label) => `Période: ${label}`}
+                                labelFormatter={(label) =>
+                                    isVertical ? `Catégorie: ${label}` : `Période: ${label}`
+                                }
                             />
                             <Legend />
 
-                            {/* Premier bar - toujours présent */}
+                            {/* Barres empilées */}
                             <Bar
                                 dataKey={dataKey1}
                                 stackId="a"
@@ -160,17 +178,15 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                                 <LabelList dataKey={dataKey1} position="center" fill="#000" fontSize={12} fontWeight="bold" />
                             </Bar>
 
-                            {/* Deuxième bar - seulement si dataKey2 est présent */}
                             {dataKey2 && (
                                 <Bar
                                     dataKey={dataKey2}
                                     stackId="a"
                                     fill={color2}
-                                    name={label2 || dataKey2} // Fallback si label2 non fourni
+                                    name={label2 || dataKey2}
                                 >
                                     <LabelList dataKey={dataKey2} position="center" fill="#000" fontSize={12} fontWeight="bold" />
                                 </Bar>
-
                             )}
                         </BarChart>
                     </ResponsiveContainer>
