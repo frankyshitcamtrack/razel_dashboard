@@ -59,7 +59,7 @@ async function httpGetTransitDashboards(req, res) {
 
         // Traitement du paramètre weekDays
         let weekDaysArray = null;
-        if (weekDays) {
+        if (weekDays && vehicle) {
             try {
                 const parsed = JSON.parse(weekDays);
                 if (!Array.isArray(parsed)) throw new Error();

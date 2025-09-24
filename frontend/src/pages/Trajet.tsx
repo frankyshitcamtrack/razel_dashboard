@@ -19,8 +19,10 @@ const Trajet = () => {
         weekDays: []
     });
 
-    const { data, isLoading } = useTrajetData(filters);
-    const { data: exceptions, isLoading: exceptionsLoading } = useExceptions(filters);
+    const { data: trajets, isLoading: istrajetLoading } = useTrajetData(filters);
+    const { data: exceptions, isLoading: _exceptionsLoading } = useExceptions(filters);
+
+    console.log(trajets);
 
     //console.log(data);
 
@@ -33,7 +35,7 @@ const Trajet = () => {
 
                     {/* Section 1 : Stack Bar Charts (2 colonnes) */}
                     <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 overflow-hidden">
-                        {(isLoading && exceptionsLoading) ? (
+                        {(istrajetLoading) ? (
                             <>
                                 <DonutSkeleton />
                                 <DonutSkeleton />
@@ -54,9 +56,9 @@ const Trajet = () => {
                                         title="Nombre de survitesses"
                                     />
                                 )}
-                                {data?.SommeDistances && (
+                                {trajets?.SommeDistances && (
                                     <CustomBarChart
-                                        data={data?.SommeDistances}
+                                        data={trajets?.SommeDistances}
                                         dataKey1="value"
                                         //dataKey2="usage"
                                         label1="Somme de distance(KM)"
@@ -66,9 +68,9 @@ const Trajet = () => {
                                         title="KM Journalier"
                                     />
                                 )}
-                                {data?.tempsMoteur && (
+                                {trajets?.tempsMoteur && (
                                     <StackedBarChart
-                                        data={data?.tempsMoteur}
+                                        data={trajets?.tempsMoteur}
                                         dataKey1="value"
                                         //dataKey2="usage"
                                         label1="Sommes de durée utilisation"

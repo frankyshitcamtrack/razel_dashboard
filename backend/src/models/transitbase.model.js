@@ -485,7 +485,7 @@ async function getDureeTransitMax(params = {}) {
     let paramIndex = 1;
 
     // Filtrage par dates (STRICT : les deux dates doivent être présentes)
-    if (dateFrom && dateTo) {
+    if (dateFrom && dateTo && hasValidVehicleFilter) {
         whereClauses.push(`tb.dates BETWEEN $${paramIndex} AND $${paramIndex + 1}`);
         values.push(dateFrom, dateTo);
         paramIndex += 2;
@@ -510,7 +510,7 @@ async function getDureeTransitMax(params = {}) {
     }
 
     // Filtrage par jours de la semaine (STRICT : doit avoir au moins un jour)
-    if (weekDaysThisWeek?.length > 0) {
+    if (weekDaysThisWeek?.length > 0 && hasValidVehicleFilter) {
         if (!weekDaysThisWeek.every(d => d >= 1 && d <= 7)) {
             throw new Error("Les jours doivent être entre 1 (lundi) et 7 (dimanche)");
         }

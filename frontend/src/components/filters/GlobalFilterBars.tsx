@@ -92,31 +92,39 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
     const handleVehicleChange = (vehicleId: number) => {
         setFilters((prev) => {
             const currentVehicles = Array.isArray(prev.vehicle) ? prev.vehicle : prev.vehicle ? [prev.vehicle] : [];
-            const newVehicles = currentVehicles.includes(vehicleId)
-                ? currentVehicles.filter((id) => id !== vehicleId)
-                : [...currentVehicles, vehicleId];
 
-            return {
-                ...prev,
-                vehicle: newVehicles.length ? newVehicles : undefined,
-            };
+            if (currentVehicles.includes(vehicleId)) {
+                const newVehicles = currentVehicles.filter((id) => id !== vehicleId);
+                return {
+                    ...prev,
+                    vehicle: newVehicles.length ? newVehicles : [],
+                };
+            } else {
+
+                const newVehicles = [...currentVehicles, vehicleId];
+                return {
+                    ...prev,
+                    vehicle: newVehicles,
+                };
+            }
         });
     };
 
     const handleGroupChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const value = e.target.value ? Number(e.target.value) : undefined;
+
         setFilters((prev) => {
-            const newFilters = { ...prev, vcleGroupId: value };
+            const newFilters = {
+                ...prev,
+                vcleGroupId: value
+            };
+
             if (value && vehicles) {
                 const vehiclesInGroup = vehicles.filter(v => v.groupid === value);
                 newFilters.vehicle = vehiclesInGroup.map(v => v.ids);
-            } else if (!value && vehicles) {
-
-                newFilters.vehicle = vehicles.map(v => v.ids);
             } else {
                 newFilters.vehicle = [];
             }
-
             return newFilters;
         });
     };
@@ -173,18 +181,37 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
         setFilters((prev) => ({ ...prev, weekDays: newDays }));
     }
 
+
     const isVehicleSelectedByGroup = (vehicleId: number) => {
         if (!filters.vcleGroupId || !vehicles) return false;
-        const vehiclesInSelectedGroup = vehicles.filter(v => v.groupid === filters.vcleGroupId);
-        return vehiclesInSelectedGroup.some(v => v.ids === vehicleId);
+        const vehicle = vehicles.find(v => v.ids === vehicleId);
+        if (!vehicle) return false;
+
+        return vehicle.groupid === filters.vcleGroupId;
     };
 
-
     const isVehicleIndividuallySelected = (vehicleId: number) => {
+        if (!filters.vehicle) return false;
+
         return Array.isArray(filters.vehicle)
             ? filters.vehicle.includes(vehicleId)
             : filters.vehicle === vehicleId;
     };
+
+
+    const isVehicleActive = (vehicleId: number) => {
+
+        if (filters.vcleGroupId) {
+            const belongsToGroup = isVehicleSelectedByGroup(vehicleId);
+            const isExplicitlyDeselected = isVehicleIndividuallySelected(vehicleId) === false;
+
+            return belongsToGroup && !isExplicitlyDeselected;
+        }
+
+
+        return isVehicleIndividuallySelected(vehicleId);
+    };
+
     return (
         <>
             <div className="mb-2 bg-white p-4 rounded-2xl shadow-md border">
@@ -442,17 +469,14 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
                                         id="selectAllVehicles"
                                         checked={
                                             filteredVehicles.length > 0 &&
-                                            filteredVehicles.every(v =>
-                                                Array.isArray(filters.vehicle)
-                                                    ? filters.vehicle.includes(v.ids)
-                                                    : filters.vehicle === v.ids
-                                            )
+                                            filteredVehicles.every(v => isVehicleActive(v.ids))
                                         }
                                         onChange={(e) => {
                                             if (e.target.checked) {
                                                 const allIds = filteredVehicles.map(v => v.ids);
                                                 setFilters(prev => ({ ...prev, vehicle: allIds }));
                                             } else {
+                                                // Désélectionner tous les véhicules
                                                 setFilters(prev => ({ ...prev, vehicle: [] }));
                                             }
                                         }}
@@ -496,11 +520,10 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
                                 ) : filteredVehicles.length === 0 ? (
                                     <div className="text-center text-gray-500 py-4">Aucun véhicule trouvé</div>
                                 ) : (
-
                                     filteredVehicles.map((vehicle) => {
-                                        const isGroupSelected = isVehicleSelectedByGroup(vehicle.ids);
-                                        const isIndividuallySelected = isVehicleIndividuallySelected(vehicle.ids);
-                                        const isActive = isGroupSelected || isIndividuallySelected;
+                                        const isActive = isVehicleActive(vehicle.ids);
+                                        const belongsToSelectedGroup = isVehicleSelectedByGroup(vehicle.ids);
+                                        const isExplicitlySelected = isVehicleIndividuallySelected(vehicle.ids);
 
                                         return (
                                             <button
@@ -510,12 +533,17 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
                                                 className={`w-full px-2 py-1 rounded text-sm transition-all ${isActive
                                                     ? "bg-[#F7D000] text-white shadow-sm"
                                                     : "bg-white text-gray-700 hover:bg-gray-100"
-                                                    } ${isGroupSelected && !isIndividuallySelected
-                                                        ? "bg-[#F7D000] text - white shadow - sm"
-                                                        : ""
-                                                    }`}
+                                                    } `}
+                                                title={
+                                                    belongsToSelectedGroup && !isExplicitlySelected
+                                                        ? "Sélectionné via le groupe"
+                                                        : isExplicitlySelected
+                                                            ? "Sélectionné manuellement"
+                                                            : "Non sélectionné"
+                                                }
                                             >
                                                 <span>{vehicle.names.split('-')[0]}</span>
+
                                             </button>
                                         );
                                     })

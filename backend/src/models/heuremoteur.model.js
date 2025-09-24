@@ -53,7 +53,7 @@ async function getHmoteur(params = {}) {
     const whereClauses = [];
 
     // Filtrage par dates (STRICT : les deux dates doivent être présentes)
-    if (dateFrom && dateTo) {
+    if (dateFrom && dateTo && vehicleId) {
         whereClauses.push(`hm.dates BETWEEN $${values.length + 1} AND $${values.length + 2}`);
         values.push(dateFrom, dateTo);
     } else if (dateFrom || dateTo) {
@@ -76,13 +76,13 @@ async function getHmoteur(params = {}) {
     }
 
     // Filtrage par groupe (STRICT : doit être défini)
-    if (groupId) {
+    if (groupId && vehicleId) {
         whereClauses.push(`v.groupid = $${values.length + 1}`);
         values.push(groupId);
     }
 
     // Filtrage par jours de la semaine (STRICT : doit avoir au moins un jour)
-    if (weekDaysThisWeek?.length > 0) {
+    if (weekDaysThisWeek?.length > 0 && vehicleId) {
         if (!weekDaysThisWeek.every(d => d >= 1 && d <= 7)) {
             throw new Error("Les jours doivent être entre 1 (lundi) et 7 (dimanche)");
         }
