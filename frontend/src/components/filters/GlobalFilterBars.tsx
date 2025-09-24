@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { useAuth } from "../../store/AuthContext";
 
 import {
@@ -50,7 +50,6 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
 
     const filteredVehicles = useMemo(() => {
         if (!vehicles) return [];
-
         return vehicles.filter((vehicle) => {
             const matchesSearch = vehicle.names.toLowerCase().includes(searchTerm.toLowerCase());
             let matchesGroup = true;
@@ -64,29 +63,29 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
     }, [vehicles, searchTerm, filters.vcleGroupId, user?.groupid]);
 
 
-    useEffect(() => {
-        if (vehicles && user) {
-            if (user.isadmin === true) {
-                const allVehicleIds = vehicles.map(v => v.ids);
-                setFilters((prev) => ({
-                    ...prev,
-                    weekDays: [1],
-                    vehicle: allVehicleIds,
-                    vcleGroupId: undefined
-                }));
-            } else {
-                const vehiclebygroups = vehicles.filter(item => item.groupid === user.groupid);
-                const selectedVecle = vehiclebygroups.map(v => v.ids);
-                setFilters((prev) => ({
-                    ...prev,
-                    weekDays: [1],
-                    vehicle: selectedVecle,
-                    vcleGroupId: user.groupid
-                }));
-            }
-        }
-    }, [vehicles, user]);
-
+    /*   useEffect(() => {
+          if (vehicles && user) {
+              if (user.isadmin === true) {
+                  const allVehicleIds = vehicles.map(v => v.ids);
+                  setFilters((prev) => ({
+                      ...prev,
+                      weekDays: [1],
+                      vehicle: allVehicleIds,
+                      vcleGroupId: undefined
+                  }));
+              } else {
+                  const vehiclebygroups = vehicles.filter(item => item.groupid === user.groupid);
+                  const selectedVecle = vehiclebygroups.map(v => v.ids);
+                  setFilters((prev) => ({
+                      ...prev,
+                      weekDays: [1],
+                      vehicle: selectedVecle,
+                      vcleGroupId: user.groupid
+                  }));
+              }
+          }
+      }, [vehicles, user]);
+   */
 
 
     const handleVehicleChange = (vehicleId: number) => {

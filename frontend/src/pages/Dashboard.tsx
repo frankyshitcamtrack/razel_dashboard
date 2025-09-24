@@ -1,7 +1,7 @@
-import { useState } from "react";
 import Sidebar from "../components/layout/SideBar";
 import GlobalFilterBar from "../components/filters/GlobalFilterBars";
 //import CustomBarChart from "../components/charts/BarChart";
+import { useFilters } from "../store/GlobalFiltersContext";
 import PieChartComponent from "../components/charts/PieChart";
 import CombinedChartComponent from "../components/charts/CombinedChart";
 import StackedBarChart from "../components/charts/StackedBarChart";
@@ -9,22 +9,25 @@ import { useHeureMoteurData } from "../hooks/useHeureMoteurData";
 import { useExceptions } from "../hooks/useExceptions";
 /* import CombinedChartTimeComponent from "../components/charts/CombinedChartTime"; */
 import CombinedBarChartTimeComponent from "../components/charts/CombinedBarChartTime";
-import type { Filters } from "../components/filters/GlobalFilterBars";
+import { VehicleLoadingSpinner } from "../components/UI/LoadingSpinner";
 /* import LineChartComponent from "../components/charts/LineChart"; */
 
 const Dashboard = () => {
-    const [filters, setFilters] = useState<Filters>({
-        date1: undefined,
-        date2: undefined,
-        vehicle: undefined,
-        groupBy: undefined,
-        vcleGroupId: undefined,
-        weekDays: []
-    });
+    const { filters, setFilters, isInitialized } = useFilters();
 
     const { data, isLoading } = useHeureMoteurData(filters);
     const { data: exceptions } = useExceptions(filters);
 
+    if (!isInitialized) {
+        return (
+            <div className="min-h-screen bg-gray-100 flex">
+                <Sidebar />
+                <div className="w-full flex justify-center items-center">
+                    <VehicleLoadingSpinner />
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-100 flex">

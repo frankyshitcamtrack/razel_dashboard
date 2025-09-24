@@ -1,4 +1,3 @@
-import { useState } from "react";
 import Sidebar from "../components/layout/SideBar";
 import GlobalFilterBar from "../components/filters/GlobalFilterBars";
 //import VerticalStackedBarChart from "../components/charts/VerticalStakedBarChart";
@@ -6,25 +5,25 @@ import StackedBarChart from "../components/charts/StackedBarChart";
 import CustomBarChart from "../components/charts/BarChart"
 import { useTrajetData } from "../hooks/useTrajet";
 import { useExceptions } from "../hooks/useExceptions";
-import type { Filters } from "../components/filters/GlobalFilterBars";
+import { useFilters } from "../store/GlobalFiltersContext";
+import { VehicleLoadingSpinner } from "../components/UI/LoadingSpinner";
 
 
 const Trajet = () => {
-    const [filters, setFilters] = useState<Filters>({
-        date1: undefined,
-        date2: undefined,
-        vehicle: undefined,
-        groupBy: undefined,
-        vcleGroupId: undefined,
-        weekDays: []
-    });
-
+    const { filters, setFilters, isInitialized } = useFilters();
     const { data: trajets, isLoading: istrajetLoading } = useTrajetData(filters);
-    const { data: exceptions, isLoading: _exceptionsLoading } = useExceptions(filters);
+    const { data: exceptions, isLoading: exceptionsLoading } = useExceptions(filters);
 
-    console.log(trajets);
-
-    //console.log(data);
+    if (!isInitialized) {
+        return (
+            <div className="min-h-screen bg-gray-100 flex">
+                <Sidebar />
+                <div className="w-full flex justify-center items-center">
+                    <VehicleLoadingSpinner />
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-100 flex">
@@ -35,7 +34,7 @@ const Trajet = () => {
 
                     {/* Section 1 : Stack Bar Charts (2 colonnes) */}
                     <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 overflow-hidden">
-                        {(istrajetLoading) ? (
+                        {(istrajetLoading && exceptionsLoading) ? (
                             <>
                                 <DonutSkeleton />
                                 <DonutSkeleton />

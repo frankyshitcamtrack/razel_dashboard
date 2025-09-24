@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AuthRouter from './root/autRoot';
 import { AuthProvider } from './store/AuthContext';
+import { FilterProvider } from './store/GlobalFiltersContext';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -15,7 +16,9 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <AuthRouter />
+        <FilterProvider>
+          <AuthRouter />
+        </FilterProvider>
       </AuthProvider>
     </QueryClientProvider>
   )

@@ -50,7 +50,7 @@ async function getDureeParBase(params = {}) {
     const hasValidWeekDays = !!(weekDaysThisWeek?.length > 0);
 
     // Si aucun paramètre valide n'est présent, ne pas exécuter la requête
-    if (!hasValidDateRange && !hasValidVehicleFilter && !hasValidWeekDays) {
+    if (!hasValidDateRange && !hasValidWeekDays) {
         console.log('Aucun filtre valide spécifié - requête annulée');
         return {
             data: [],
@@ -76,7 +76,7 @@ async function getDureeParBase(params = {}) {
     let paramIndex = 1;
 
     // Filtrage par dates (STRICT : les deux dates doivent être présentes)
-    if (dateFrom && dateTo) {
+    if (dateFrom && dateTo && hasValidVehicleFilter) {
         whereClauses.push(`tb.dates BETWEEN $${paramIndex} AND $${paramIndex + 1}`);
         values.push(dateFrom, dateTo);
         paramIndex += 2;
@@ -102,7 +102,7 @@ async function getDureeParBase(params = {}) {
     }
 
     // Filtrage par jours de la semaine (STRICT : doit avoir au moins un jour)
-    if (weekDaysThisWeek?.length > 0) {
+    if (weekDaysThisWeek?.length > 0 && hasValidVehicleFilter) {
         if (!weekDaysThisWeek.every(d => d >= 1 && d <= 7)) {
             throw new Error("Les jours doivent être entre 1 (lundi) et 7 (dimanche)");
         }
@@ -186,7 +186,7 @@ async function getToursParBase(params = {}) {
     const hasValidWeekDays = !!(weekDaysThisWeek?.length > 0);
 
     // Si aucun paramètre valide n'est présent, ne pas exécuter la requête
-    if (!hasValidDateRange && !hasValidVehicleFilter && !hasValidWeekDays) {
+    if (!hasValidDateRange && !hasValidWeekDays) {
         console.log('Aucun filtre valide spécifié - requête annulée');
         return {
             data: [],
@@ -212,7 +212,7 @@ async function getToursParBase(params = {}) {
     let paramIndex = 1;
 
     // Filtrage par dates (STRICT : les deux dates doivent être présentes)
-    if (dateFrom && dateTo) {
+    if (dateFrom && dateTo && hasValidVehicleFilter) {
         whereClauses.push(`tb.dates BETWEEN $${paramIndex} AND $${paramIndex + 1}`);
         values.push(dateFrom, dateTo);
         paramIndex += 2;
@@ -237,7 +237,7 @@ async function getToursParBase(params = {}) {
     }
 
     // Filtrage par jours de la semaine (STRICT : doit avoir au moins un jour)
-    if (weekDaysThisWeek?.length > 0) {
+    if (weekDaysThisWeek?.length > 0 && hasValidVehicleFilter) {
         if (!weekDaysThisWeek.every(d => d >= 1 && d <= 7)) {
             throw new Error("Les jours doivent être entre 1 (lundi) et 7 (dimanche)");
         }
@@ -320,7 +320,7 @@ async function getHistoriqueTransit(params = {}) {
     const hasValidWeekDays = !!(weekDaysThisWeek?.length > 0);
 
     // Si aucun paramètre valide n'est présent, ne pas exécuter la requête
-    if (!hasValidDateRange && !hasValidVehicleFilter && !hasValidWeekDays) {
+    if (!hasValidDateRange && !hasValidWeekDays) {
         console.log('Aucun filtre valide spécifié - requête annulée');
         return {
             data: [],
@@ -352,7 +352,7 @@ async function getHistoriqueTransit(params = {}) {
     let paramIndex = 1;
 
     // Filtrage par dates (STRICT : les deux dates doivent être présentes)
-    if (dateFrom && dateTo) {
+    if (dateFrom && dateTo && hasValidVehicleFilter) {
         whereClauses.push(`tb.dates BETWEEN $${paramIndex} AND $${paramIndex + 1}`);
         values.push(dateFrom, dateTo);
         paramIndex += 2;
@@ -377,7 +377,7 @@ async function getHistoriqueTransit(params = {}) {
     }
 
     // Filtrage par jours de la semaine (STRICT : doit avoir au moins un jour)
-    if (weekDaysThisWeek?.length > 0) {
+    if (weekDaysThisWeek?.length > 0 && hasValidVehicleFilter) {
         if (!weekDaysThisWeek.every(d => d >= 1 && d <= 7)) {
             throw new Error("Les jours doivent être entre 1 (lundi) et 7 (dimanche)");
         }

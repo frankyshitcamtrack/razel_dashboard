@@ -12,7 +12,7 @@ export const useTrajetData = (params: {
     return useQuery<DashboardTrajet, Error>({
         queryKey: ['transit data', params],
         queryFn: () => fetchTrajets(params),
-        enabled: !!params.date2 || params.vehicle !== undefined || params.groupBy !== undefined,
-        staleTime: 5 * 60 * 1000,
+        enabled: !!(params.date2 && params.date2.length > 0) || params.vehicle !== undefined || params.groupBy !== undefined,
+        staleTime: 0,
     });
 };

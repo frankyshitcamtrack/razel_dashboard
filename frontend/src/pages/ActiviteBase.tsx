@@ -1,26 +1,28 @@
-import { useState } from "react";
 import Sidebar from "../components/layout/SideBar";
 import GlobalFilterBar from "../components/filters/GlobalFilterBars";
 import StackedBarChart from "../components/charts/StackedBarChart";
 import VerticalStackedBarChart from "../components/charts/VerticalStakedBarChart";
 import CustomBarChart from "../components/charts/BarChart"
 import { useTransitData } from "../hooks/useTransitData";
-import type { Filters } from "../components/filters/GlobalFilterBars";
-
+import { useFilters } from "../store/GlobalFiltersContext";
+import { VehicleLoadingSpinner } from "../components/UI/LoadingSpinner";
 
 const ActiviteBase = () => {
-    const [filters, setFilters] = useState<Filters>({
-        date1: undefined,
-        date2: undefined,
-        vehicle: undefined,
-        groupBy: undefined,
-        vcleGroupId: undefined,
-        weekDays: []
-    });
+    const { filters, setFilters, isInitialized } = useFilters();
 
     const { data, isLoading } = useTransitData(filters);
 
     //console.log(data);
+    if (!isInitialized) {
+        return (
+            <div className="min-h-screen bg-gray-100 flex">
+                <Sidebar />
+                <div className="w-full flex justify-center items-center">
+                    <VehicleLoadingSpinner />
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-100 flex">

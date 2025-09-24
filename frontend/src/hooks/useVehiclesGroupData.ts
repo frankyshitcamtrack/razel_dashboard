@@ -6,6 +6,6 @@ export const useVehiclesGroupData = () => {
     return useQuery<vehiclesGroup[], Error>({
         queryKey: ['vehiclesGroup'],
         queryFn: () => fetchVehiclesGroup(),
-        staleTime: 5 * 60 * 1000,
+        staleTime: 0,
     });
 };
