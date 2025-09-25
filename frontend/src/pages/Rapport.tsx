@@ -1,12 +1,24 @@
 import React from 'react';
 import DataTable from '../components/dataTable/dataTable';
 import Sidebar from '../components/layout/SideBar';
-
+import HamburgerButton from "../components/UI/HamburgerButton";
+import { useState } from 'react';
 const Rapport: React.FC = () => {
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     return (
         <div className="min-h-screen bg-gray-100 flex">
-            <Sidebar />
+            <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
             <div className="w-full">
+                <header className="lg:hidden bg-white shadow-sm border-b border-gray-200 p-4">
+                    <div className="flex items-center justify-between">
+                        <HamburgerButton
+                            isOpen={sidebarOpen}
+                            onClick={() => setSidebarOpen(!sidebarOpen)}
+                        />
+                        <span className="text-lg font-semibold text-gray-800">Rapports</span>
+                        <div className="w-6"></div> {/* Pour l'équilibrage */}
+                    </div>
+                </header>
                 <main className="p-6">
                     <h1 className="text-2xl font-bold mb-6">Liste des Rapports</h1>
 

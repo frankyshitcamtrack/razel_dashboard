@@ -6,18 +6,20 @@ import CustomBarChart from "../components/charts/BarChart"
 import { useTrajetData } from "../hooks/useTrajet";
 import { useExceptions } from "../hooks/useExceptions";
 import { useFilters } from "../store/GlobalFiltersContext";
+import { useState } from "react";
 import { VehicleLoadingSpinner } from "../components/UI/LoadingSpinner";
-
+import HamburgerButton from "../components/UI/HamburgerButton";
 
 const Trajet = () => {
     const { filters, setFilters, isInitialized } = useFilters();
     const { data: trajets, isLoading: istrajetLoading } = useTrajetData(filters);
     const { data: exceptions, isLoading: exceptionsLoading } = useExceptions(filters);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
     if (!isInitialized) {
         return (
             <div className="min-h-screen bg-gray-100 flex">
-                <Sidebar />
+                <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
                 <div className="w-full flex justify-center items-center">
                     <VehicleLoadingSpinner />
                 </div>
@@ -27,13 +29,23 @@ const Trajet = () => {
 
     return (
         <div className="min-h-screen bg-gray-100 flex">
-            <Sidebar />
+            <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
             <div className="w-full">
+                <header className="lg:hidden bg-white shadow-sm border-b border-gray-200 p-4">
+                    <div className="flex items-center justify-between">
+                        <HamburgerButton
+                            isOpen={sidebarOpen}
+                            onClick={() => setSidebarOpen(!sidebarOpen)}
+                        />
+                        <span className="text-lg font-semibold text-gray-800">Utilisation Tracteurs</span>
+                        <div className="w-6"></div> {/* Pour l'équilibrage */}
+                    </div>
+                </header>
                 <main className="p-4">
                     <GlobalFilterBar filters={filters} setFilters={setFilters} />
 
                     {/* Section 1 : Stack Bar Charts (2 colonnes) */}
-                    <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 overflow-hidden">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 overflow-hidden">
                         {(istrajetLoading && exceptionsLoading) ? (
                             <>
                                 <DonutSkeleton />

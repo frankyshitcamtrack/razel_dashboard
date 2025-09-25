@@ -264,47 +264,54 @@ const DataTable: React.FC<{ dataType: DataType }> = ({ dataType }) => {
             <div className="mb-6">
                 <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
                     {/* Filtres (gauche) */}
-                    <div className="flex flex-wrap items-end gap-4">
-                        <div className="flex items-center gap-2">
-                            <label htmlFor="dateFrom" className="text-sm font-medium">Date début :</label>
+
+                    {/* Dates - Empiler verticalement sur mobile */}
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full lg:w-auto">
+                        <div className="flex items-center gap-2 w-full sm:w-auto">
+                            <label htmlFor="dateFrom" className="text-sm font-medium whitespace-nowrap">Date début :</label>
                             <input
                                 id="dateFrom"
                                 type="date"
                                 value={startDate ?? ""}
                                 onChange={(e) => handleStartDateChange(e.target.value)}
-                                className="h-10 w-44 border rounded-md px-3"
+                                className="h-10 w-full sm:w-44 border rounded-md px-3 text-sm"
                             />
-                            <span className="text-sm">à</span>
-                            <label htmlFor="dateTo" className="sr-only">Date fin</label>
+                        </div>
+
+                        <span className="text-sm hidden sm:inline">à</span>
+
+                        <div className="flex items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+                            <label htmlFor="dateTo" className="text-sm font-medium whitespace-nowrap sm:sr-only">Date fin :</label>
                             <input
                                 id="dateTo"
                                 type="date"
                                 value={endDate ?? ""}
                                 onChange={(e) => handleEndDateChange(e.target.value)}
-                                className="h-10 w-44 border rounded-md px-3"
+                                className="h-10 w-full sm:w-44 border rounded-md px-3 text-sm"
                             />
                         </div>
+                    </div>
 
-                        <div className="flex items-center gap-2">
-                            <select
-                                name="vcleGroupId"
-                                value={filters.vehicleGroupId ?? ""}
-                                onChange={(e) => handleVehicleGroupChange(e.target.value)}
-                                className="w-64 py-2 px-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                                disabled={groupLoading}
-                            >
-                                <option value="">Tous les groupes</option>
-                                {groupLoading ? (
-                                    <option disabled>Chargement...</option>
-                                ) : (
-                                    vehicleGroups?.map(group => (
-                                        <option key={group.ids} value={group.ids ?? ""}>
-                                            {group.names}
-                                        </option>
-                                    ))
-                                )}
-                            </select>
-                        </div>
+                    {/* Sélecteur de groupe - Pleine largeur sur mobile */}
+                    <div className="flex items-center gap-2 w-full lg:w-auto">
+                        <select
+                            name="vcleGroupId"
+                            value={filters.vehicleGroupId ?? ""}
+                            onChange={(e) => handleVehicleGroupChange(e.target.value)}
+                            className="w-full lg:w-64 py-2 px-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
+                            disabled={groupLoading}
+                        >
+                            <option value="">Tous les groupes</option>
+                            {groupLoading ? (
+                                <option disabled>Chargement...</option>
+                            ) : (
+                                vehicleGroups?.map(group => (
+                                    <option key={group.ids} value={group.ids ?? ""}>
+                                        {group.names}
+                                    </option>
+                                ))
+                            )}
+                        </select>
                     </div>
 
                     {/* Boutons (droite) */}

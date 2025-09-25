@@ -1,5 +1,5 @@
 import React from "react";
-import { Pie, Cell, ResponsiveContainer, PieChart, Tooltip, Legend } from "recharts";
+import { Pie, Cell, ResponsiveContainer, PieChart, Tooltip } from "recharts";
 
 interface DailyConsommationData {
     name: string;
@@ -19,14 +19,12 @@ const COLORS = [
     "#ef4444", "#ec4899", "#14b8a6", "#64748b"
 ];
 
-// ... (même interface et const COLORS)
-
 const PieChartComponent: React.FC<PieChartProps> = ({
     data = [],
     title,
     unit = "",
     className = "",
-    variant = "donut" // Donut par défaut
+    variant = "donut"
 }) => {
     const renderCustomizedLabel = ({
         cx,
@@ -36,7 +34,6 @@ const PieChartComponent: React.FC<PieChartProps> = ({
         outerRadius,
         percent
     }: any) => {
-        // Afficher seulement le pourcentage pour les petits segments
         if (percent < 0.05) return null;
 
         const RADIAN = Math.PI / 180;
@@ -64,10 +61,11 @@ const PieChartComponent: React.FC<PieChartProps> = ({
     const total = data.reduce((sum, item) => sum + item.daylyConsom, 0);
 
     return (
-        <div className={`bg-white rounded-xl shadow-lg p-2 flex flex-col ${className}`}>
-            <h3 className="text-xl font-semibold text-gray-800 mb-4 text-center">{title}</h3>
-            <div className="flex-grow flex items-center justify-center relative">
-                <ResponsiveContainer width="100%" height={280}>
+        <div className={`bg-white rounded-xl shadow-lg p-4 flex flex-col ${className}`}>
+            <h3 className="text-lg font-semibold text-gray-800 mb-1 text-center">{title}</h3>
+
+            <div className="flex-grow flex flex-col lg:flex-row items-center justify-center relative min-h-[300px]">
+                <ResponsiveContainer width="100%" height={280} className="lg:flex-1">
                     <PieChart>
                         <Tooltip
                             formatter={(value, _name, props) => [
@@ -78,6 +76,7 @@ const PieChartComponent: React.FC<PieChartProps> = ({
                                 backgroundColor: '#fff',
                                 border: '1px solid #e5e7eb',
                                 borderRadius: '8px',
+                                fontSize: '12px'
                             }}
                         />
                         <Pie
@@ -85,7 +84,7 @@ const PieChartComponent: React.FC<PieChartProps> = ({
                             cx="50%"
                             cy="50%"
                             outerRadius={100}
-                            innerRadius={variant === "donut" ? 60 : 0}
+                            innerRadius={variant === "donut" ? 50 : 0}
                             paddingAngle={1}
                             dataKey="daylyConsom"
                             nameKey="name"
@@ -109,7 +108,7 @@ const PieChartComponent: React.FC<PieChartProps> = ({
                                 y="45%"
                                 textAnchor="middle"
                                 dominantBaseline="middle"
-                                className="text-2xl font-bold fill-gray-800"
+                                className="text-lg font-bold fill-gray-800"
                             >
                                 {total.toFixed(1)}
                             </text>
@@ -120,30 +119,33 @@ const PieChartComponent: React.FC<PieChartProps> = ({
                                 y="55%"
                                 textAnchor="middle"
                                 dominantBaseline="middle"
-                                className="text-sm fill-gray-600"
+                                className="text-xs fill-gray-600"
                             >
                                 {unit}
                             </text>
                         )}
-
-                        <Legend
-                            layout="vertical"
-                            verticalAlign="middle"
-                            align="right"
-                            wrapperStyle={{
-                                paddingLeft: '20px',
-                                fontSize: '12px'
-                            }}
-                            formatter={(value, entry: any) => (
-                                <span className="text-xs text-gray-700">
-                                    {value}: {entry.payload.daylyConsom}{unit}
-                                </span>
-                            )}
-                        />
                     </PieChart>
                 </ResponsiveContainer>
+
+                {/* Légende séparée - en dessous sur mobile, à droite sur desktop */}
+                <div className="w-full lg:w-auto lg:flex-1 mt-4 lg:mt-0 lg:pl-4">
+                    <div className="flex flex-wrap justify-center lg:justify-start gap-2 lg:block">
+                        {data.map((entry, index) => (
+                            <div key={index} className="flex items-center text-xs mb-1">
+                                <div
+                                    className="w-3 h-3 rounded-full mr-2 flex-shrink-0"
+                                    style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                                />
+                                <span className="text-gray-700 truncate max-w-[120px] lg:max-w-none">
+                                    {entry.name}: {entry.daylyConsom}{unit}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
         </div>
     );
 };
+
 export default PieChartComponent;

@@ -1,4 +1,5 @@
 import Sidebar from "../components/layout/SideBar";
+import { useState } from "react";
 import GlobalFilterBar from "../components/filters/GlobalFilterBars";
 import StackedBarChart from "../components/charts/StackedBarChart";
 import VerticalStackedBarChart from "../components/charts/VerticalStakedBarChart";
@@ -6,17 +7,18 @@ import CustomBarChart from "../components/charts/BarChart"
 import { useTransitData } from "../hooks/useTransitData";
 import { useFilters } from "../store/GlobalFiltersContext";
 import { VehicleLoadingSpinner } from "../components/UI/LoadingSpinner";
+import HamburgerButton from "../components/UI/HamburgerButton";
 
 const ActiviteBase = () => {
     const { filters, setFilters, isInitialized } = useFilters();
-
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const { data, isLoading } = useTransitData(filters);
 
     //console.log(data);
     if (!isInitialized) {
         return (
             <div className="min-h-screen bg-gray-100 flex">
-                <Sidebar />
+                <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
                 <div className="w-full flex justify-center items-center">
                     <VehicleLoadingSpinner />
                 </div>
@@ -26,13 +28,23 @@ const ActiviteBase = () => {
 
     return (
         <div className="min-h-screen bg-gray-100 flex">
-            <Sidebar />
+            <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
             <div className="w-full">
+                <header className="lg:hidden bg-white shadow-sm border-b border-gray-200 p-4">
+                    <div className="flex items-center justify-between">
+                        <HamburgerButton
+                            isOpen={sidebarOpen}
+                            onClick={() => setSidebarOpen(!sidebarOpen)}
+                        />
+                        <span className="text-lg font-semibold text-gray-800">Acivite sur Base</span>
+                        <div className="w-6"></div> {/* Pour l'équilibrage */}
+                    </div>
+                </header>
                 <main className="p-4">
                     <GlobalFilterBar filters={filters} setFilters={setFilters} />
 
                     {/* Section 1 : Stack Bar Charts (2 colonnes) */}
-                    <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 overflow-hidden">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 overflow-hidden">
                         {isLoading ? (
                             <>
                                 <DonutSkeleton />

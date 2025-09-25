@@ -1,5 +1,6 @@
 import Sidebar from "../components/layout/SideBar";
 import GlobalFilterBar from "../components/filters/GlobalFilterBars";
+import { useState } from "react";
 //import CustomBarChart from "../components/charts/BarChart";
 import { useFilters } from "../store/GlobalFiltersContext";
 import PieChartComponent from "../components/charts/PieChart";
@@ -7,6 +8,7 @@ import CombinedChartComponent from "../components/charts/CombinedChart";
 import StackedBarChart from "../components/charts/StackedBarChart";
 import { useHeureMoteurData } from "../hooks/useHeureMoteurData";
 import { useExceptions } from "../hooks/useExceptions";
+import HamburgerButton from "../components/UI/HamburgerButton";
 /* import CombinedChartTimeComponent from "../components/charts/CombinedChartTime"; */
 import CombinedBarChartTimeComponent from "../components/charts/CombinedBarChartTime";
 import { VehicleLoadingSpinner } from "../components/UI/LoadingSpinner";
@@ -14,14 +16,14 @@ import { VehicleLoadingSpinner } from "../components/UI/LoadingSpinner";
 
 const Dashboard = () => {
     const { filters, setFilters, isInitialized } = useFilters();
-
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const { data, isLoading } = useHeureMoteurData(filters);
     const { data: exceptions } = useExceptions(filters);
 
     if (!isInitialized) {
         return (
             <div className="min-h-screen bg-gray-100 flex">
-                <Sidebar />
+                <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
                 <div className="w-full flex justify-center items-center">
                     <VehicleLoadingSpinner />
                 </div>
@@ -31,8 +33,18 @@ const Dashboard = () => {
 
     return (
         <div className="min-h-screen bg-gray-100 flex">
-            <Sidebar />
+            <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
             <div className="w-full">
+                <header className="lg:hidden bg-white shadow-sm border-b border-gray-200 p-4">
+                    <div className="flex items-center justify-between">
+                        <HamburgerButton
+                            isOpen={sidebarOpen}
+                            onClick={() => setSidebarOpen(!sidebarOpen)}
+                        />
+                        <span className="text-lg font-semibold text-gray-800">Tableau de bord</span>
+                        <div className="w-6"></div> {/* Pour l'équilibrage */}
+                    </div>
+                </header>
                 <main className="p-4">
                     <GlobalFilterBar filters={filters} setFilters={setFilters} />
 
