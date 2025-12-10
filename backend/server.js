@@ -23,7 +23,7 @@ const server = https.createServer(options, app);
 
 async function startServer() {
   server.listen(PORT, () =>
-    console.log(`webhook is listening to port ${PORT}`)
+    console.log(`App is listening to port ${PORT}`)
   );
 }
 
