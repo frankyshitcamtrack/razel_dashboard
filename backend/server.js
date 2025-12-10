@@ -14,9 +14,9 @@ const app = require('./app');
 const PORT = process.env.PORT || 8443;
 
 const options = {
-  key: fs.readFileSync('./ssl/camtrack_net.key'),
-  cert: fs.readFileSync('./ssl/camtrack_net.crt'),
-  ca: fs.readFileSync('./ssl/camtrack_net.ca-bundle'),
+  key: fs.readFileSync('./ssl/privkey19.pem'),
+  cert: fs.readFileSync('./ssl/cert19.pem'),
+  ca: fs.readFileSync('./ssl/fullchain19.pem'),
 };
 
 const server = https.createServer(options, app);
