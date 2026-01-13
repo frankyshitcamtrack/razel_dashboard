@@ -83,8 +83,8 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
             dataKey2,
             label1,
             label2,
-            color1 = "#3b82f6",
-            color2 = "#10b981",
+            color1 = "#002060",
+            color2 = "#FAA330",
             title = "Graphique",
         } = this.props;
 

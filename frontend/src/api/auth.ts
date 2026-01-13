@@ -9,7 +9,7 @@ interface User {
 }
 
 
-//const BASE_URL = 'http://localhost:8000'
+// const BASE_URL = 'http://localhost:8000'
 
 export const login = async (username: string, password: string): Promise<{ user: User; token: string }> => {
     const response = await fetch(`/auth/secure/login`, {

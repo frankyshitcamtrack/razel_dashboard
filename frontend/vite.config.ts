@@ -13,5 +13,19 @@ export default defineConfig({
     outDir: '../backend/public',
     emptyOutDir: true,
   },
-  base: '/'
+  base: '/',
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://localhost:8443',
+        changeOrigin: true,
+        secure: false
+      },
+      '/auth': {
+        target: 'https://localhost:8443',
+        changeOrigin: true,
+        secure: false
+      }
+    }
+  }
 })

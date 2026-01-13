@@ -217,7 +217,10 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
 
                 <div
                     className="flex items-center justify-between cursor-pointer"
-                    onClick={() => setIsExpandedGlobal(!isExpandedGlogbal)}
+                    onClick={() => {
+                        setIsExpandedGlobal(!isExpandedGlogbal);
+                        if (!isExpandedGlogbal) setIsExpanded(false);
+                    }}
                 >
                     <h3 className="text-lg font-semibold text-gray-800">
                         {isExpandedGlogbal ? "Masquer les filtres Generaux" : "Afficher les filtres Generaux"}
@@ -384,11 +387,14 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
                 )}
             </div>
 
-            <div className="mb-2 bg-white p-4 rounded-2xl shadow-md border">
-                <div className="flex items-center justify-between mb-4">
+            <div className="mb-2 bg-white p-4 rounded-2xl shadow-md border" style={{width: 'calc(100vw - 320px)'}}>
+                <div className={`flex items-center justify-between ${isExpanded ? 'mb-4' : ''}`}>
                     <div
                         className="flex items-center justify-between cursor-pointer flex-1"
-                        onClick={() => setIsExpanded(!isExpanded)}
+                        onClick={() => {
+                            setIsExpanded(!isExpanded);
+                            if (!isExpanded) setIsExpandedGlobal(false);
+                        }}
                     >
                         <h3 className="text-lg font-semibold text-gray-800">
                             Filtres : Jour & Véhicule
@@ -421,7 +427,7 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
                 {isExpanded && (
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-5">
                         {/* Gauche : Jours de la semaine */}
-                        <div className="border rounded-lg p-2">
+                        <div className="border rounded-lg p-4 h-40">
                             <label className="block text-sm font-medium text-gray-700 mb-3 flex items-center">
                                 <svg className="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -451,16 +457,11 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
                         </div>
 
                         {/* Droite : Véhicules */}
-                        <div className="border rounded-lg p-2">
-                            <div className="flex items-center justify-between  mb-2">
+                        <div className="border rounded-lg p-4 h-40">
+                            <div className="flex items-center justify-between mb-2">
                                 <label className="block text-sm font-medium text-gray-700 flex items-center">
                                     <TruckIcon className="w-5 h-5 mr-2 text-green-500" />
                                     Sélectionner les véhicules
-                                    {/*   {filters.vehicleIds.length > 0 && (
-                                                <span className="ml-2 px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">
-                                                    {filters.vehicleIds.length} sélectionné(s)
-                                                </span>
-                                            )} */}
                                 </label>
                                 <div>
                                     <input
@@ -475,7 +476,6 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
                                                 const allIds = filteredVehicles.map(v => v.ids);
                                                 setFilters(prev => ({ ...prev, vehicle: allIds }));
                                             } else {
-                                                // Désélectionner tous les véhicules
                                                 setFilters(prev => ({ ...prev, vehicle: [] }));
                                             }
                                         }}
@@ -485,64 +485,28 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
                                         Sélectionner Tous les véhicules
                                     </label>
                                 </div>
-
                             </div>
 
-                            {/* Barre de recherche */}
-                            {/*     <div className="relative mb-3">
-                                <input
-                                    type="text"
-                                    placeholder="Rechercher un véhicule..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
-                                />
-                                <svg
-                                    className="w-5 h-5 absolute left-3 top-2.5 text-gray-400"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                                    />
-                                </svg>
-                            </div> */}
-
-                            {/* Liste des véhicules en boutons */}
-                            <div className="max-h-15 overflow-y-auto grid grid-cols-1 lg:grid-cols-11 gap-1 overflow-hidden">
+                            <div className="h-28 overflow-y-auto grid grid-cols-7 gap-1">
                                 {isLoading ? (
-                                    <div className="text-center text-gray-500 py-4">Chargement des véhicules...</div>
+                                    <div className="text-center text-gray-500 py-4 col-span-7">Chargement des véhicules...</div>
                                 ) : filteredVehicles.length === 0 ? (
-                                    <div className="text-center text-gray-500 py-4">Aucun véhicule trouvé</div>
+                                    <div className="text-center text-gray-500 py-4 col-span-7">Aucun véhicule trouvé</div>
                                 ) : (
                                     filteredVehicles.map((vehicle) => {
                                         const isActive = isVehicleActive(vehicle.ids);
-                                        const belongsToSelectedGroup = isVehicleSelectedByGroup(vehicle.ids);
-                                        const isExplicitlySelected = isVehicleIndividuallySelected(vehicle.ids);
-
                                         return (
                                             <button
                                                 key={vehicle.ids}
                                                 type="button"
                                                 onClick={() => handleVehicleChange(vehicle.ids)}
-                                                className={`w-full px-2 py-1 rounded text-sm transition-all ${isActive
+                                                className={`w-full px-1 py-1 rounded text-xs transition-all ${isActive
                                                     ? "bg-[#F7D000] text-white shadow-sm"
                                                     : "bg-white text-gray-700 hover:bg-gray-100"
-                                                    } `}
-                                                title={
-                                                    belongsToSelectedGroup && !isExplicitlySelected
-                                                        ? "Sélectionné via le groupe"
-                                                        : isExplicitlySelected
-                                                            ? "Sélectionné manuellement"
-                                                            : "Non sélectionné"
-                                                }
+                                                    }`}
+                                                title={vehicle.names}
                                             >
-                                                <span>{vehicle.names.split('-')[0]}</span>
-
+                                                <span className="text-xs">{vehicle.names.split('-')[0]}</span>
                                             </button>
                                         );
                                     })

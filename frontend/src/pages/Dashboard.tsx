@@ -45,11 +45,11 @@ const Dashboard = () => {
                         <div className="w-6"></div> {/* Pour l'équilibrage */}
                     </div>
                 </header>
-                <main className="p-4">
+                <main className="pl-4 pr-4 pt-4 pb-4">
                     <GlobalFilterBar filters={filters} setFilters={setFilters} />
 
                     {/* Section 1 : Stack Bar Charts (2 colonnes) */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 overflow-hidden">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 overflow-hidden lg:-ml-65 lg:pl-0">
                         {isLoading ? (
                             <>
                                 <DonutSkeleton />
@@ -67,12 +67,12 @@ const Dashboard = () => {
                                 {data?.engineData && (
                                     <StackedBarChart
                                         data={data.engineData}
-                                        dataKey1="stops"
-                                        dataKey2="usage"
-                                        label1="Arrêts moteur"
-                                        label2="Durée d'utilisation"
-                                        color1="#02509D"
-                                        color2="#F7D000"
+                                        dataKey1="usage"
+                                        dataKey2="stops"
+                                        label1="Durée d'utilisation réelle"
+                                        label2="Arrêts moteur tournant"
+                                        color1="#002060"
+                                        color2="#FAA330"
                                         valueType="time"
                                         title="Arrêts moteur vs Durée d'utilisation"
                                     />
@@ -80,12 +80,12 @@ const Dashboard = () => {
                                 {data?.engineDataPercentage && (
                                     <StackedBarChart
                                         data={data.engineDataPercentage}
-                                        dataKey1="stops"
-                                        dataKey2="usage"
-                                        label1="Arrêts moteur"
-                                        label2="Durée d'utilisation"
-                                        color1="#F7D000"
-                                        color2="#02509D"
+                                        dataKey1="usage"
+                                        dataKey2="stops"
+                                        label1="% temps d'utilisation réel"
+                                        label2="% Arrêts moteur tournant"
+                                        color1="#002060"
+                                        color2="#FAA330"
                                         valueType="percentage"
                                         title="Arrêts moteur vs Durée d'utilisation (%)"
                                     />
