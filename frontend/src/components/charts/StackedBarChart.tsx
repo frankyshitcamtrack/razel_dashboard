@@ -126,7 +126,21 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
 
         return (
             <div className="bg-white rounded-lg shadow p-2 flex flex-col h-[320px]">
-                <h3 className="text-lg font-semibold text-gray-700 mb-4">{title}</h3>
+                <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-lg font-semibold text-gray-700">{title}</h3>
+                    <div className="flex flex-col text-sm text-right">
+                        <div className="flex items-center justify-end mb-1">
+                            <div className="w-3 h-3 mr-2" style={{ backgroundColor: color1 }}></div>
+                            <span>{label1}</span>
+                        </div>
+                        {label2 && (
+                            <div className="flex items-center justify-end">
+                                <div className="w-3 h-3 mr-2" style={{ backgroundColor: color2 }}></div>
+                                <span>{label2}</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
                 <div className="flex-grow">
                     <ResponsiveContainer width="100%" height={250}>
                         <BarChart
@@ -138,6 +152,7 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                                 dataKey="name"
                                 axisLine={{ stroke: "#9ca3af" }}
                                 tick={{ fontSize: 11 }}
+                                label={{ value: 'VE38A', position: 'insideBottom', offset: -5, fontSize: 12 }}
                             />
                             <YAxis
                                 tickFormatter={(value) => this.formatValue(value, dataKey1)}
@@ -148,7 +163,6 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                                 formatter={formatTooltip}
                                 labelFormatter={(label) => `Période: ${label}`}
                             />
-                            <Legend />
 
                             {/* Premier bar - toujours présent */}
                             <Bar
@@ -157,7 +171,7 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                                 fill={color1}
                                 name={label1}
                             >
-                                <LabelList dataKey={dataKey1} position="center" fill="#000" fontSize={12} fontWeight="bold" />
+                                <LabelList dataKey={dataKey1} position="center" fill="#ffffff" fontSize={12} fontWeight="bold" />
                             </Bar>
 
                             {/* Deuxième bar - seulement si dataKey2 est présent */}
@@ -168,7 +182,7 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                                     fill={color2}
                                     name={label2 || dataKey2} // Fallback si label2 non fourni
                                 >
-                                    <LabelList dataKey={dataKey2} position="center" fill="#000" fontSize={12} fontWeight="bold" />
+                                    <LabelList dataKey={dataKey2} position="center" fill="#ffffff" fontSize={12} fontWeight="bold" />
                                 </Bar>
 
                             )}

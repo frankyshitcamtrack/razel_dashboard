@@ -16,14 +16,16 @@ import { VehicleLoadingSpinner } from "../components/UI/LoadingSpinner";
 
 const Dashboard = () => {
     const { filters, setFilters, isInitialized } = useFilters();
-    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [sidebarDropdownOpen, setSidebarDropdownOpen] = useState(true);
+    const [filterExpanded, setFilterExpanded] = useState(true);
     const { data, isLoading } = useHeureMoteurData(filters);
     const { data: exceptions } = useExceptions(filters);
 
     if (!isInitialized) {
         return (
             <div className="min-h-screen bg-gray-100 flex">
-                <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+                <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} isDropdownOpen={sidebarDropdownOpen} setIsDropdownOpen={setSidebarDropdownOpen} />
                 <div className="w-full flex justify-center items-center">
                     <VehicleLoadingSpinner />
                 </div>
@@ -33,7 +35,7 @@ const Dashboard = () => {
 
     return (
         <div className="min-h-screen bg-gray-100 flex">
-            <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+            <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} isDropdownOpen={sidebarDropdownOpen} setIsDropdownOpen={setSidebarDropdownOpen} />
             <div className="w-full">
                 <header className="lg:hidden bg-white shadow-sm border-b border-gray-200 p-4">
                     <div className="flex items-center justify-between">
@@ -46,7 +48,13 @@ const Dashboard = () => {
                     </div>
                 </header>
                 <main className="pl-4 pr-4 pt-4 pb-4">
-                    <GlobalFilterBar filters={filters} setFilters={setFilters} />
+                    <GlobalFilterBar 
+                        filters={filters} 
+                        setFilters={setFilters} 
+                        setSidebarOpen={setSidebarOpen} 
+                        setSidebarDropdownOpen={setSidebarDropdownOpen}
+                        setIsExpanded={setFilterExpanded}
+                    />
 
                     {/* Section 1 : Stack Bar Charts (2 colonnes) */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 overflow-hidden lg:-ml-65 lg:pl-0">
@@ -69,12 +77,12 @@ const Dashboard = () => {
                                         data={data.engineData}
                                         dataKey1="usage"
                                         dataKey2="stops"
-                                        label1="Durée d'utilisation réelle"
-                                        label2="Arrêts moteur tournant"
+                                        label1="Somme de Durée d'utilisation réelle"
+                                        label2="Somme de Arrêts moteur tournant"
                                         color1="#002060"
                                         color2="#FAA330"
                                         valueType="time"
-                                        title="Arrêts moteur vs Durée d'utilisation"
+                                        title=""
                                     />
                                 )}
                                 {data?.engineDataPercentage && (
@@ -82,12 +90,12 @@ const Dashboard = () => {
                                         data={data.engineDataPercentage}
                                         dataKey1="usage"
                                         dataKey2="stops"
-                                        label1="% temps d'utilisation réel"
-                                        label2="% Arrêts moteur tournant"
+                                        label1="Somme de % temps d'utilisation réel"
+                                        label2="Somme de % Arrêts moteur tournant"
                                         color1="#002060"
                                         color2="#FAA330"
                                         valueType="percentage"
-                                        title="Arrêts moteur vs Durée d'utilisation (%)"
+                                        title=""
                                     />
                                 )}
 
@@ -131,11 +139,12 @@ const Dashboard = () => {
 
                                     <CombinedChartComponent
                                         data={exceptions.speeding}
-                                        title="Excès de vitesse"
+                                        title="Consommation au 100 Km"
                                         barDataKey=""
                                         barLabel=""
                                         lineDataKey="value"
                                         lineLabel="Nombre d'excès de vitesse"
+                                        vehicleReference="VE38A"
                                     />
                                 )}
                                 {exceptions?.harshAccelerationBraking && (
@@ -152,11 +161,12 @@ const Dashboard = () => {
 
                                     <CombinedChartComponent
                                         data={exceptions.speeding}
-                                        title="Excès de vitesse"
+                                        title="Consommation au 100 Km"
                                         barDataKey=""
                                         barLabel=""
                                         lineDataKey="value"
                                         lineLabel="Nombre d'excès de vitesse"
+                                        vehicleReference="VE38A"
                                     />
                                 )}
                                 {exceptions?.harshAccelerationBraking && (

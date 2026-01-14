@@ -26,6 +26,8 @@ export interface Filters {
 interface FilterBarProps {
     filters: Filters;
     setFilters: React.Dispatch<React.SetStateAction<Filters>>;
+    setSidebarOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+    setSidebarDropdownOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 
@@ -39,7 +41,7 @@ const WEEKDAYS = [
     { num: 7, short: "Dim", long: "Dimanche" },
 ];
 
-const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) => {
+const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters, setSidebarOpen, setSidebarDropdownOpen }) => {
     const { user } = useAuth();
     const [isExpandedGlogbal, setIsExpandedGlobal] = useState(false);
     const [isExpanded, setIsExpanded] = useState(true);
@@ -387,13 +389,17 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
                 )}
             </div>
 
-            <div className="mb-2 bg-white p-4 rounded-2xl shadow-md border" style={{width: 'calc(100vw - 320px)'}}>
+            <div className="mb-2 bg-white p-4 rounded-2xl shadow-md border">
                 <div className={`flex items-center justify-between ${isExpanded ? 'mb-4' : ''}`}>
                     <div
                         className="flex items-center justify-between cursor-pointer flex-1"
                         onClick={() => {
-                            setIsExpanded(!isExpanded);
-                            if (!isExpanded) setIsExpandedGlobal(false);
+                            const newExpanded = !isExpanded;
+                            setIsExpanded(newExpanded);
+                            if (!newExpanded) {
+                                setIsExpandedGlobal(false);
+                                setSidebarDropdownOpen?.(false);
+                            }
                         }}
                     >
                         <h3 className="text-lg font-semibold text-gray-800">
@@ -444,9 +450,9 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
                                             type="button"
                                             onClick={() => toggleWeekday(num)}
                                             title={long}
-                                            className={`py-2 px-1 rounded text-xs font-medium transition-all duration-150 transform hover:scale-105 ${isSelected
-                                                ? "bg-[#02509D] text-white shadow-md"
-                                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                            className={`py-2 px-1 rounded text-xs font-medium transition-all duration-150 transform hover:scale-105 border ${isSelected
+                                                ? "bg-[#B8CCE4] text-gray-800 border-[#B8CCE4]"
+                                                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
                                                 }`}
                                         >
                                             {short}
@@ -487,7 +493,7 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
                                 </div>
                             </div>
 
-                            <div className="h-28 overflow-y-auto grid grid-cols-7 gap-1">
+                            <div className="h-24 overflow-y-auto grid grid-cols-7 gap-1 p-1">
                                 {isLoading ? (
                                     <div className="text-center text-gray-500 py-4 col-span-7">Chargement des véhicules...</div>
                                 ) : filteredVehicles.length === 0 ? (
@@ -500,9 +506,9 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters }) =
                                                 key={vehicle.ids}
                                                 type="button"
                                                 onClick={() => handleVehicleChange(vehicle.ids)}
-                                                className={`w-full px-1 py-1 rounded text-xs transition-all ${isActive
-                                                    ? "bg-[#F7D000] text-white shadow-sm"
-                                                    : "bg-white text-gray-700 hover:bg-gray-100"
+                                                className={`w-full px-1 py-1 rounded text-xs transition-all border ${isActive
+                                                    ? "bg-[#B8CCE4] text-gray-800 border-[#B8CCE4]"
+                                                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
                                                     }`}
                                                 title={vehicle.names}
                                             >

@@ -6,13 +6,18 @@ import { ArrowLeftOnRectangleIcon, XMarkIcon, ChevronDownIcon } from "@heroicons
 interface SidebarProps {
     isOpen: boolean;
     onClose: () => void;
+    isDropdownOpen?: boolean;
+    setIsDropdownOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 
 
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isDropdownOpen: externalDropdownOpen, setIsDropdownOpen: setExternalDropdownOpen }) => {
     const { logout } = useAuth();
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [internalDropdownOpen, setInternalDropdownOpen] = useState(true);
+    
+    const isDropdownOpen = externalDropdownOpen !== undefined ? externalDropdownOpen : internalDropdownOpen;
+    const setIsDropdownOpen = setExternalDropdownOpen || setInternalDropdownOpen;
 
     // Auto-open dropdown on mobile when sidebar opens
     useEffect(() => {
@@ -36,7 +41,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
             {/* Sidebar */}
             <aside className={`
-        fixed lg:static lg:mt-4 lg:ml-4 top-0 left-0 z-40
+        ${isDropdownOpen ? 'static' : 'fixed lg:static'} lg:mt-4 lg:ml-4 top-0 left-0 z-40
         w-72 bg-white shadow-lg rounded-2xl border border-black
         transform transition-transform duration-300 ease-in-out
         ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
@@ -45,7 +50,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 {/* Header - Clickable dropdown trigger */}
                 <div
                     className="flex items-center justify-between h-16 px-4 lg:cursor-pointer"
-                    onClick={() => window.innerWidth >= 1024 && setIsDropdownOpen(!isDropdownOpen)}
+                    onClick={() => {
+                        if (window.innerWidth >= 1024) {
+                            const newOpen = !isDropdownOpen;
+                            setIsDropdownOpen(newOpen);
+                            if (newOpen && setExternalDropdownOpen) {
+                                setExternalDropdownOpen(true);
+                            }
+                        }
+                    }}
                 >
                     <span className="text-xl font-bold text-blue-600">Razel Fleet Manager</span>
                     <div className="flex items-center">
