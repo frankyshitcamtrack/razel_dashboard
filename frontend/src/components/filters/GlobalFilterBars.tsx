@@ -45,7 +45,7 @@ const WEEKDAYS = [
     { num: 7, short: "Dim", long: "Dimanche" },
 ];
 
-const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters, setSidebarOpen, setSidebarDropdownOpen, isExpanded: externalIsExpanded, setIsExpanded: externalSetIsExpanded, isExpandedGlobal: externalIsExpandedGlobal, setIsExpandedGlobal: externalSetIsExpandedGlobal }) => {
+const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters, setSidebarDropdownOpen, isExpanded: externalIsExpanded, setIsExpanded: externalSetIsExpanded, isExpandedGlobal: externalIsExpandedGlobal, setIsExpandedGlobal: externalSetIsExpandedGlobal }) => {
     const { user } = useAuth();
     const [internalIsExpandedGlobal, setInternalIsExpandedGlobal] = useState(false);
     const [internalIsExpanded, setInternalIsExpanded] = useState(true);

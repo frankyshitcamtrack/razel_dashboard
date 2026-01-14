@@ -6,7 +6,6 @@ import {
     YAxis,
     CartesianGrid,
     Tooltip,
-    Legend,
     ResponsiveContainer,
     ComposedChart,
 } from "recharts";
@@ -92,7 +91,7 @@ const CombinedBarChartTimeComponent: React.FC<CombinedChartProps> = ({
                             dataKey="durationHours" 
                             fill="#F5A623" 
                             barSize={40}
-                            label={{ position: 'top', formatter: (val: number) => formatYAxisTime(val), fontSize: 11 }}
+                            label={{ position: 'top', formatter: (val: any) => formatYAxisTime(Number(val)), fontSize: 11 }}
                         />
                         <Line 
                             yAxisId="left"

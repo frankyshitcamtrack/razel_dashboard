@@ -55,10 +55,10 @@ const PieChartComponent: React.FC<PieChartProps> = ({
     const createPieSlice = (startAngle: number, endAngle: number, depth = 40) => {
         const centerX = 300;
         const centerY = 200;
-        const radiusX = 180; // Horizontal radius
-        const radiusY = 100; // Vertical radius (compressed for 3D effect)
-        const innerRadiusX = variant === "donut" ? 90 : 0;
-        const innerRadiusY = variant === "donut" ? 50 : 0;
+        const radiusX = 220; // Horizontal radius - increased
+        const radiusY = 130; // Vertical radius - increased
+        const innerRadiusX = variant === "donut" ? 110 : 0; // Increased
+        const innerRadiusY = variant === "donut" ? 65 : 0; // Increased
         
         const startRad = (startAngle - 90) * Math.PI / 180;
         const endRad = (endAngle - 90) * Math.PI / 180;
@@ -121,7 +121,7 @@ const PieChartComponent: React.FC<PieChartProps> = ({
             <div className="flex-grow flex flex-col lg:flex-row items-center justify-center relative min-h-[300px]">
                 {/* 3D Pie Chart */}
                 <div className="lg:flex-1">
-                    <svg width="600" height="450" viewBox="0 0 600 450" className="w-full h-auto">
+                    <svg width="600" height="450" viewBox="0 0 600 450" className="w-full h-auto" preserveAspectRatio="xMidYMid meet">
                         {data.length === 1 ? (
                             // Single element - draw complete ellipse
                             <>
@@ -129,16 +129,16 @@ const PieChartComponent: React.FC<PieChartProps> = ({
                                 <ellipse
                                     cx="300"
                                     cy="240"
-                                    rx="180"
-                                    ry="25"
+                                    rx="220"
+                                    ry="30"
                                     fill={darkenColor(segments[0].color, 40)}
                                 />
                                 {/* Main ellipse */}
                                 <ellipse
                                     cx="300"
                                     cy="200"
-                                    rx="180"
-                                    ry="100"
+                                    rx="220"
+                                    ry="130"
                                     fill={segments[0].color}
                                     stroke="#fff"
                                     strokeWidth="3"
@@ -152,8 +152,8 @@ const PieChartComponent: React.FC<PieChartProps> = ({
                                     <ellipse
                                         cx="300"
                                         cy="200"
-                                        rx="90"
-                                        ry="50"
+                                        rx="110"
+                                        ry="65"
                                         fill="white"
                                     />
                                 )}
@@ -229,8 +229,8 @@ const PieChartComponent: React.FC<PieChartProps> = ({
                                     
                                     // Calculate label position with elliptical coordinates
                                     const midAngle = ((segment.startAngle + segment.endAngle) / 2 - 90) * Math.PI / 180;
-                                    const labelRadiusX = variant === "donut" ? 135 : 120;
-                                    const labelRadiusY = variant === "donut" ? 75 : 65;
+                                    const labelRadiusX = variant === "donut" ? 165 : 145;
+                                    const labelRadiusY = variant === "donut" ? 95 : 85;
                                     const labelX = 300 + labelRadiusX * Math.cos(midAngle);
                                     const labelY = 200 + labelRadiusY * Math.sin(midAngle);
                                     
