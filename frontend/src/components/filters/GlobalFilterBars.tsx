@@ -28,6 +28,10 @@ interface FilterBarProps {
     setFilters: React.Dispatch<React.SetStateAction<Filters>>;
     setSidebarOpen?: React.Dispatch<React.SetStateAction<boolean>>;
     setSidebarDropdownOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+    isExpanded?: boolean;
+    setIsExpanded?: React.Dispatch<React.SetStateAction<boolean>>;
+    isExpandedGlobal?: boolean;
+    setIsExpandedGlobal?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 
@@ -41,14 +45,19 @@ const WEEKDAYS = [
     { num: 7, short: "Dim", long: "Dimanche" },
 ];
 
-const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters, setSidebarOpen, setSidebarDropdownOpen }) => {
+const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters, setSidebarOpen, setSidebarDropdownOpen, isExpanded: externalIsExpanded, setIsExpanded: externalSetIsExpanded, isExpandedGlobal: externalIsExpandedGlobal, setIsExpandedGlobal: externalSetIsExpandedGlobal }) => {
     const { user } = useAuth();
-    const [isExpandedGlogbal, setIsExpandedGlobal] = useState(false);
-    const [isExpanded, setIsExpanded] = useState(true);
+    const [internalIsExpandedGlobal, setInternalIsExpandedGlobal] = useState(false);
+    const [internalIsExpanded, setInternalIsExpanded] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const { data: vehicles, isLoading } = useVehiclesData();
     const { data: vehicleGroups, isLoading: groupLoading } = useVehiclesGroupData();
+
+    const isExpandedGlobal = externalIsExpandedGlobal !== undefined ? externalIsExpandedGlobal : internalIsExpandedGlobal;
+    const setIsExpandedGlobal = externalSetIsExpandedGlobal || setInternalIsExpandedGlobal;
+    const isExpanded = externalIsExpanded !== undefined ? externalIsExpanded : internalIsExpanded;
+    const setIsExpanded = externalSetIsExpanded || setInternalIsExpanded;
 
     const filteredVehicles = useMemo(() => {
         if (!vehicles) return [];
@@ -220,14 +229,17 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters, set
                 <div
                     className="flex items-center justify-between cursor-pointer"
                     onClick={() => {
-                        setIsExpandedGlobal(!isExpandedGlogbal);
-                        if (!isExpandedGlogbal) setIsExpanded(false);
+                        const newState = !isExpandedGlobal;
+                        setIsExpandedGlobal(newState);
+                        if (newState) {
+                            setIsExpanded(false);
+                        }
                     }}
                 >
                     <h3 className="text-lg font-semibold text-gray-800">
-                        {isExpandedGlogbal ? "Masquer les filtres Generaux" : "Afficher les filtres Generaux"}
+                        {isExpandedGlobal ? "Masquer les filtres Generaux" : "Afficher les filtres Generaux"}
                     </h3>
-                    {isExpandedGlogbal ? (
+                    {isExpandedGlobal ? (
                         <ChevronUpIcon className="w-5 h-5 text-gray-500" />
                     ) : (
                         <ChevronDownIcon className="w-5 h-5 text-gray-500" />
@@ -235,7 +247,7 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters, set
                 </div>
 
 
-                {isExpandedGlogbal && (
+                {isExpandedGlobal && (
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-200">
 
                         <div className="md:col-span-2">
@@ -394,10 +406,11 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters, set
                     <div
                         className="flex items-center justify-between cursor-pointer flex-1"
                         onClick={() => {
-                            const newExpanded = !isExpanded;
-                            setIsExpanded(newExpanded);
-                            if (!newExpanded) {
+                            const newState = !isExpanded;
+                            setIsExpanded(newState);
+                            if (newState) {
                                 setIsExpandedGlobal(false);
+                            } else {
                                 setSidebarDropdownOpen?.(false);
                             }
                         }}

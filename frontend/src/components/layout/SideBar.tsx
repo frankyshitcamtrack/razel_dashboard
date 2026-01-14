@@ -8,11 +8,13 @@ interface SidebarProps {
     onClose: () => void;
     isDropdownOpen?: boolean;
     setIsDropdownOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+    setFilterExpanded?: React.Dispatch<React.SetStateAction<boolean>>;
+    setFilterGlobalExpanded?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 
 
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isDropdownOpen: externalDropdownOpen, setIsDropdownOpen: setExternalDropdownOpen }) => {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isDropdownOpen: externalDropdownOpen, setIsDropdownOpen: setExternalDropdownOpen, setFilterExpanded, setFilterGlobalExpanded }) => {
     const { logout } = useAuth();
     const [internalDropdownOpen, setInternalDropdownOpen] = useState(true);
     
@@ -41,7 +43,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isDropdownOpen: exte
 
             {/* Sidebar */}
             <aside className={`
-        ${isDropdownOpen ? 'static' : 'fixed lg:static'} lg:mt-4 lg:ml-4 top-0 left-0 z-40
+        fixed lg:static lg:mt-4 lg:ml-4 top-0 left-0 z-40
         w-72 bg-white shadow-lg rounded-2xl border border-black
         transform transition-transform duration-300 ease-in-out
         ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
@@ -54,8 +56,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isDropdownOpen: exte
                         if (window.innerWidth >= 1024) {
                             const newOpen = !isDropdownOpen;
                             setIsDropdownOpen(newOpen);
-                            if (newOpen && setExternalDropdownOpen) {
-                                setExternalDropdownOpen(true);
+                            if (newOpen) {
+                                setFilterExpanded?.(true);
+                                setFilterGlobalExpanded?.(false);
                             }
                         }
                     }}

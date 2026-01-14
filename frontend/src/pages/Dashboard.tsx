@@ -19,14 +19,22 @@ const Dashboard = () => {
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [sidebarDropdownOpen, setSidebarDropdownOpen] = useState(true);
     const [filterExpanded, setFilterExpanded] = useState(true);
+    const [filterGlobalExpanded, setFilterGlobalExpanded] = useState(false);
     const { data, isLoading } = useHeureMoteurData(filters);
     const { data: exceptions } = useExceptions(filters);
 
     if (!isInitialized) {
         return (
-            <div className="min-h-screen bg-gray-100 flex">
-                <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} isDropdownOpen={sidebarDropdownOpen} setIsDropdownOpen={setSidebarDropdownOpen} />
-                <div className="w-full flex justify-center items-center">
+            <div className="min-h-screen bg-gray-100 lg:flex">
+                <Sidebar 
+                    isOpen={sidebarOpen} 
+                    onClose={() => setSidebarOpen(false)} 
+                    isDropdownOpen={sidebarDropdownOpen} 
+                    setIsDropdownOpen={setSidebarDropdownOpen}
+                    setFilterExpanded={setFilterExpanded}
+                    setFilterGlobalExpanded={setFilterGlobalExpanded}
+                />
+                <div className="w-full lg:flex-1 flex justify-center items-center">
                     <VehicleLoadingSpinner />
                 </div>
             </div>
@@ -34,9 +42,16 @@ const Dashboard = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 flex">
-            <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} isDropdownOpen={sidebarDropdownOpen} setIsDropdownOpen={setSidebarDropdownOpen} />
-            <div className="w-full">
+        <div className="min-h-screen bg-gray-100 lg:flex">
+            <Sidebar 
+                isOpen={sidebarOpen} 
+                onClose={() => setSidebarOpen(false)} 
+                isDropdownOpen={sidebarDropdownOpen} 
+                setIsDropdownOpen={setSidebarDropdownOpen}
+                setFilterExpanded={setFilterExpanded}
+                setFilterGlobalExpanded={setFilterGlobalExpanded}
+            />
+            <div className="w-full lg:flex-1">
                 <header className="lg:hidden bg-white shadow-sm border-b border-gray-200 p-4">
                     <div className="flex items-center justify-between">
                         <HamburgerButton
@@ -53,7 +68,10 @@ const Dashboard = () => {
                         setFilters={setFilters} 
                         setSidebarOpen={setSidebarOpen} 
                         setSidebarDropdownOpen={setSidebarDropdownOpen}
+                        isExpanded={filterExpanded}
                         setIsExpanded={setFilterExpanded}
+                        isExpandedGlobal={filterGlobalExpanded}
+                        setIsExpandedGlobal={setFilterGlobalExpanded}
                     />
 
                     {/* Section 1 : Stack Bar Charts (2 colonnes) */}
