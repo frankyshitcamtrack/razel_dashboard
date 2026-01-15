@@ -25,6 +25,22 @@ interface VerticalStackedBarChartProps {
 }
 
 export default class VerticalStackedBarChart extends PureComponent<VerticalStackedBarChartProps> {
+    // Extract vehicle code from name (e.g., "V304I" from "V304I-VL CDF - KALLA")
+    extractVehicleCode = (fullName: string): string => {
+        const match = fullName.match(/V\d+[A-Z]/);
+        return match ? match[0] : fullName;
+    };
+
+    // Extract base name from the full name string
+    extractBaseName = (fullName: string): string => {
+        // Pattern: "Day - Vehicle - Base" -> extract Base
+        const parts = fullName.split(' - ');
+        if (parts.length >= 3) {
+            return parts[parts.length - 1]; // Last part is the base name
+        }
+        return '';
+    };
+
     // Détecte automatiquement le type de valeur
     detectValueType = (value: any): 'number' | 'time' | 'percentage' => {
         if (typeof value === 'string') {
@@ -103,18 +119,38 @@ export default class VerticalStackedBarChart extends PureComponent<VerticalStack
             );
         }
 
-        // Prépare les données normalisées
-        const chartData = data.map(item => {
-            const normalizedItem: any = {
-                ...item,
-                [dataKey1]: this.normalizeValue(item[dataKey1], dataKey1),
-            };
-
-            if (dataKey2 && item[dataKey2] !== undefined) {
-                normalizedItem[dataKey2] = this.normalizeValue(item[dataKey2], dataKey2);
+        // Prépare les données normalisées et groupées par base
+        // Aggregate data by vehicle code (sum across all days)
+        const aggregatedData: { [key: string]: any } = {};
+        
+        data.forEach(item => {
+            const vehicleCode = this.extractVehicleCode(item.name);
+            const baseName = this.extractBaseName(item.name);
+            
+            if (!aggregatedData[vehicleCode]) {
+                aggregatedData[vehicleCode] = {
+                    name: vehicleCode,
+                    vehicleCode,
+                    baseName,
+                    [dataKey1]: 0,
+                };
+                if (dataKey2) {
+                    aggregatedData[vehicleCode][dataKey2] = 0;
+                }
             }
+            
+            // Sum the values
+            aggregatedData[vehicleCode][dataKey1] += this.normalizeValue(item[dataKey1], dataKey1);
+            if (dataKey2 && item[dataKey2] !== undefined) {
+                aggregatedData[vehicleCode][dataKey2] += this.normalizeValue(item[dataKey2], dataKey2);
+            }
+        });
 
-            return normalizedItem;
+        // Convert to array and sort by base name, then by vehicle code
+        const chartData = Object.values(aggregatedData).sort((a, b) => {
+            const baseCompare = a.baseName.localeCompare(b.baseName);
+            if (baseCompare !== 0) return baseCompare;
+            return a.vehicleCode.localeCompare(b.vehicleCode);
         });
 
         // Formatteur pour le tooltip
@@ -129,34 +165,105 @@ export default class VerticalStackedBarChart extends PureComponent<VerticalStack
         // Configuration basée sur l'orientation
         const isVertical = orientation === 'vertical';
 
+        // Custom grid to add horizontal separators between base groups
+        const CustomGrid = (props: any) => {
+            const { x, y, width, height } = props;
+            const lines: React.ReactElement[] = [];
+            
+            let currentBase = '';
+            chartData.forEach((item, index) => {
+                if (currentBase && currentBase !== item.baseName) {
+                    const yPos = y + (index / chartData.length) * height;
+                    lines.push(
+                        <line
+                            key={`sep-${index}`}
+                            x1={x}
+                            y1={yPos}
+                            x2={x + width}
+                            y2={yPos}
+                            stroke="#1F497D"
+                            strokeWidth={2}
+                        />
+                    );
+                }
+                currentBase = item.baseName;
+            });
+            
+            return <>{lines}</>;
+        };
+
+        // Group data by base name for vertical labels with proper positioning
+        const baseGroupsMap: { [key: string]: { start: number; count: number; items: any[] } } = {};
+        chartData.forEach((item, index) => {
+            if (!baseGroupsMap[item.baseName]) {
+                baseGroupsMap[item.baseName] = { start: index, count: 0, items: [] };
+            }
+            baseGroupsMap[item.baseName].count++;
+            baseGroupsMap[item.baseName].items.push(item);
+        });
+
+        const baseGroups = Object.entries(baseGroupsMap);
+
         return (
             <div className="bg-white rounded-lg shadow p-2 flex flex-col h-[320px]">
-                <h3 className="text-lg font-semibold text-gray-700 mb-4">{title}</h3>
-                <div className="flex-grow">
+                <div className="flex items-center justify-between mb-4">
+                    <span className="text-sm font-normal" style={{ color: '#1F497D' }}>{label1}</span>
+                    <h3 className="text-lg font-semibold text-center flex-1" style={{ color: '#1F497D' }}>{title}</h3>
+                    <span className="invisible text-sm">{label1}</span>
+                </div>
+                <div className="flex-grow relative">
+                    {/* Vertical base name labels on the left */}
+                    <div className="absolute left-0 top-5 bottom-5 flex flex-col justify-start" style={{ width: '120px', paddingRight: '10px' }}>
+                        {baseGroups.map(([baseName, groupInfo]) => {
+                            const heightPercent = (groupInfo.count / chartData.length) * 100;
+                            const topPercent = (groupInfo.start / chartData.length) * 100;
+                            return (
+                                <div 
+                                    key={baseName} 
+                                    className="flex items-center justify-center" 
+                                    style={{ 
+                                        position: 'absolute',
+                                        top: `${topPercent}%`,
+                                        height: `${heightPercent}%`,
+                                        width: '100%',
+                                        writingMode: 'vertical-rl', 
+                                        transform: 'rotate(180deg)', 
+                                        fontSize: '10px', 
+                                        color: '#1F497D', 
+                                        fontWeight: 'bold',
+                                        borderTop: groupInfo.start > 0 ? '2px solid #1F497D' : 'none'
+                                    }}
+                                >
+                                    {baseName}
+                                </div>
+                            );
+                        })}
+                    </div>
                     <ResponsiveContainer width="100%" height={250}>
                         <BarChart
                             data={chartData}
                             layout={isVertical ? "vertical" : "horizontal"}
-                            margin={{ top: 20, right: 30, left: 40, bottom: 5 }}
+                            margin={{ top: 20, right: 30, left: 130, bottom: 5 }}
                         >
                             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                            <CustomGrid />
 
                             {/* Axe X - dépend de l'orientation */}
                             <XAxis
                                 type={isVertical ? "number" : "category"}
                                 dataKey={isVertical ? undefined : "name"}
                                 axisLine={{ stroke: "#9ca3af" }}
-                                tick={{ fill: "#6b7280", fontSize: 11 }}
+                                tick={{ fill: "#1F497D", fontSize: 11 }}
                                 tickFormatter={isVertical ? (value) => this.formatValue(value, dataKey1) : undefined}
                             />
 
                             {/* Axe Y - dépend de l'orientation */}
                             <YAxis
                                 type={isVertical ? "category" : "number"}
-                                dataKey={isVertical ? "name" : undefined}
-                                width={isVertical ? 100 : 60}
+                                dataKey={isVertical ? "vehicleCode" : undefined}
+                                width={isVertical ? 60 : 60}
                                 axisLine={{ stroke: "#9ca3af" }}
-                                tick={{ fill: "#6b7280", fontSize: 11 }}
+                                tick={{ fill: "#1F497D", fontSize: 11, fontWeight: "bold" }}
                                 tickFormatter={!isVertical ? (value) => this.formatValue(value, dataKey1) : undefined}
                             />
 
@@ -175,7 +282,14 @@ export default class VerticalStackedBarChart extends PureComponent<VerticalStack
                                 fill={color1}
                                 name={label1}
                             >
-                                <LabelList dataKey={dataKey1} position="center" fill="#000" fontSize={12} fontWeight="bold" />
+                                <LabelList 
+                                    dataKey={dataKey1} 
+                                    position="center" 
+                                    fill="#1F497D" 
+                                    fontSize={12} 
+                                    fontWeight="bold"
+                                    formatter={(value: any) => this.formatValue(Number(value), dataKey1)}
+                                />
                             </Bar>
 
                             {dataKey2 && (
@@ -185,7 +299,14 @@ export default class VerticalStackedBarChart extends PureComponent<VerticalStack
                                     fill={color2}
                                     name={label2 || dataKey2}
                                 >
-                                    <LabelList dataKey={dataKey2} position="center" fill="#000" fontSize={12} fontWeight="bold" />
+                                    <LabelList 
+                                        dataKey={dataKey2} 
+                                        position="center" 
+                                        fill="#1F497D" 
+                                        fontSize={12} 
+                                        fontWeight="bold"
+                                        formatter={(value: any) => this.formatValue(Number(value), dataKey2)}
+                                    />
                                 </Bar>
                             )}
                         </BarChart>
