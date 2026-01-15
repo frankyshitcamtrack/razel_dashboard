@@ -65,7 +65,7 @@ const checkAuth = (req, res) => {
     }
 
     try {
-        const decoded = jwt.verify(req.session.token, SECRET_KEY);
+        const decoded = jwt.verify(req.session.token, process.env.JWT_SECRET);
         res.json({
             authenticated: true,
             user: decoded
