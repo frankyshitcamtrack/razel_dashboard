@@ -88,8 +88,8 @@ const ActiviteBase = () => {
                                         dataKey2="duree_transit"
                                         label1="duree base depart"
                                         label2="duree de transit"
-                                        color1="#02509D"
-                                        color2="#f3992bff"
+                                        color1="#F68A2A"
+                                        color2="#255186"
                                         valueType="time"
                                         title="Historique Transit"
                                     />

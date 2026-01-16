@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useAuth } from '../store/AuthContext';
 import { useNavigate, useLocation } from 'react-router';
 import { Truck, Fuel, Lock, Eye, EyeOff } from 'lucide-react';
-import LoadingIndicator from '../components/UI/Loader';
 
 const LoginPage = () => {
     const [username, setUsername] = useState('');
@@ -123,13 +122,13 @@ const LoginPage = () => {
                             <button
                                 type="submit"
                                 disabled={isLoading || isSubmitting}
-                                className={`w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all ${isLoading || isSubmitting ? 'opacity-80 cursor-not-allowed' : ''
-                                    }`}
+                                className={`w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all ${isLoading || isSubmitting ? 'opacity-80 cursor-not-allowed' : ''}`}
                             >
                                 {isLoading || isSubmitting ? (
-                                    <>
-                                        <LoadingIndicator />
-                                    </>
+                                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
                                 ) : (
                                     'Accéder au dashboard'
                                 )}

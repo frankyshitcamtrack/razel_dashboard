@@ -27,7 +27,7 @@ interface VerticalStackedBarChartProps {
 export default class VerticalStackedBarChart extends PureComponent<VerticalStackedBarChartProps> {
     // Extract vehicle code from name (e.g., "V304I" from "V304I-VL CDF - KALLA")
     extractVehicleCode = (fullName: string): string => {
-        const match = fullName.match(/V\d+[A-Z]/);
+        const match = fullName.match(/V[A-Z0-9]+/);
         return match ? match[0] : fullName;
     };
 

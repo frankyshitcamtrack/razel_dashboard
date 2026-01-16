@@ -49,7 +49,7 @@ const CustomBarChart: React.FC<BarChartProps> = ({
 
     // Extract vehicle code and base name
     const extractVehicleCode = (fullName: string): string => {
-        const match = fullName.match(/V\d+[A-Z]/);
+        const match = fullName.match(/V[A-Z0-9]+/);
         return match ? match[0] : fullName;
     };
 

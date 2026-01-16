@@ -23,6 +23,21 @@ interface StackedBarChartProps {
 }
 
 export default class StackedBarChart extends PureComponent<StackedBarChartProps> {
+    // Extract vehicle code from name
+    extractVehicleCode = (fullName: string): string => {
+        const match = fullName.match(/V[A-Z0-9]+/);
+        return match ? match[0] : fullName;
+    };
+
+    // Extract base name from the full name string
+    extractBaseName = (fullName: string): string => {
+        const parts = fullName.split(' - ');
+        if (parts.length >= 3) {
+            return parts[parts.length - 1];
+        }
+        return '';
+    };
+
     // Détecte automatiquement le type de valeur
     detectValueType = (value: any): 'number' | 'time' | 'percentage' => {
         if (typeof value === 'string') {
@@ -99,20 +114,73 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
             );
         }
 
-        // Prépare les données normalisées
-        const chartData = data.map(item => {
-            const normalizedItem: any = {
-                ...item,
-                [dataKey1]: this.normalizeValue(item[dataKey1], dataKey1),
-            };
-
-            // Normalise dataKey2 seulement s'il est présent
-            if (dataKey2 && item[dataKey2] !== undefined) {
-                normalizedItem[dataKey2] = this.normalizeValue(item[dataKey2], dataKey2);
+        // Prépare les données normalisées et agrégées par véhicule
+        const aggregatedData: { [key: string]: any } = {};
+        const hasDateFields = data.some(item => item.date_depart);
+        
+        data.forEach(item => {
+            const vehicleCode = this.extractVehicleCode(item.name);
+            const baseName = this.extractBaseName(item.name);
+            
+            if (!aggregatedData[vehicleCode]) {
+                aggregatedData[vehicleCode] = {
+                    name: vehicleCode,
+                    vehicleCode,
+                    baseName,
+                    [dataKey1]: 0,
+                };
+                if (dataKey2) {
+                    aggregatedData[vehicleCode][dataKey2] = 0;
+                }
+                if (hasDateFields && item.date_depart) {
+                    aggregatedData[vehicleCode].minDate = item.date_depart;
+                    aggregatedData[vehicleCode].maxDate = item.date_depart;
+                }
             }
-
-            return normalizedItem;
+            
+            // Track min and max dates only if date fields exist
+            if (hasDateFields && item.date_depart) {
+                if (new Date(item.date_depart) < new Date(aggregatedData[vehicleCode].minDate)) {
+                    aggregatedData[vehicleCode].minDate = item.date_depart;
+                }
+                if (new Date(item.date_depart) > new Date(aggregatedData[vehicleCode].maxDate)) {
+                    aggregatedData[vehicleCode].maxDate = item.date_depart;
+                }
+            }
+            
+            aggregatedData[vehicleCode][dataKey1] += this.normalizeValue(item[dataKey1], dataKey1);
+            if (dataKey2 && item[dataKey2] !== undefined) {
+                aggregatedData[vehicleCode][dataKey2] += this.normalizeValue(item[dataKey2], dataKey2);
+            }
         });
+
+        // Format time range for each vehicle only if dates exist
+        if (hasDateFields) {
+            Object.values(aggregatedData).forEach((item: any) => {
+                if (item.minDate && item.maxDate) {
+                    const minTime = new Date(item.minDate).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    const maxTime = new Date(item.maxDate).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    item.timeRange = `${minTime} à ${maxTime}`;
+                }
+            });
+        }
+
+        const chartData = Object.values(aggregatedData).sort((a: any, b: any) => {
+            const baseCompare = a.baseName.localeCompare(b.baseName);
+            if (baseCompare !== 0) return baseCompare;
+            return a.vehicleCode.localeCompare(b.vehicleCode);
+        });
+
+        // Group data by base name
+        const baseGroupsMap: { [key: string]: { start: number; count: number } } = {};
+        chartData.forEach((item: any, index: number) => {
+            if (!baseGroupsMap[item.baseName]) {
+                baseGroupsMap[item.baseName] = { start: index, count: 0 };
+            }
+            baseGroupsMap[item.baseName].count++;
+        });
+
+        const baseGroups = Object.entries(baseGroupsMap);
 
         // Formatteur pour le tooltip
         const formatTooltip = (value: number, name: string) => {
@@ -131,17 +199,16 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                     <span className="invisible text-sm">{label1}</span>
                 </div>
                 <div className="flex-grow">
-                    <ResponsiveContainer width="100%" height={250}>
+                    <ResponsiveContainer width="100%" height={220}>
                         <BarChart
                             data={chartData}
-                            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                            margin={{ top: 20, right: 30, left: 20, bottom: hasDateFields ? 80 : 60 }}
                         >
                             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                             <XAxis
-                                dataKey="name"
+                                dataKey="vehicleCode"
                                 axisLine={{ stroke: "#9ca3af" }}
-                                tick={{ fill: "#1F497D", fontSize: 11 }}
-                                label={{ value: 'VE38A', position: 'insideBottom', offset: -5, fontSize: 12 }}
+                                tick={{ fill: "#1F497D", fontSize: 11, fontWeight: "bold" }}
                             />
                             <YAxis
                                 tickFormatter={(value) => this.formatValue(value, dataKey1)}
@@ -160,7 +227,14 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                                 fill={color1}
                                 name={label1}
                             >
-                                <LabelList dataKey={dataKey1} position="center" fill="#1F497D" fontSize={12} fontWeight="bold" />
+                                <LabelList 
+                                    dataKey={dataKey1} 
+                                    position="center" 
+                                    fill="#1F497D" 
+                                    fontSize={12} 
+                                    fontWeight="bold"
+                                    formatter={(value: any) => this.formatValue(Number(value), dataKey1)}
+                                />
                             </Bar>
 
                             {/* Deuxième bar - seulement si dataKey2 est présent */}
@@ -169,14 +243,74 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                                     dataKey={dataKey2}
                                     stackId="a"
                                     fill={color2}
-                                    name={label2 || dataKey2} // Fallback si label2 non fourni
+                                    name={label2 || dataKey2}
                                 >
-                                    <LabelList dataKey={dataKey2} position="center" fill="#1F497D" fontSize={12} fontWeight="bold" />
+                                    <LabelList 
+                                        dataKey={dataKey2} 
+                                        position="center" 
+                                        fill="#1F497D" 
+                                        fontSize={12} 
+                                        fontWeight="bold"
+                                        formatter={(value: any) => this.formatValue(Number(value), dataKey2)}
+                                    />
                                 </Bar>
-
                             )}
                         </BarChart>
                     </ResponsiveContainer>
+                    {/* Time range labels - only show if dates exist */}
+                    {hasDateFields && (
+                        <div className="flex relative" style={{ height: '20px', marginTop: '-55px', marginLeft: '20px', marginRight: '30px' }}>
+                            {chartData.map((item: any, index: number) => {
+                                const widthPercent = (1 / chartData.length) * 100;
+                                const leftPercent = (index / chartData.length) * 100;
+                                // Responsive font size based on number of items
+                                const fontSize = chartData.length > 5 ? '8px' : chartData.length > 3 ? '9px' : '10px';
+                                return (
+                                    <div
+                                        key={`time-${item.vehicleCode}`}
+                                        className="flex items-center justify-center"
+                                        style={{
+                                            position: 'absolute',
+                                            left: `${leftPercent}%`,
+                                            width: `${widthPercent}%`,
+                                            fontSize: fontSize,
+                                            color: '#1F497D',
+                                            fontWeight: '600',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            whiteSpace: 'nowrap',
+                                        }}
+                                    >
+                                        {item.timeRange}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                    {/* Base name labels below chart */}
+                    <div className="flex relative" style={{ height: '25px', marginTop: hasDateFields ? '5px' : '-35px', marginLeft: '20px', marginRight: '30px' }}>
+                        {baseGroups.map(([baseName, groupInfo]) => {
+                            const widthPercent = (groupInfo.count / chartData.length) * 100;
+                            const leftPercent = (groupInfo.start / chartData.length) * 100;
+                            return (
+                                <div
+                                    key={baseName}
+                                    className="flex items-center justify-center"
+                                    style={{
+                                        position: 'absolute',
+                                        left: `${leftPercent}%`,
+                                        width: `${widthPercent}%`,
+                                        fontSize: '10px',
+                                        color: '#1F497D',
+                                        fontWeight: 'bold',
+                                        borderLeft: groupInfo.start > 0 ? '2px solid #1F497D' : 'none',
+                                    }}
+                                >
+                                    {baseName}
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
         );
