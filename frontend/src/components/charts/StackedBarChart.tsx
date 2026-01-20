@@ -171,13 +171,14 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
             return a.vehicleCode.localeCompare(b.vehicleCode);
         });
 
-        // Group data by base name
+        // Group data by base name with correct positioning
         const baseGroupsMap: { [key: string]: { start: number; count: number } } = {};
         chartData.forEach((item: any, index: number) => {
-            if (!baseGroupsMap[item.baseName]) {
-                baseGroupsMap[item.baseName] = { start: index, count: 0 };
+            const baseName = item.baseName || 'Unknown';
+            if (!baseGroupsMap[baseName]) {
+                baseGroupsMap[baseName] = { start: index, count: 0 };
             }
-            baseGroupsMap[item.baseName].count++;
+            baseGroupsMap[baseName].count++;
         });
 
         const baseGroups = Object.entries(baseGroupsMap);
@@ -287,29 +288,37 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                             })}
                         </div>
                     )}
-                    {/* Base name labels below chart */}
-                    <div className="flex relative" style={{ height: '25px', marginTop: hasDateFields ? '5px' : '-35px', marginLeft: '20px', marginRight: '30px' }}>
-                        {baseGroups.map(([baseName, groupInfo]) => {
-                            const widthPercent = (groupInfo.count / chartData.length) * 100;
-                            const leftPercent = (groupInfo.start / chartData.length) * 100;
-                            return (
-                                <div
-                                    key={baseName}
-                                    className="flex items-center justify-center"
-                                    style={{
-                                        position: 'absolute',
-                                        left: `${leftPercent}%`,
-                                        width: `${widthPercent}%`,
-                                        fontSize: '10px',
-                                        color: '#1F497D',
-                                        fontWeight: 'bold',
-                                        borderLeft: groupInfo.start > 0 ? '2px solid #1F497D' : 'none',
-                                    }}
-                                >
-                                    {baseName}
-                                </div>
-                            );
-                        })}
+                    {/* Base name labels with exact chart alignment */}
+                    <div className="relative" style={{ height: '40px', marginTop: hasDateFields ? '5px' : '-35px' }}>
+                        <div className="absolute inset-x-0" style={{ left: '50px', right: '50px' }}>
+                            {baseGroups.map(([baseName, groupInfo]) => {
+                                const barSpacing = 100 / chartData.length; // Equal spacing for each bar
+                                const leftPosition = groupInfo.start * barSpacing;
+                                const width = groupInfo.count * barSpacing;
+                                
+                                return (
+                                    <div
+                                        key={baseName}
+                                        className="absolute flex items-center justify-center"
+                                        style={{
+                                            left: `${leftPosition}%`,
+                                            width: `${width}%`,
+                                            height: '40px',
+                                            fontSize: '9px',
+                                            color: '#1F497D',
+                                            fontWeight: 'bold',
+                                            borderLeft: groupInfo.start > 0 ? '2px solid #1F497D' : 'none',
+                                            overflow: 'hidden',
+                                            textAlign: 'center',
+                                            padding: '0 2px',
+                                            lineHeight: '1.2'
+                                        }}
+                                    >
+                                        <span style={{ wordBreak: 'break-word' }}>{baseName}</span>
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
             </div>

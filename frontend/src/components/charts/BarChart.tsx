@@ -104,13 +104,31 @@ const CustomBarChart: React.FC<BarChartProps> = ({
 
     const baseGroups = Object.entries(baseGroupsMap);
 
-    // Custom X-axis tick to show vehicle code
+    // Custom X-axis tick to show vehicle code with dynamic sizing
     const CustomXAxisTick = (props: any) => {
         const { x, y, payload } = props;
+        const fontSize = chartData.length === 1 ? 14 : Math.max(8, Math.min(11, 120 / chartData.length));
+        const displayText = chartData.length === 1 ? 
+            chartData.find(item => item.vehicleCode === payload.value)?.name || payload.value :
+            payload.value;
+        
         return (
             <g transform={`translate(${x},${y})`}>
-                <text x={0} y={0} dy={16} textAnchor="middle" fill="#1F497D" fontSize={11} fontWeight="bold">
-                    {payload.value}
+                <text 
+                    x={0} 
+                    y={0} 
+                    dy={16} 
+                    textAnchor="middle" 
+                    fill="#1F497D" 
+                    fontSize={fontSize} 
+                    fontWeight="bold"
+                    style={{
+                        maxWidth: chartData.length === 1 ? '200px' : '60px',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
+                    }}
+                >
+                    {displayText}
                 </text>
             </g>
         );
@@ -151,29 +169,40 @@ const CustomBarChart: React.FC<BarChartProps> = ({
                     </ComposedChart>
                 </ResponsiveContainer>
             </div>
-            {/* Base name labels below chart */}
-            <div className="flex relative" style={{ height: '25px', marginTop: '-15px', marginLeft: '50px', marginRight: '30px' }}>
-                {baseGroups.map(([baseName, groupInfo]) => {
-                    const widthPercent = (groupInfo.count / chartData.length) * 100;
-                    const leftPercent = (groupInfo.start / chartData.length) * 100;
-                    return (
-                        <div
-                            key={baseName}
-                            className="flex items-center justify-center"
-                            style={{
-                                position: 'absolute',
-                                left: `${leftPercent}%`,
-                                width: `${widthPercent}%`,
-                                fontSize: '10px',
-                                color: '#1F497D',
-                                fontWeight: 'bold',
-                                borderLeft: groupInfo.start > 0 ? '2px solid #1F497D' : 'none',
-                            }}
-                        >
-                            {baseName}
-                        </div>
-                    );
-                })}
+            {/* Base name labels below chart with proper alignment */}
+            <div className="relative" style={{ height: '25px', marginTop: '-15px' }}>
+                <div className="absolute" style={{ left: '50px', right: '30px', height: '25px' }}>
+                    {baseGroups.map(([baseName, groupInfo]) => {
+                        // Calculate exact positioning based on chart area
+                        const totalWidth = 100; // percentage
+                        const barWidth = totalWidth / chartData.length;
+                        const startPosition = groupInfo.start * barWidth;
+                        const groupWidth = groupInfo.count * barWidth;
+                        const fontSize = Math.max(8, Math.min(10, groupWidth * 0.8));
+                        
+                        return (
+                            <div
+                                key={baseName}
+                                className="absolute flex items-center justify-center"
+                                style={{
+                                    left: `${startPosition}%`,
+                                    width: `${groupWidth}%`,
+                                    height: '25px',
+                                    fontSize: `${fontSize}px`,
+                                    color: '#1F497D',
+                                    fontWeight: 'bold',
+                                    borderLeft: groupInfo.start > 0 ? '2px solid #1F497D' : 'none',
+                                    overflow: 'hidden',
+                                    textAlign: 'center',
+                                    whiteSpace: 'nowrap',
+                                    textOverflow: 'clip'
+                                }}
+                            >
+                                {baseName}
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
         </div>
     );

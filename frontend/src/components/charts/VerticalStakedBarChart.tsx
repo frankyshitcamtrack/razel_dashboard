@@ -153,7 +153,7 @@ export default class VerticalStackedBarChart extends PureComponent<VerticalStack
 
 
         const maxValue = Math.max(...chartData.map(item => item[dataKey1]));
-        const barHeight = Math.min(20, Math.max(12, (250 - 40) / chartData.length));
+        const barHeight = Math.max(18, Math.min(28, 220 / chartData.length)); // Increased minimum height
         const chartHeight = chartData.length * barHeight;
 
         return (
@@ -164,65 +164,80 @@ export default class VerticalStackedBarChart extends PureComponent<VerticalStack
                     <span className="invisible text-sm">{label1}</span>
                 </div>
                 <div className="flex-grow flex overflow-hidden">
-                    {/* Base name labels with responsive text wrapping */}
-                    <div className="flex flex-col justify-center" style={{ width: '80px', minWidth: '80px' }}>
+                    <div className="flex">
+                    {/* Base name labels with exact alignment */}
+                    <div className="flex flex-col" style={{ width: '80px', minWidth: '80px', position: 'relative' }}>
                         {Object.entries(baseGroupsMap).map(([baseName, group]) => {
                             const groupHeight = group.count * barHeight;
-                            // Responsive font size with higher minimum for visibility
-                            const fontSize = Math.max(8, Math.min(12, groupHeight / 6));
-                            // Calculate max characters based on font size and height
-                            const maxChars = Math.max(3, Math.floor(groupHeight / fontSize) - 1);
+                            const startPosition = group.start * barHeight;
+                            const fontSize = Math.max(8, Math.min(11, groupHeight / 10));
                             
                             return (
                                 <div 
                                     key={baseName}
-                                    className="flex items-center justify-center pr-1" 
+                                    className="flex items-center justify-center" 
                                     style={{ 
+                                        position: 'absolute',
+                                        top: `${startPosition}px`,
                                         height: `${groupHeight}px`,
+                                        width: '80px',
                                         fontSize: `${fontSize}px`,
                                         color: '#1F497D', 
                                         fontWeight: 'bold',
                                         writingMode: 'vertical-rl',
                                         textOrientation: 'mixed',
                                         transform: 'rotate(180deg)',
-                                        wordBreak: 'break-word',
-                                        hyphens: 'auto'
+                                        overflow: 'hidden',
+                                        textAlign: 'center',
+                                        paddingRight: '2px'
                                     }}
                                 >
-                                    {baseName.length > maxChars ? 
-                                        baseName.substring(0, maxChars) + '...' : 
-                                        baseName
-                                    }
+                                    {baseName}
                                 </div>
                             );
                         })}
+                        <div style={{ height: `${chartHeight}px` }}></div>
                     </div>
                     
-                    {/* Vehicle codes column - no gap */}
-                    <div className="flex flex-col justify-center" style={{ width: '40px', minWidth: '40px' }}>
+                    {/* Vehicle codes column - with clear separation */}
+                    <div className="flex flex-col" style={{ width: '60px', minWidth: '60px' }}>
                         {chartData.map((item, index) => {
                             const isFirstInGroup = index === 0 || chartData[index - 1].baseName !== item.baseName;
+                            const fontSize = Math.max(9, Math.min(12, barHeight * 0.4));
+                            
                             return (
                                 <div 
                                     key={item.vehicleCode}
                                     className="flex items-center justify-end" 
                                     style={{ 
                                         height: `${barHeight}px`,
-                                        fontSize: '10px',
+                                        fontSize: `${fontSize}px`,
                                         color: '#1F497D', 
                                         fontWeight: 'bold',
-                                        borderTop: isFirstInGroup && index > 0 ? '2px solid #1F497D' : 'none'
+                                        borderTop: isFirstInGroup && index > 0 ? '3px solid #1F497D' : '1px solid #e5e7eb',
+                                        paddingRight: '4px',
+                                        paddingTop: '3px',
+                                        paddingBottom: '3px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'flex-end'
                                     }}
                                 >
-                                    {item.vehicleCode}
+                                    <span style={{ 
+                                        wordBreak: 'break-all',
+                                        textAlign: 'right',
+                                        lineHeight: '1.2'
+                                    }}>
+                                        {item.vehicleCode}
+                                    </span>
                                 </div>
                             );
                         })}
                     </div>
                     
-                    {/* Chart area */}
+                    {/* Chart area with proper value positioning */}
                     <div className="flex-1 overflow-hidden">
-                        <svg width="100%" height="100%" viewBox={`0 0 400 ${chartHeight + 40}`} preserveAspectRatio="xMidYMid meet">
+                        <svg width="100%" height="100%" viewBox={`0 0 450 ${chartHeight + 40}`} preserveAspectRatio="xMidYMid meet">
                             {/* Y-axis line */}
                             <line
                                 x1={0}
@@ -237,7 +252,7 @@ export default class VerticalStackedBarChart extends PureComponent<VerticalStack
                             <line
                                 x1={0}
                                 y1={chartHeight + 20}
-                                x2={320}
+                                x2={350}
                                 y2={chartHeight + 20}
                                 stroke="#9ca3af"
                                 strokeWidth={1}
@@ -245,7 +260,7 @@ export default class VerticalStackedBarChart extends PureComponent<VerticalStack
                             
                             {/* Grid lines */}
                             {[0, 1, 2, 3, 4].map(i => {
-                                const x = (i * 300 / 4);
+                                const x = (i * 330 / 4);
                                 return (
                                     <line
                                         key={`grid-${i}`}
@@ -262,7 +277,7 @@ export default class VerticalStackedBarChart extends PureComponent<VerticalStack
                             {/* Bars and values */}
                             {chartData.map((item, index) => {
                                 const y = 20 + index * barHeight;
-                                const barWidth = (item[dataKey1] / maxValue) * 300;
+                                const barWidth = (item[dataKey1] / maxValue) * 330;
                                 
                                 return (
                                     <g key={item.vehicleCode}>
@@ -277,7 +292,7 @@ export default class VerticalStackedBarChart extends PureComponent<VerticalStack
                                         
                                         {/* Value label */}
                                         <text
-                                            x={barWidth + 5}
+                                            x={Math.min(barWidth + 5, 400)}
                                             y={y + barHeight / 2}
                                             dominantBaseline="middle"
                                             fontSize="9"
@@ -292,7 +307,7 @@ export default class VerticalStackedBarChart extends PureComponent<VerticalStack
                             
                             {/* X-axis labels */}
                             {[0, 1, 2, 3, 4].map(i => {
-                                const x = (i * 300 / 4);
+                                const x = (i * 330 / 4);
                                 const value = (i * maxValue / 4);
                                 return (
                                     <text
@@ -308,6 +323,7 @@ export default class VerticalStackedBarChart extends PureComponent<VerticalStack
                                 );
                             })}
                         </svg>
+                    </div>
                     </div>
                 </div>
             </div>
