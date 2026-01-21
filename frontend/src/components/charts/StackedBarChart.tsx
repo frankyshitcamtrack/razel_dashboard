@@ -7,7 +7,6 @@ import {
     CartesianGrid,
     Tooltip,
     ResponsiveContainer,
-    LabelList,
 } from "recharts";
 
 interface StackedBarChartProps {
@@ -25,17 +24,37 @@ interface StackedBarChartProps {
 export default class StackedBarChart extends PureComponent<StackedBarChartProps> {
     // Extract vehicle code from name
     extractVehicleCode = (fullName: string): string => {
-        const match = fullName.match(/V[A-Z0-9]+/);
-        return match ? match[0] : fullName;
+        if (!fullName) return 'Unknown';
+        // Try multiple patterns to catch vehicle codes
+        const patterns = [
+            /V[A-Z0-9]+/,  // Standard pattern like V492E, V453N
+            /[A-Z][0-9]+[A-Z]/,  // Alternative pattern
+        ];
+        
+        for (const pattern of patterns) {
+            const match = fullName.match(pattern);
+            if (match) return match[0];
+        }
+        
+        // If no vehicle code found, try to extract from the second part after first dash
+        const parts = fullName.split(' - ');
+        if (parts.length >= 2) {
+            const secondPart = parts[1];
+            const vehicleMatch = secondPart.match(/^([A-Z0-9]+)/);
+            if (vehicleMatch) return vehicleMatch[1];
+        }
+        
+        return 'Unknown';
     };
 
     // Extract base name from the full name string
     extractBaseName = (fullName: string): string => {
+        if (!fullName) return 'Unknown';
         const parts = fullName.split(' - ');
         if (parts.length >= 3) {
             return parts[parts.length - 1];
         }
-        return '';
+        return 'Unknown';
     };
 
     // Détecte automatiquement le type de valeur
@@ -119,38 +138,47 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
         const hasDateFields = data.some(item => item.date_depart);
         
         data.forEach(item => {
+            // Skip items without valid data
+            if (!item || !item.name || !item[dataKey1]) return;
+            
             const vehicleCode = this.extractVehicleCode(item.name);
             const baseName = this.extractBaseName(item.name);
             
-            if (!aggregatedData[vehicleCode]) {
-                aggregatedData[vehicleCode] = {
+            // Skip items that couldn't be properly parsed
+            if (vehicleCode === 'Unknown' || baseName === 'Unknown') return;
+            
+            // Use only vehicle code as key to aggregate all data for each vehicle
+            const key = vehicleCode;
+            
+            if (!aggregatedData[key]) {
+                aggregatedData[key] = {
                     name: vehicleCode,
                     vehicleCode,
-                    baseName,
+                    baseName, // Use the first base name encountered
                     [dataKey1]: 0,
                 };
                 if (dataKey2) {
-                    aggregatedData[vehicleCode][dataKey2] = 0;
+                    aggregatedData[key][dataKey2] = 0;
                 }
                 if (hasDateFields && item.date_depart) {
-                    aggregatedData[vehicleCode].minDate = item.date_depart;
-                    aggregatedData[vehicleCode].maxDate = item.date_depart;
+                    aggregatedData[key].minDate = item.date_depart;
+                    aggregatedData[key].maxDate = item.date_depart;
                 }
             }
             
             // Track min and max dates only if date fields exist
             if (hasDateFields && item.date_depart) {
-                if (new Date(item.date_depart) < new Date(aggregatedData[vehicleCode].minDate)) {
-                    aggregatedData[vehicleCode].minDate = item.date_depart;
+                if (new Date(item.date_depart) < new Date(aggregatedData[key].minDate)) {
+                    aggregatedData[key].minDate = item.date_depart;
                 }
-                if (new Date(item.date_depart) > new Date(aggregatedData[vehicleCode].maxDate)) {
-                    aggregatedData[vehicleCode].maxDate = item.date_depart;
+                if (new Date(item.date_depart) > new Date(aggregatedData[key].maxDate)) {
+                    aggregatedData[key].maxDate = item.date_depart;
                 }
             }
             
-            aggregatedData[vehicleCode][dataKey1] += this.normalizeValue(item[dataKey1], dataKey1);
+            aggregatedData[key][dataKey1] += this.normalizeValue(item[dataKey1], dataKey1);
             if (dataKey2 && item[dataKey2] !== undefined) {
-                aggregatedData[vehicleCode][dataKey2] += this.normalizeValue(item[dataKey2], dataKey2);
+                aggregatedData[key][dataKey2] += this.normalizeValue(item[dataKey2], dataKey2);
             }
         });
 
@@ -165,16 +193,19 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
             });
         }
 
-        const chartData = Object.values(aggregatedData).sort((a: any, b: any) => {
-            const baseCompare = a.baseName.localeCompare(b.baseName);
-            if (baseCompare !== 0) return baseCompare;
-            return a.vehicleCode.localeCompare(b.vehicleCode);
-        });
+        // Filter out items with no valid data and sort
+        const chartData = Object.values(aggregatedData)
+            .filter((item: any) => item[dataKey1] > 0 || (dataKey2 && item[dataKey2] > 0))
+            .sort((a: any, b: any) => {
+                const baseCompare = a.baseName.localeCompare(b.baseName);
+                if (baseCompare !== 0) return baseCompare;
+                return a.vehicleCode.localeCompare(b.vehicleCode);
+            });
 
         // Group data by base name with correct positioning
         const baseGroupsMap: { [key: string]: { start: number; count: number } } = {};
         chartData.forEach((item: any, index: number) => {
-            const baseName = item.baseName || 'Unknown';
+            const baseName = item.baseName;
             if (!baseGroupsMap[baseName]) {
                 baseGroupsMap[baseName] = { start: index, count: 0 };
             }
@@ -227,16 +258,7 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                                 stackId="a"
                                 fill={color1}
                                 name={label1}
-                            >
-                                <LabelList 
-                                    dataKey={dataKey1} 
-                                    position="center" 
-                                    fill="#1F497D" 
-                                    fontSize={12} 
-                                    fontWeight="bold"
-                                    formatter={(value: any) => this.formatValue(Number(value), dataKey1)}
-                                />
-                            </Bar>
+                            />
 
                             {/* Deuxième bar - seulement si dataKey2 est présent */}
                             {dataKey2 && (
@@ -245,16 +267,7 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                                     stackId="a"
                                     fill={color2}
                                     name={label2 || dataKey2}
-                                >
-                                    <LabelList 
-                                        dataKey={dataKey2} 
-                                        position="center" 
-                                        fill="#1F497D" 
-                                        fontSize={12} 
-                                        fontWeight="bold"
-                                        formatter={(value: any) => this.formatValue(Number(value), dataKey2)}
-                                    />
-                                </Bar>
+                                />
                             )}
                         </BarChart>
                     </ResponsiveContainer>

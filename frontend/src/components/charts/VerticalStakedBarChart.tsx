@@ -14,20 +14,41 @@ interface VerticalStackedBarChartProps {
 }
 
 export default class VerticalStackedBarChart extends PureComponent<VerticalStackedBarChartProps> {
-    // Extract vehicle code from name (e.g., "V304I" from "V304I-VL CDF - KALLA")
+    // Extract vehicle code from name (e.g., "V304I" from "Lundi - V304I - KALLA")
     extractVehicleCode = (fullName: string): string => {
-        const match = fullName.match(/V[A-Z0-9]+/);
-        return match ? match[0] : fullName;
+        if (!fullName) return '';
+        
+        // Try multiple patterns to catch vehicle codes
+        const patterns = [
+            /V[A-Z0-9]+/,  // Standard pattern like V492E, V453N
+            /[A-Z][0-9]+[A-Z]/,  // Alternative pattern
+        ];
+        
+        for (const pattern of patterns) {
+            const match = fullName.match(pattern);
+            if (match) return match[0];
+        }
+        
+        // If no vehicle code found, try to extract from the second part after first dash
+        const parts = fullName.split(' - ');
+        if (parts.length >= 2) {
+            const secondPart = parts[1];
+            const vehicleMatch = secondPart.match(/^([A-Z0-9]+)/);
+            if (vehicleMatch) return vehicleMatch[1];
+        }
+        
+        return '';
     };
 
     // Extract base name from the full name string
     extractBaseName = (fullName: string): string => {
+        if (!fullName) return '';
         // Pattern: "Day - Vehicle - Base" -> extract Base
         const parts = fullName.split(' - ');
         if (parts.length >= 3) {
             return parts[parts.length - 1]; // Last part is the base name
         }
-        return '';
+        return ''; // Return empty if format is different
     };
 
     // Détecte automatiquement le type de valeur
@@ -112,31 +133,39 @@ export default class VerticalStackedBarChart extends PureComponent<VerticalStack
             const vehicleCode = this.extractVehicleCode(item.name);
             const baseName = this.extractBaseName(item.name);
             
-            if (!aggregatedData[vehicleCode]) {
-                aggregatedData[vehicleCode] = {
-                    name: vehicleCode,
+            // Skip items that couldn't be properly parsed
+            if (!vehicleCode || !baseName || vehicleCode === item.name) return;
+            
+            // Create a unique key combining vehicle and base to avoid conflicts
+            const uniqueKey = `${vehicleCode}-${baseName}`;
+            
+            if (!aggregatedData[uniqueKey]) {
+                aggregatedData[uniqueKey] = {
+                    name: uniqueKey,
                     vehicleCode,
                     baseName,
                     [dataKey1]: 0,
                 };
                 if (dataKey2) {
-                    aggregatedData[vehicleCode][dataKey2] = 0;
+                    aggregatedData[uniqueKey][dataKey2] = 0;
                 }
             }
             
             // Sum the values
-            aggregatedData[vehicleCode][dataKey1] += this.normalizeValue(item[dataKey1], dataKey1);
+            aggregatedData[uniqueKey][dataKey1] += this.normalizeValue(item[dataKey1], dataKey1);
             if (dataKey2 && item[dataKey2] !== undefined) {
-                aggregatedData[vehicleCode][dataKey2] += this.normalizeValue(item[dataKey2], dataKey2);
+                aggregatedData[uniqueKey][dataKey2] += this.normalizeValue(item[dataKey2], dataKey2);
             }
         });
 
         // Convert to array and sort by base name, then by vehicle code
-        const chartData = Object.values(aggregatedData).sort((a, b) => {
-            const baseCompare = a.baseName.localeCompare(b.baseName);
-            if (baseCompare !== 0) return baseCompare;
-            return a.vehicleCode.localeCompare(b.vehicleCode);
-        });
+        const chartData = Object.values(aggregatedData)
+            .filter(item => item[dataKey1] > 0) // Only filter by actual data values
+            .sort((a, b) => {
+                const baseCompare = a.baseName.localeCompare(b.baseName);
+                if (baseCompare !== 0) return baseCompare;
+                return a.vehicleCode.localeCompare(b.vehicleCode);
+            });
 
 
 
