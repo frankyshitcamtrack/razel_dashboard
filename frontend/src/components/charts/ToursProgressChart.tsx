@@ -202,7 +202,7 @@ const ToursProgressChart: React.FC<ToursProgressChartProps> = ({ data, title }) 
                                 <div className="flex" style={{ gap: '2px' }}>
                                     {sortedVehicles.map((vehicle: any) => (
                                         <div key={`${vehicle.reference}-${vehicle.isDummy ? 'dummy' : 'real'}`} className="flex flex-col items-center" style={{ width: `${barWidth}px`, visibility: vehicle.isDummy ? 'hidden' : 'visible' }}>
-                                            <span className="text-xs text-gray-600 text-center transform -rotate-90 whitespace-nowrap" style={{ height: '20px', lineHeight: '20px' }}>
+                                            <span className="text-xs text-gray-600 text-left transform -rotate-45 whitespace-nowrap" style={{ height: '20px', lineHeight: '20px', transformOrigin: 'left bottom', marginTop: '10px' }}>
                                                 {vehicle.reference}
                                             </span>
                                         </div>

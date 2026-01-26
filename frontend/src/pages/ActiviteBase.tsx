@@ -44,8 +44,8 @@ const ActiviteBase = () => {
                 <main className="p-4">
                     <GlobalFilterBar filters={filters} setFilters={setFilters} />
 
-                    {/* Section 1 : Stack Bar Charts (2 colonnes) */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 overflow-hidden">
+                    {/* Section 1 : Stack Bar Charts (vertical layout) */}
+                    <div className="space-y-4 overflow-hidden">
                         {isLoading ? (
                             <>
                                 <DonutSkeleton />
@@ -54,46 +54,50 @@ const ActiviteBase = () => {
                                 <DonutSkeleton />
                             </>
                         ) : (
-                            <>
-                                {data?.DureeParBase && (
-                                    <DurationProgressChart
-                                        data={data.DureeParBase}
-                                        title="Durée/Base"
-                                    />
-                                )}
-                                {data?.ToursParBase && (
-                                    <ToursProgressChart
-                                        data={data.ToursParBase}
-                                        title="Nbre de tours/Bases"
-                                    />
-                                )}
-                                {data?.HistoriqueTransit && (
-                                    <StackedBarChart
-                                        data={data.HistoriqueTransit}
-                                        dataKey1="duree_base_depart"
-                                        dataKey2="duree_transit"
-                                        label1="duree base depart"
-                                        label2="duree de transit"
-                                        color1="#F68A2A"
-                                        color2="#255186"
-                                        valueType="time"
-                                        title="Historique Transit"
-                                    />
-                                )}
-                                {data?.DureeTransitMax && (
-                                    <StackedBarChart
-                                        data={data?.DureeTransitMax}
-                                        dataKey1="duree_transit_max"
-                                        //dataKey2=""
-                                        label1="Max duree transit"
-                                        //label2=""
-                                        color1="#f3992bff"
-                                        //color2="#02509D"
-                                        // valueType="percentage"
-                                        title="Duree Transit"
-                                        valueType="time"
-                                    />
-                                )}
+                            <>                                
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                    {data?.DureeParBase && (
+                                        <DurationProgressChart
+                                            data={data.DureeParBase}
+                                            title="Durée/Base"
+                                        />
+                                    )}
+                                    {data?.ToursParBase && (
+                                        <ToursProgressChart
+                                            data={data.ToursParBase}
+                                            title="Nbre de tours/Bases"
+                                        />
+                                    )}
+                                </div>
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                    {data?.HistoriqueTransit && (
+                                        <StackedBarChart
+                                            data={data.HistoriqueTransit}
+                                            dataKey1="duree_base_depart"
+                                            dataKey2="duree_transit"
+                                            label1="duree base depart"
+                                            label2="duree de transit"
+                                            color1="#F68A2A"
+                                            color2="#255186"
+                                            valueType="time"
+                                            title="Historique Transit"
+                                        />
+                                    )}
+                                    {data?.DureeTransitMax && (
+                                        <StackedBarChart
+                                            data={data?.DureeTransitMax}
+                                            dataKey1="duree_transit_max"
+                                            //dataKey2=""
+                                            label1="Max duree transit"
+                                            //label2=""
+                                            color1="#f3992bff"
+                                            //color2="#02509D"
+                                            // valueType="percentage"
+                                            title="Duree Transit"
+                                            valueType="time"
+                                        />
+                                    )}
+                                </div>
 
                             </>
                         )}

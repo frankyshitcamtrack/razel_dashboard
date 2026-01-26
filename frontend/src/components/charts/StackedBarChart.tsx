@@ -133,6 +133,73 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
             );
         }
 
+        // Check if this is time-based data (simple names like "lun. 5") vs vehicle-based data
+        const isTimeBased = data.every(item => 
+            item.name && !item.name.includes(' - ') && item.name.match(/^[a-z]{3}\. \d+$/)
+        );
+
+        if (isTimeBased) {
+            // Handle time-based data directly without vehicle parsing
+            const chartData = data.map(item => ({
+                name: item.name,
+                [dataKey1]: this.normalizeValue(item[dataKey1], dataKey1),
+                ...(dataKey2 && { [dataKey2]: this.normalizeValue(item[dataKey2], dataKey2) })
+            }));
+
+            const formatTooltip = (value: number, name: string) => {
+                let dataKey = dataKey1;
+                if (dataKey2 && name === label2) {
+                    dataKey = dataKey2;
+                }
+                return [this.formatValue(value, dataKey), name];
+            };
+
+            return (
+                <div className="bg-white rounded-lg shadow p-2 flex flex-col h-[320px]">
+                    <div className="flex items-center justify-between mb-4">
+                        <span className="text-sm font-normal" style={{ color: '#1F497D' }}>{label1}</span>
+                        <h3 className="text-lg font-semibold text-center flex-1" style={{ color: '#1F497D' }}>{title}</h3>
+                        <span className="invisible text-sm">{label1}</span>
+                    </div>
+                    <div className="flex-grow">
+                        <ResponsiveContainer width="100%" height={250}>
+                            <BarChart
+                                data={chartData}
+                                margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+                            >
+                                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                                <XAxis
+                                    dataKey="name"
+                                    axisLine={{ stroke: "#9ca3af" }}
+                                    tick={{ fill: "#1F497D", fontSize: 11, fontWeight: "bold" }}
+                                />
+                                <YAxis
+                                    tickFormatter={(value) => this.formatValue(value, dataKey1)}
+                                    axisLine={{ stroke: "#9ca3af" }}
+                                    tick={{ fill: "#1F497D" }}
+                                />
+                                <Tooltip formatter={formatTooltip} />
+                                <Bar
+                                    dataKey={dataKey1}
+                                    stackId="a"
+                                    fill={color1}
+                                    name={label1}
+                                />
+                                {dataKey2 && (
+                                    <Bar
+                                        dataKey={dataKey2}
+                                        stackId="a"
+                                        fill={color2}
+                                        name={label2 || dataKey2}
+                                    />
+                                )}
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+            );
+        }
+
         // Prépare les données normalisées et agrégées par véhicule
         const aggregatedData: { [key: string]: any } = {};
         const hasDateFields = data.some(item => item.date_depart);

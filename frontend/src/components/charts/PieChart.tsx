@@ -32,14 +32,16 @@ const PieChartComponent: React.FC<PieChartProps> = ({
         return () => clearTimeout(timer);
     }, []);
 
-    const total = data.reduce((sum, item) => sum + item.daylyConsom, 0);
+    // Filter out zero values to avoid empty segments
+    const filteredData = data.filter(item => item.daylyConsom > 0);
+    const total = filteredData.reduce((sum, item) => sum + item.daylyConsom, 0);
     
     // Calculate angles for each segment
     let currentAngle = 0;
-    const segments = data.map((item, index) => {
+    const segments = filteredData.map((item, index) => {
         const percentage = (item.daylyConsom / total) * 100;
         // For single element, use 359.9 degrees to avoid full circle rendering issues
-        const angle = data.length === 1 ? 359.9 : (item.daylyConsom / total) * 360;
+        const angle = filteredData.length === 1 ? 359.9 : (item.daylyConsom / total) * 360;
         const segment = {
             ...item,
             percentage,
@@ -122,16 +124,18 @@ const PieChartComponent: React.FC<PieChartProps> = ({
                 {/* 3D Pie Chart */}
                 <div className="lg:flex-1">
                     <svg width="600" height="450" viewBox="0 0 600 450" className="w-full h-auto" preserveAspectRatio="xMidYMid meet">
-                        {data.length === 1 ? (
-                            // Single element - draw complete ellipse
+                        {filteredData.length === 1 ? (
+                            // Single element - draw complete ellipse with proper 3D effect
                             <>
-                                {/* 3D shadow ellipse */}
+                                {/* 3D side surface for single element */}
                                 <ellipse
                                     cx="300"
                                     cy="240"
                                     rx="220"
-                                    ry="30"
-                                    fill={darkenColor(segments[0].color, 40)}
+                                    ry="130"
+                                    fill={darkenColor(segments[0].color, 35)}
+                                    stroke="#fff"
+                                    strokeWidth="3"
                                 />
                                 {/* Main ellipse */}
                                 <ellipse
@@ -149,13 +153,24 @@ const PieChartComponent: React.FC<PieChartProps> = ({
                                     }}
                                 />
                                 {variant === "donut" && (
-                                    <ellipse
-                                        cx="300"
-                                        cy="200"
-                                        rx="110"
-                                        ry="65"
-                                        fill="white"
-                                    />
+                                    <>
+                                        <ellipse
+                                            cx="300"
+                                            cy="240"
+                                            rx="110"
+                                            ry="65"
+                                            fill={darkenColor('#ffffff', 20)}
+                                        />
+                                        <ellipse
+                                            cx="300"
+                                            cy="200"
+                                            rx="110"
+                                            ry="65"
+                                            fill="white"
+                                            stroke="#fff"
+                                            strokeWidth="2"
+                                        />
+                                    </>
                                 )}
                                 {/* Label */}
                                 <text
@@ -167,6 +182,28 @@ const PieChartComponent: React.FC<PieChartProps> = ({
                                     style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}
                                 >
                                     {segments[0].daylyConsom}{unit}
+                                </text>
+                            </>
+                        ) : filteredData.length === 0 ? (
+                            // No data - show empty state
+                            <>
+                                <ellipse
+                                    cx="300"
+                                    cy="200"
+                                    rx="220"
+                                    ry="130"
+                                    fill="#f3f4f6"
+                                    stroke="#d1d5db"
+                                    strokeWidth="3"
+                                />
+                                <text
+                                    x="300"
+                                    y="200"
+                                    textAnchor="middle"
+                                    dominantBaseline="middle"
+                                    className="fill-gray-500 font-medium text-lg"
+                                >
+                                    Aucune donnée
                                 </text>
                             </>
                         ) : (

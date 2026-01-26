@@ -1,0 +1,2287 @@
+http://localhost:8000/api/razel_dashboard/vehicles
+[
+    {
+        "names": "V588E-VL-DUCLAIR",
+        "create_at": "2025-07-24T00:00:00.000Z",
+        "ids": "107",
+        "groupid": 1
+    },
+    {
+        "names": "V524M-M.VICTOR MONTEIRO",
+        "create_at": "2025-07-24T00:00:00.000Z",
+        "ids": "114",
+        "groupid": 1
+    },
+    {
+        "names": "V276F-VL-MICHAEL",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "4",
+        "groupid": 1
+    },
+    {
+        "names": "VB10N-COASTER -",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "13",
+        "groupid": null
+    },
+    {
+        "names": "V510G-VL-PILOTE-NDJOCK THOMAS",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "16",
+        "groupid": null
+    },
+    {
+        "names": "VT81F",
+        "create_at": "2025-06-30T00:00:00.000Z",
+        "ids": "103",
+        "groupid": 16
+    },
+    {
+        "names": "VB130-TRANSPORT PERSONNEL",
+        "create_at": "2025-07-21T00:00:00.000Z",
+        "ids": "77",
+        "groupid": 16
+    },
+    {
+        "names": "V170F",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "25",
+        "groupid": null
+    },
+    {
+        "names": "V305I-VL-FRANCOIS MAWOUNG",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "31",
+        "groupid": null
+    },
+    {
+        "names": "V308I-VL - CHANTIER CDV",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "32",
+        "groupid": null
+    },
+    {
+        "names": "V452N-VL-CYRILLE PERIER",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "33",
+        "groupid": null
+    },
+    {
+        "names": "V598E-VL- GERVAIS KOMBOU",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "45",
+        "groupid": 1
+    },
+    {
+        "names": "V588E-VL-VINCENT SIEUMENI",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "41",
+        "groupid": null
+    },
+    {
+        "names": "VT82F-TRACTEUR ROUTIER-MEBENGA",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "46",
+        "groupid": null
+    },
+    {
+        "names": "VU10J-HIACE-SCES ACHT",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "49",
+        "groupid": null
+    },
+    {
+        "names": "VT83M-BOX LOADER -POKAM CELESTIN",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "56",
+        "groupid": 1
+    },
+    {
+        "names": "VC24G-CITERNE A EAU-TIENTCHEU ALEXANDRE",
+        "create_at": "2025-07-21T00:00:00.000Z",
+        "ids": "62",
+        "groupid": 1
+    },
+    {
+        "names": "VU13K-TRANSPORT PERSONNEL",
+        "create_at": "2025-07-21T00:00:00.000Z",
+        "ids": "78",
+        "groupid": 16
+    },
+    {
+        "names": "VU11J-HIACE-",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "60",
+        "groupid": null
+    },
+    {
+        "names": "VP80F-CAMION HIAB-MBIDA",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "55",
+        "groupid": 1
+    },
+    {
+        "names": "VC85G-CITERNE A GASOIL-DAVID KUETE",
+        "create_at": "2025-07-21T00:00:00.000Z",
+        "ids": "63",
+        "groupid": null
+    },
+    {
+        "names": "V303I-VL-TERENCE",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "5",
+        "groupid": 1
+    },
+    {
+        "names": "V513G-VL-SERVICE TOPO ( MAROUA)",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "59",
+        "groupid": 1
+    },
+    {
+        "names": "V530K-VL-Abdourazak ATTOUMANE",
+        "create_at": "2025-06-30T00:00:00.000Z",
+        "ids": "95",
+        "groupid": 16
+    },
+    {
+        "names": "V170F-KEMDA STEPHANE",
+        "create_at": "2025-07-24T00:00:00.000Z",
+        "ids": "117",
+        "groupid": 1
+    },
+    {
+        "names": "V307I-VL-NJOGA",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "58",
+        "groupid": 15
+    },
+    {
+        "names": "V5310-VL-DONGMO CREPIN",
+        "create_at": "2025-07-21T00:00:00.000Z",
+        "ids": "75",
+        "groupid": 16
+    },
+    {
+        "names": "V4410-VL-BERNARD CROZAT",
+        "create_at": "2025-07-21T00:00:00.000Z",
+        "ids": "74",
+        "groupid": 16
+    },
+    {
+        "names": "V183G-VL-LONLTIO DOMINIQUE",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "29",
+        "groupid": 1
+    },
+    {
+        "names": "V528K-SOUARE Ibrahima",
+        "create_at": "2025-07-21T00:00:00.000Z",
+        "ids": "66",
+        "groupid": 16
+    },
+    {
+        "names": "V450N-VL-ABDIAS WARANG",
+        "create_at": "2025-07-21T00:00:00.000Z",
+        "ids": "81",
+        "groupid": 1
+    },
+    {
+        "names": "V176G-VL-JODEL",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "27",
+        "groupid": 1
+    },
+    {
+        "names": "VG29G-CAMION D'ENT",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "42",
+        "groupid": 1
+    },
+    {
+        "names": "VT79F-TRACTEUR ROUTIER",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "14",
+        "groupid": 1
+    },
+    {
+        "names": "VU10J-HIACE-SCES ACHATS",
+        "create_at": "2025-07-24T00:00:00.000Z",
+        "ids": "109",
+        "groupid": 1
+    },
+    {
+        "names": "V585E-VL-PICK-UP (Chantier Yagoua)",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "39",
+        "groupid": 1
+    },
+    {
+        "names": "RN26E",
+        "create_at": "2025-07-21T00:00:00.000Z",
+        "ids": "68",
+        "groupid": 16
+    },
+    {
+        "names": "VP72E-CAMION HIAB-OLIVIER NTSA",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "44",
+        "groupid": 1
+    },
+    {
+        "names": "V522J -VL- LAMAH",
+        "create_at": "2025-07-21T00:00:00.000Z",
+        "ids": "70",
+        "groupid": 16
+    },
+    {
+        "names": "V597M-VL-OHN OHN ANICET",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "11",
+        "groupid": 1
+    },
+    {
+        "names": "V393F-VL-JOSEPH GWODOK",
+        "create_at": "2025-06-30T00:00:00.000Z",
+        "ids": "79",
+        "groupid": 1
+    },
+    {
+        "names": "V598M-VL-BENOIT GUILOT",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "47",
+        "groupid": 1
+    },
+    {
+        "names": "V452N-VL-DAVID REY",
+        "create_at": "2025-07-24T00:00:00.000Z",
+        "ids": "110",
+        "groupid": 1
+    },
+    {
+        "names": "V592M-M.PASCAL VASSART - DAF",
+        "create_at": "2025-07-24T00:00:00.000Z",
+        "ids": "115",
+        "groupid": 1
+    },
+    {
+        "names": "V354M-FOUDA VALERY",
+        "create_at": "2025-08-08T23:00:00.000Z",
+        "ids": "138",
+        "groupid": 1
+    },
+    {
+        "names": "V509G-VL-PISTE MBOUDA",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "8",
+        "groupid": 1
+    },
+    {
+        "names": "V394G-FORT-RAOUL OYONO",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "18",
+        "groupid": 1
+    },
+    {
+        "names": "V172F-VITARA-MBASSI WILLIAM",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "26",
+        "groupid": 1
+    },
+    {
+        "names": "V0250-Charles-Henri ROPARTZ",
+        "create_at": "2025-06-30T00:00:00.000Z",
+        "ids": "91",
+        "groupid": 16
+    },
+    {
+        "names": "V524K - VL - LOUZOLO BERNADIN",
+        "create_at": "2025-07-21T00:00:00.000Z",
+        "ids": "71",
+        "groupid": 16
+    },
+    {
+        "names": "V497N-LCRUIS-D'ENT-PATRICK DZOUNDJA",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "19",
+        "groupid": 1
+    },
+    {
+        "names": "V350M-M.THIERY GUILLAUME",
+        "create_at": "2025-07-24T00:00:00.000Z",
+        "ids": "111",
+        "groupid": 1
+    },
+    {
+        "names": "V354M",
+        "create_at": "2025-07-24T00:00:00.000Z",
+        "ids": "113",
+        "groupid": 1
+    },
+    {
+        "names": "VP69D-CAMION HIAB-MAMA",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "54",
+        "groupid": 1
+    },
+    {
+        "names": "V492E-FORT-PRÊT",
+        "create_at": "2025-07-21T00:00:00.000Z",
+        "ids": "80",
+        "groupid": 1
+    },
+    {
+        "names": "VB08N-VL-RAZEL - SAPHYR",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "22",
+        "groupid": 1
+    },
+    {
+        "names": "V173F-VITARA-",
+        "create_at": "2025-07-21T00:00:00.000Z",
+        "ids": "85",
+        "groupid": 1
+    },
+    {
+        "names": "V458I-HERNIOT Frederic",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "34",
+        "groupid": 1
+    },
+    {
+        "names": "V186G-VL-GILDAS KOUNGA",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "2",
+        "groupid": 1
+    },
+    {
+        "names": "V570F-FORTUNER (Directeur Yagoua)",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "35",
+        "groupid": 1
+    },
+    {
+        "names": "VG18C-CAMION D'ENT-MATHIEU KUETE",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "53",
+        "groupid": 1
+    },
+    {
+        "names": "V523J-Assane TIANABOU",
+        "create_at": "2025-07-21T00:00:00.000Z",
+        "ids": "65",
+        "groupid": 16
+    },
+    {
+        "names": "V745C",
+        "create_at": "2025-07-21T00:00:00.000Z",
+        "ids": "73",
+        "groupid": 16
+    },
+    {
+        "names": "V519J-VL-DJIOFACK HERMANN",
+        "create_at": "2025-07-04T00:00:00.000Z",
+        "ids": "87",
+        "groupid": 1
+    },
+    {
+        "names": "VU11J-HIACE-SCES ACHATS",
+        "create_at": "2025-07-24T00:00:00.000Z",
+        "ids": "116",
+        "groupid": 1
+    },
+    {
+        "names": "V309I-VL-MBARGA Jean",
+        "create_at": "2025-07-12T00:00:00.000Z",
+        "ids": "88",
+        "groupid": 1
+    },
+    {
+        "names": "VC74E-CITERNE A GASOIL",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "40",
+        "groupid": 1
+    },
+    {
+        "names": "VT47E-TRACTEUR ROUTIER- MOUSSA",
+        "create_at": "2025-07-21T00:00:00.000Z",
+        "ids": "64",
+        "groupid": 1
+    },
+    {
+        "names": "V704G",
+        "create_at": "2025-06-30T00:00:00.000Z",
+        "ids": "96",
+        "groupid": 16
+    },
+    {
+        "names": "V634A",
+        "create_at": "2025-07-05T00:00:00.000Z",
+        "ids": "104",
+        "groupid": 16
+    },
+    {
+        "names": "V707D",
+        "create_at": "2025-06-30T00:00:00.000Z",
+        "ids": "98",
+        "groupid": 16
+    },
+    {
+        "names": "V706G",
+        "create_at": "2025-06-30T00:00:00.000Z",
+        "ids": "97",
+        "groupid": 16
+    },
+    {
+        "names": "V594M-VL-PADAE",
+        "create_at": "2025-07-13T00:00:00.000Z",
+        "ids": "89",
+        "groupid": 1
+    },
+    {
+        "names": "VC83G-CITERNE A GASOIL",
+        "create_at": "2025-06-30T00:00:00.000Z",
+        "ids": "102",
+        "groupid": 16
+    },
+    {
+        "names": "V110I-JIMNY-ALIOU",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "1",
+        "groupid": 1
+    },
+    {
+        "names": "V722F",
+        "create_at": "2025-06-30T00:00:00.000Z",
+        "ids": "99",
+        "groupid": 16
+    },
+    {
+        "names": "VT83F-PORTE CHAR-EBOA",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "48",
+        "groupid": 1
+    },
+    {
+        "names": "V304I-VL CDF - KALLA",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "30",
+        "groupid": 1
+    },
+    {
+        "names": "V201G-VL-THIERY KENFACK",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "3",
+        "groupid": 1
+    },
+    {
+        "names": "VP20G",
+        "create_at": "2025-07-21T00:00:00.000Z",
+        "ids": "86",
+        "groupid": 16
+    },
+    {
+        "names": "V484N-PICK-UP (GERALDO)",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "15",
+        "groupid": 1
+    },
+    {
+        "names": "VB10N-COASTER -ATEBA ETOGA ALAIN",
+        "create_at": "2025-07-24T00:00:00.000Z",
+        "ids": "108",
+        "groupid": 1
+    },
+    {
+        "names": "V596M-VL- LEON",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "20",
+        "groupid": 1
+    },
+    {
+        "names": "V180G-VL-LAURENT HEUDE",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "28",
+        "groupid": 1
+    },
+    {
+        "names": "V508J - XAVIER MARCHAIS",
+        "create_at": "2025-06-30T00:00:00.000Z",
+        "ids": "93",
+        "groupid": 16
+    },
+    {
+        "names": "V643G-NAVETTE-NGUELE RODRIGUE",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "38",
+        "groupid": 1
+    },
+    {
+        "names": "V507G-VL-D'ENT-",
+        "create_at": "2025-07-21T00:00:00.000Z",
+        "ids": "84",
+        "groupid": 1
+    },
+    {
+        "names": "V109I-DABOUGUI Ismael",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "24",
+        "groupid": 1
+    },
+    {
+        "names": "VT80F-PLATEAU-BELIBI JOSEPH",
+        "create_at": "2025-07-21T00:00:00.000Z",
+        "ids": "83",
+        "groupid": 1
+    },
+    {
+        "names": "V527K - VL - YALLA JOSEPH",
+        "create_at": "2025-06-30T00:00:00.000Z",
+        "ids": "90",
+        "groupid": 16
+    },
+    {
+        "names": "V526K - VL - BIANG MATIN",
+        "create_at": "2025-06-30T00:00:00.000Z",
+        "ids": "94",
+        "groupid": 16
+    },
+    {
+        "names": "V529K-BETELEM Jean-Bruno",
+        "create_at": "2025-07-21T00:00:00.000Z",
+        "ids": "72",
+        "groupid": 16
+    },
+    {
+        "names": "VU48F-HIACE-NKOA DESIRE",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "50",
+        "groupid": 1
+    },
+    {
+        "names": "V595M-VL-PANDEU ALAIN",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "10",
+        "groupid": 1
+    },
+    {
+        "names": "V330F-VL-Equipe TOPO MBOUDA",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "17",
+        "groupid": 1
+    },
+    {
+        "names": "V980F",
+        "create_at": "2025-07-06T00:00:00.000Z",
+        "ids": "105",
+        "groupid": 16
+    },
+    {
+        "names": "V723F",
+        "create_at": "2025-06-30T00:00:00.000Z",
+        "ids": "100",
+        "groupid": 16
+    },
+    {
+        "names": "V306I-VL-MYRIAM",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "6",
+        "groupid": 1
+    },
+    {
+        "names": "V350M-",
+        "create_at": "2025-08-08T23:00:00.000Z",
+        "ids": "137",
+        "groupid": 1
+    },
+    {
+        "names": "V4930-VL-Hadrien OLLIVIER",
+        "create_at": "2025-06-30T00:00:00.000Z",
+        "ids": "101",
+        "groupid": 16
+    },
+    {
+        "names": "V520J-VL-GILLES HAPPI",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "37",
+        "groupid": 1
+    },
+    {
+        "names": "V305I-VL- MBELECK MERIMEE",
+        "create_at": "2025-08-27T23:00:00.000Z",
+        "ids": "159",
+        "groupid": 1
+    },
+    {
+        "names": "V352M-M.GAEL GUIHARD",
+        "create_at": "2025-07-24T00:00:00.000Z",
+        "ids": "112",
+        "groupid": 1
+    },
+    {
+        "names": "V593E-VL-",
+        "create_at": "2025-08-27T23:00:00.000Z",
+        "ids": "160",
+        "groupid": 1
+    },
+    {
+        "names": "VC24G-CITERNE A EAU-ANDELA ROGER",
+        "create_at": "2025-09-01T23:00:00.000Z",
+        "ids": "161",
+        "groupid": 1
+    },
+    {
+        "names": "V353M-M.HAMDI",
+        "create_at": "2025-07-25T00:00:00.000Z",
+        "ids": "122",
+        "groupid": 1
+    },
+    {
+        "names": "VP80F-CAMION HIAB- TIENTCHEU ALEXANDRE",
+        "create_at": "2025-09-01T23:00:00.000Z",
+        "ids": "162",
+        "groupid": 1
+    },
+    {
+        "names": "V350M-COULIBALY",
+        "create_at": "2025-09-07T23:00:00.000Z",
+        "ids": "163",
+        "groupid": 1
+    },
+    {
+        "names": "V170F-",
+        "create_at": "2025-09-13T00:00:00.000Z",
+        "ids": "164",
+        "groupid": 1
+    },
+    {
+        "names": "V512G-VL-MINI CARAVANE ATELIER AEROPORT",
+        "create_at": "2025-07-21T00:00:00.000Z",
+        "ids": "69",
+        "groupid": 16
+    },
+    {
+        "names": "V4450",
+        "create_at": "2025-09-13T00:00:00.000Z",
+        "ids": "165",
+        "groupid": 16
+    },
+    {
+        "names": "VC85G-CITERNE A GASOIL- MOUHAMED-",
+        "create_at": "2025-09-18T23:00:00.000Z",
+        "ids": "166",
+        "groupid": 1
+    },
+    {
+        "names": "V 744 C-RENAULT KERAX-RAZEL",
+        "create_at": "2025-09-28T23:00:00.000Z",
+        "ids": "167",
+        "groupid": 1
+    },
+    {
+        "names": "V 767 C-RENAULT KERAX-RAZEL",
+        "create_at": "2025-09-28T23:00:00.000Z",
+        "ids": "168",
+        "groupid": 1
+    },
+    {
+        "names": "V744C-RENAULT KERAX-RAZEL",
+        "create_at": "2025-09-28T23:00:00.000Z",
+        "ids": "169",
+        "groupid": 1
+    },
+    {
+        "names": "V746C-RENAULT KERAX-RAZEL",
+        "create_at": "2025-10-02T23:00:00.000Z",
+        "ids": "173",
+        "groupid": 1
+    },
+    {
+        "names": "1.7.2",
+        "create_at": "2025-07-28T00:00:00.000Z",
+        "ids": "134",
+        "groupid": 9
+    },
+    {
+        "names": "1.7.3",
+        "create_at": "2025-07-28T00:00:00.000Z",
+        "ids": "135",
+        "groupid": 9
+    },
+    {
+        "names": "V764B-RENAULT KERAX-RAZEL",
+        "create_at": "2025-10-02T23:00:00.000Z",
+        "ids": "175",
+        "groupid": 1
+    },
+    {
+        "names": "V492E-FORT-BASILE ATEBA",
+        "create_at": "2025-10-08T23:00:00.000Z",
+        "ids": "176",
+        "groupid": 1
+    },
+    {
+        "names": "V176G-VL-",
+        "create_at": "2025-10-01T23:00:00.000Z",
+        "ids": "178",
+        "groupid": 1
+    },
+    {
+        "names": "V180G-VL-",
+        "create_at": "2025-10-01T23:00:00.000Z",
+        "ids": "179",
+        "groupid": 1
+    },
+    {
+        "names": "VP21G-CAMION HIAB-TIENTCHEU ALEXANDRE",
+        "create_at": "2025-11-05T23:00:00.000Z",
+        "ids": "202",
+        "groupid": 1
+    },
+    {
+        "names": "V521J-VL-RAOUL  - C.M TOPO ( MBOUDA)",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "9",
+        "groupid": 1
+    },
+    {
+        "names": "V593E-VL-NDJOCK JOEL",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "36",
+        "groupid": 1
+    },
+    {
+        "names": "VB07N-COASTER (BUS CHANTIER)-SIMON",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "21",
+        "groupid": 1
+    },
+    {
+        "names": "V305I-VL-OUMAR BRAHIM",
+        "create_at": "2025-07-24T00:00:00.000Z",
+        "ids": "118",
+        "groupid": 1
+    },
+    {
+        "names": "V309I-VL-YCDV",
+        "create_at": "2025-10-03T23:00:00.000Z",
+        "ids": "180",
+        "groupid": 1
+    },
+    {
+        "names": "V906C",
+        "create_at": "2025-11-30T23:00:00.000Z",
+        "ids": "211",
+        "groupid": 1
+    },
+    {
+        "names": "V510G-VL-PILOTE-PLATINI",
+        "create_at": "2025-07-24T00:00:00.000Z",
+        "ids": "120",
+        "groupid": 1
+    },
+    {
+        "names": "V111I-JIMMY",
+        "create_at": "2025-07-21T00:00:00.000Z",
+        "ids": "61",
+        "groupid": 1
+    },
+    {
+        "names": "V308I-VL - TOLLCAM - PEAGES ROUTIERS",
+        "create_at": "2025-07-24T00:00:00.000Z",
+        "ids": "119",
+        "groupid": 1
+    },
+    {
+        "names": "VG17C-CAMION D'ENT-FAÏ ETIENNE",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "52",
+        "groupid": 1
+    },
+    {
+        "names": "VP21G-CAMION HIAB-LEUCHI YVES",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "43",
+        "groupid": 1
+    },
+    {
+        "names": "V458I-BLAISE SIMO",
+        "create_at": "2025-10-08T23:00:00.000Z",
+        "ids": "181",
+        "groupid": 1
+    },
+    {
+        "names": "V497N-LCRUIS-D'ENT-NGUEMO ERIC",
+        "create_at": "2025-10-09T23:00:00.000Z",
+        "ids": "188",
+        "groupid": 1
+    },
+    {
+        "names": "V4440-VL-PISSA BENGBA  Romuald",
+        "create_at": "2025-07-21T00:00:00.000Z",
+        "ids": "67",
+        "groupid": 16
+    },
+    {
+        "names": "VP83G",
+        "create_at": "2025-07-24T00:00:00.000Z",
+        "ids": "121",
+        "groupid": 16
+    },
+    {
+        "names": "VT84M-BOX LOADER-KAWA ROLAND",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "57",
+        "groupid": 1
+    },
+    {
+        "names": "VB63F-",
+        "create_at": "2025-07-28T00:00:00.000Z",
+        "ids": "124",
+        "groupid": 1
+    },
+    {
+        "names": "VC15G-CAMION LAVAGE AVEC KACHER - SEDENA SERGES",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "51",
+        "groupid": 1
+    },
+    {
+        "names": "V533K-VL-STEPHANE COPPIN",
+        "create_at": "2025-07-09T00:00:00.000Z",
+        "ids": "106",
+        "groupid": 16
+    },
+    {
+        "names": "VT82F-TRACTEUR ROUTIER-KUETE DAVID",
+        "create_at": "2025-07-28T00:00:00.000Z",
+        "ids": "123",
+        "groupid": 1
+    },
+    {
+        "names": "V497N-LCRUIS-D'ENT-AYISSI VENANT",
+        "create_at": "2025-08-08T23:00:00.000Z",
+        "ids": "139",
+        "groupid": 1
+    },
+    {
+        "names": "V303I-VL-EQUIPE TOPO - VEY",
+        "create_at": "2025-08-08T23:00:00.000Z",
+        "ids": "140",
+        "groupid": 1
+    },
+    {
+        "names": "V308I-VL - ATELIER MBOUDA",
+        "create_at": "2025-08-08T23:00:00.000Z",
+        "ids": "141",
+        "groupid": 1
+    },
+    {
+        "names": "VC24G-CITERNE A EAU",
+        "create_at": "2025-08-08T23:00:00.000Z",
+        "ids": "143",
+        "groupid": 1
+    },
+    {
+        "names": "VB07N-COASTER (BUS CHANTIER)-",
+        "create_at": "2025-10-08T23:00:00.000Z",
+        "ids": "183",
+        "groupid": 1
+    },
+    {
+        "names": "VP80F-CAMION HIAB-MBIA PASCAL",
+        "create_at": "2025-08-08T23:00:00.000Z",
+        "ids": "144",
+        "groupid": 1
+    },
+    {
+        "names": "V593E-VL-YCDV",
+        "create_at": "2025-10-08T23:00:00.000Z",
+        "ids": "184",
+        "groupid": 1
+    },
+    {
+        "names": "V492E-FORT-PRÊT -YCDV",
+        "create_at": "2025-08-08T23:00:00.000Z",
+        "ids": "145",
+        "groupid": 1
+    },
+    {
+        "names": "VU48F-HIACE-",
+        "create_at": "2025-10-08T23:00:00.000Z",
+        "ids": "185",
+        "groupid": 1
+    },
+    {
+        "names": "V596M-VL- BASILE ATEBA",
+        "create_at": "2025-08-08T23:00:00.000Z",
+        "ids": "146",
+        "groupid": 1
+    },
+    {
+        "names": "VC15G-CAMION AVEC KACHER -ALEXANDRE TIETCHEU",
+        "create_at": "2025-08-08T23:00:00.000Z",
+        "ids": "147",
+        "groupid": 1
+    },
+    {
+        "names": "VT79F-TRACTEUR ROUTIER-KO MOLO ERNEST",
+        "create_at": "2025-08-11T23:00:00.000Z",
+        "ids": "149",
+        "groupid": 1
+    },
+    {
+        "names": "V458I-NELSON FARO",
+        "create_at": "2025-10-19T23:00:00.000Z",
+        "ids": "189",
+        "groupid": 1
+    },
+    {
+        "names": "V4550",
+        "create_at": "2025-10-27T23:00:00.000Z",
+        "ids": "190",
+        "groupid": 16
+    },
+    {
+        "names": "V350M-M.GEORGES LEMAIRE",
+        "create_at": "2025-11-05T23:00:00.000Z",
+        "ids": "192",
+        "groupid": 1
+    },
+    {
+        "names": "VC85G-CITERNE A GASOIL-",
+        "create_at": "2025-07-21T00:00:00.000Z",
+        "ids": "125",
+        "groupid": 1
+    },
+    {
+        "names": "V393F-VL-MARIUS - LABO YCDV",
+        "create_at": "2025-08-20T23:00:00.000Z",
+        "ids": "152",
+        "groupid": 1
+    },
+    {
+        "names": "VU48F-HIACE-NKOA DESIRE - SANGMELIMA",
+        "create_at": "2025-08-20T23:00:00.000Z",
+        "ids": "153",
+        "groupid": 1
+    },
+    {
+        "names": "V173F-VITARA- KEMDA STEPHANE",
+        "create_at": "2025-08-20T23:00:00.000Z",
+        "ids": "154",
+        "groupid": 1
+    },
+    {
+        "names": "VB10N-COASTER - SIMON - SIMBOCK",
+        "create_at": "2025-11-05T23:00:00.000Z",
+        "ids": "194",
+        "groupid": 1
+    },
+    {
+        "names": "V180G-VL-MATAF -YCDV (Dispo)",
+        "create_at": "2025-11-05T23:00:00.000Z",
+        "ids": "195",
+        "groupid": 1
+    },
+    {
+        "names": "V308I-VL -",
+        "create_at": "2025-11-05T23:00:00.000Z",
+        "ids": "197",
+        "groupid": 1
+    },
+    {
+        "names": "VP80F-CAMION HIAB-",
+        "create_at": "2025-08-20T23:00:00.000Z",
+        "ids": "155",
+        "groupid": 1
+    },
+    {
+        "names": "V305I-VL-",
+        "create_at": "2025-08-24T23:00:00.000Z",
+        "ids": "157",
+        "groupid": 1
+    },
+    {
+        "names": "V111I-JIMMY-YCDV",
+        "create_at": "2025-08-26T23:00:00.000Z",
+        "ids": "158",
+        "groupid": 1
+    },
+    {
+        "names": "V458I-",
+        "create_at": "2025-11-05T23:00:00.000Z",
+        "ids": "199",
+        "groupid": 1
+    },
+    {
+        "names": "VC15G-CAMION AVEC KACHER -",
+        "create_at": "2025-11-05T23:00:00.000Z",
+        "ids": "201",
+        "groupid": 1
+    },
+    {
+        "names": "V110I-JIMNY-",
+        "create_at": "2025-11-05T23:00:00.000Z",
+        "ids": "203",
+        "groupid": 1
+    },
+    {
+        "names": "V111I-JIMMY-",
+        "create_at": "2025-11-05T23:00:00.000Z",
+        "ids": "204",
+        "groupid": 1
+    },
+    {
+        "names": "V509G-VL-",
+        "create_at": "2025-11-05T23:00:00.000Z",
+        "ids": "205",
+        "groupid": 1
+    },
+    {
+        "names": "V510G-VL-",
+        "create_at": "2025-11-05T23:00:00.000Z",
+        "ids": "206",
+        "groupid": 1
+    },
+    {
+        "names": "V593E-VL",
+        "create_at": "2025-11-05T23:00:00.000Z",
+        "ids": "207",
+        "groupid": 1
+    },
+    {
+        "names": "V598E-VL-",
+        "create_at": "2025-11-05T23:00:00.000Z",
+        "ids": "208",
+        "groupid": 1
+    },
+    {
+        "names": "VB120-TRANSPORT PERSONNEL",
+        "create_at": "2025-07-21T00:00:00.000Z",
+        "ids": "76",
+        "groupid": 16
+    },
+    {
+        "names": "VC01G",
+        "create_at": "2025-08-22T23:00:00.000Z",
+        "ids": "156",
+        "groupid": 16
+    },
+    {
+        "names": "V507G-VL-D'ENT-PLATINI",
+        "create_at": "2025-11-05T23:00:00.000Z",
+        "ids": "200",
+        "groupid": 1
+    },
+    {
+        "names": "V4420 - VL - DAVID REY",
+        "create_at": "2025-08-14T23:00:00.000Z",
+        "ids": "151",
+        "groupid": 16
+    },
+    {
+        "names": "1.1.1",
+        "create_at": "2025-07-28T00:00:00.000Z",
+        "ids": "126",
+        "groupid": 16
+    },
+    {
+        "names": "RAZEL 1",
+        "create_at": "2025-12-01T23:00:00.000Z",
+        "ids": "212",
+        "groupid": 1
+    },
+    {
+        "names": "V746C-RENAULT KERAX-RAZEL-BLASSUS",
+        "create_at": "2025-10-02T23:00:00.000Z",
+        "ids": "186",
+        "groupid": 1
+    },
+    {
+        "names": "V703D-RENAULT KERAX-RAZEL",
+        "create_at": "2025-10-02T23:00:00.000Z",
+        "ids": "172",
+        "groupid": 1
+    },
+    {
+        "names": "V682C-RENAULT KERAX-RAZEL",
+        "create_at": "2025-10-02T23:00:00.000Z",
+        "ids": "171",
+        "groupid": 1
+    },
+    {
+        "names": "V643G-TRIBENNE",
+        "create_at": "2025-08-10T23:00:00.000Z",
+        "ids": "148",
+        "groupid": 1
+    },
+    {
+        "names": "VB07N-COASTER - C.LOGBADJECK",
+        "create_at": "2025-11-05T23:00:00.000Z",
+        "ids": "193",
+        "groupid": 1
+    },
+    {
+        "names": "V484N-TERENCE",
+        "create_at": "2025-08-12T23:00:00.000Z",
+        "ids": "150",
+        "groupid": 1
+    },
+    {
+        "names": "1.2.1",
+        "create_at": "2025-07-28T00:00:00.000Z",
+        "ids": "127",
+        "groupid": 16
+    },
+    {
+        "names": "1.2.2",
+        "create_at": "2025-07-28T00:00:00.000Z",
+        "ids": "128",
+        "groupid": 16
+    },
+    {
+        "names": "1.3.1",
+        "create_at": "2025-07-28T00:00:00.000Z",
+        "ids": "129",
+        "groupid": 16
+    },
+    {
+        "names": "1.4.1",
+        "create_at": "2025-07-28T00:00:00.000Z",
+        "ids": "130",
+        "groupid": 16
+    },
+    {
+        "names": "1.5.1",
+        "create_at": "2025-07-28T00:00:00.000Z",
+        "ids": "131",
+        "groupid": 16
+    },
+    {
+        "names": "1.6.1",
+        "create_at": "2025-07-28T00:00:00.000Z",
+        "ids": "132",
+        "groupid": 16
+    },
+    {
+        "names": "1.7.1",
+        "create_at": "2025-07-28T00:00:00.000Z",
+        "ids": "133",
+        "groupid": 16
+    },
+    {
+        "names": "1.8.1",
+        "create_at": "2025-07-28T00:00:00.000Z",
+        "ids": "136",
+        "groupid": 16
+    },
+    {
+        "names": "V408F-VL- MATHURIN DJERABE",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "7",
+        "groupid": 1
+    },
+    {
+        "names": "V596M-VL- NDJAH - YCDV",
+        "create_at": "2025-10-08T23:00:00.000Z",
+        "ids": "182",
+        "groupid": 1
+    },
+    {
+        "names": "V767C-RENAULT KERAX-RAZEL",
+        "create_at": "2025-09-28T23:00:00.000Z",
+        "ids": "170",
+        "groupid": 1
+    },
+    {
+        "names": "V330F-VL-WILLIAMS - LABO",
+        "create_at": "2025-08-08T23:00:00.000Z",
+        "ids": "142",
+        "groupid": 1
+    },
+    {
+        "names": "V451N-VL-MATTHIAS GRALL",
+        "create_at": "2025-11-03T23:00:00.000Z",
+        "ids": "191",
+        "groupid": 1
+    },
+    {
+        "names": "V744C-RENAULT KERAX-RAZEL - RICHARD",
+        "create_at": "2025-10-08T23:00:00.000Z",
+        "ids": "177",
+        "groupid": 1
+    },
+    {
+        "names": "V753C-RENAULT KERAX-RAZEL",
+        "create_at": "2025-10-02T23:00:00.000Z",
+        "ids": "174",
+        "groupid": 1
+    },
+    {
+        "names": "V764B-RENAULT KERAX-RAZEL-DJOMO",
+        "create_at": "2025-10-02T23:00:00.000Z",
+        "ids": "187",
+        "groupid": 1
+    },
+    {
+        "names": "V498N - VL- MINI CARAVANE CARRIERE NGOURA",
+        "create_at": "2025-06-30T00:00:00.000Z",
+        "ids": "92",
+        "groupid": 16
+    },
+    {
+        "names": "V307I-VL-YCDV-LEBONGO CHRISTIAN",
+        "create_at": "2025-11-19T23:00:00.000Z",
+        "ids": "210",
+        "groupid": 1
+    },
+    {
+        "names": "V762B-RENAULT KERAX-RAZEL",
+        "create_at": "2025-11-16T23:00:00.000Z",
+        "ids": "209",
+        "groupid": 1
+    },
+    {
+        "names": "VB05N-COASTER (BUS MATAF)-WULLY",
+        "create_at": "2025-07-18T00:00:00.000Z",
+        "ids": "12",
+        "groupid": 1
+    },
+    {
+        "names": "RAZEL 2",
+        "create_at": "2025-12-01T23:00:00.000Z",
+        "ids": "213",
+        "groupid": 1
+    },
+    {
+        "names": "RAZEL 3",
+        "create_at": "2025-12-01T23:00:00.000Z",
+        "ids": "214",
+        "groupid": 1
+    },
+    {
+        "names": "V762B-RENAULT KERAX-RAZEL SONDE",
+        "create_at": "2025-12-02T23:00:00.000Z",
+        "ids": "215",
+        "groupid": 1
+    },
+    {
+        "names": "RAZEL 4",
+        "create_at": "2025-12-02T23:00:00.000Z",
+        "ids": "216",
+        "groupid": 1
+    },
+    {
+        "names": "VB10N-COASTER - NGWA STEPHEN",
+        "create_at": "2025-12-03T23:00:00.000Z",
+        "ids": "220",
+        "groupid": 1
+    },
+    {
+        "names": "V521J-VL-",
+        "create_at": "2025-12-03T23:00:00.000Z",
+        "ids": "222",
+        "groupid": 1
+    },
+    {
+        "names": "V570F-FORTUNER",
+        "create_at": "2025-12-03T23:00:00.000Z",
+        "ids": "224",
+        "groupid": 1
+    },
+    {
+        "names": "V594M-VL-DOMINIQUE LONTSO",
+        "create_at": "2025-12-03T23:00:00.000Z",
+        "ids": "225",
+        "groupid": 1
+    },
+    {
+        "names": "VC24G-CITERNE A EAU-",
+        "create_at": "2025-12-03T23:00:00.000Z",
+        "ids": "226",
+        "groupid": 1
+    },
+    {
+        "names": "VU48F-HIACE- MATAF YCDV",
+        "create_at": "2025-12-03T23:00:00.000Z",
+        "ids": "227",
+        "groupid": 1
+    },
+    {
+        "names": "V541K-VL RAZEL",
+        "create_at": "2026-01-18T23:00:00.000Z",
+        "ids": "287",
+        "groupid": 1
+    },
+    {
+        "names": "LT 531 MF-VL RAZEL",
+        "create_at": "2026-01-19T23:00:00.000Z",
+        "ids": "289",
+        "groupid": 1
+    },
+    {
+        "names": "LT 532 MF-VL RAZEL",
+        "create_at": "2026-01-19T23:00:00.000Z",
+        "ids": "290",
+        "groupid": 1
+    },
+    {
+        "names": "V162I-VL RAZEL",
+        "create_at": "2026-01-19T23:00:00.000Z",
+        "ids": "291",
+        "groupid": 1
+    },
+    {
+        "names": "V173F-VITARA- GEORGES LEMAIRE",
+        "create_at": "2025-12-05T23:00:00.000Z",
+        "ids": "230",
+        "groupid": 1
+    },
+    {
+        "names": "1.3.2",
+        "create_at": "2025-12-13T23:00:00.000Z",
+        "ids": "231",
+        "groupid": 16
+    },
+    {
+        "names": "1.3.3",
+        "create_at": "2025-12-13T23:00:00.000Z",
+        "ids": "232",
+        "groupid": 16
+    },
+    {
+        "names": "1.3.4",
+        "create_at": "2025-12-13T23:00:00.000Z",
+        "ids": "233",
+        "groupid": 16
+    },
+    {
+        "names": "1.5.2",
+        "create_at": "2025-12-13T23:00:00.000Z",
+        "ids": "234",
+        "groupid": 16
+    },
+    {
+        "names": "1.8.2",
+        "create_at": "2025-12-13T23:00:00.000Z",
+        "ids": "235",
+        "groupid": 16
+    },
+    {
+        "names": "1.8.3",
+        "create_at": "2025-12-13T23:00:00.000Z",
+        "ids": "236",
+        "groupid": 16
+    },
+    {
+        "names": "1.9.1",
+        "create_at": "2025-12-13T23:00:00.000Z",
+        "ids": "237",
+        "groupid": 16
+    },
+    {
+        "names": "1.10.1",
+        "create_at": "2025-12-13T23:00:00.000Z",
+        "ids": "238",
+        "groupid": 16
+    },
+    {
+        "names": "1.10.2",
+        "create_at": "2025-12-13T23:00:00.000Z",
+        "ids": "239",
+        "groupid": 16
+    },
+    {
+        "names": "1.11.1",
+        "create_at": "2025-12-13T23:00:00.000Z",
+        "ids": "240",
+        "groupid": 16
+    },
+    {
+        "names": "1.12.1",
+        "create_at": "2025-12-13T23:00:00.000Z",
+        "ids": "241",
+        "groupid": 16
+    },
+    {
+        "names": "1.13.1",
+        "create_at": "2025-12-13T23:00:00.000Z",
+        "ids": "242",
+        "groupid": 16
+    },
+    {
+        "names": "1.13.2",
+        "create_at": "2025-12-13T23:00:00.000Z",
+        "ids": "243",
+        "groupid": 16
+    },
+    {
+        "names": "1.13.3",
+        "create_at": "2025-12-13T23:00:00.000Z",
+        "ids": "244",
+        "groupid": 16
+    },
+    {
+        "names": "VB10N-COASTER - BEKONO",
+        "create_at": "2026-01-08T23:00:00.000Z",
+        "ids": "267",
+        "groupid": 1
+    },
+    {
+        "names": "V308I-VL - FRANCOIS MAWO",
+        "create_at": "2026-01-05T23:00:00.000Z",
+        "ids": "274",
+        "groupid": 1
+    },
+    {
+        "names": "VC74E-CITERNE A GASOIL-JULES SIPA",
+        "create_at": "2025-12-03T23:00:00.000Z",
+        "ids": "223",
+        "groupid": 1
+    },
+    {
+        "names": "V309I-VL-TEPI SYLVIN",
+        "create_at": "2025-11-05T23:00:00.000Z",
+        "ids": "198",
+        "groupid": 1
+    },
+    {
+        "names": "V453N-TOYOTAHILUX-RAZEL",
+        "create_at": "2026-01-14T23:00:00.000Z",
+        "ids": "278",
+        "groupid": 1
+    },
+    {
+        "names": "VB52N-RAZEL",
+        "create_at": "2026-01-15T23:00:00.000Z",
+        "ids": "284",
+        "groupid": 1
+    },
+    {
+        "names": "VB11N - NANA",
+        "create_at": "2026-01-08T23:00:00.000Z",
+        "ids": "268",
+        "groupid": 1
+    },
+    {
+        "names": "V110I-JIMNY-YOUNOUSSA",
+        "create_at": "2025-11-26T23:00:00.000Z",
+        "ids": "217",
+        "groupid": 1
+    },
+    {
+        "names": "V180G-VL-YCDV",
+        "create_at": "2025-11-26T23:00:00.000Z",
+        "ids": "218",
+        "groupid": 1
+    },
+    {
+        "names": "V183G-VL-YCDV",
+        "create_at": "2025-11-29T23:00:00.000Z",
+        "ids": "219",
+        "groupid": 1
+    },
+    {
+        "names": "V303I-VL-EQUIPE TOPO - SIMBOCK",
+        "create_at": "2025-11-05T23:00:00.000Z",
+        "ids": "196",
+        "groupid": 1
+    },
+    {
+        "names": "V509G-VL-MATHIEU",
+        "create_at": "2025-12-03T23:00:00.000Z",
+        "ids": "221",
+        "groupid": 1
+    },
+    {
+        "names": "V906C- MOUAFFO",
+        "create_at": "2025-12-04T23:00:00.000Z",
+        "ids": "228",
+        "groupid": 1
+    },
+    {
+        "names": "VB11N",
+        "create_at": "2025-12-04T23:00:00.000Z",
+        "ids": "229",
+        "groupid": 1
+    },
+    {
+        "names": "V302I-RAZEL",
+        "create_at": "2026-01-18T23:00:00.000Z",
+        "ids": "288",
+        "groupid": 1
+    },
+    {
+        "names": "VC 85 G-RAZEL",
+        "create_at": "2025-12-21T23:00:00.000Z",
+        "ids": "245",
+        "groupid": 1
+    },
+    {
+        "names": "VC85G-CITERNE-RAZEL",
+        "create_at": "2025-12-22T23:00:00.000Z",
+        "ids": "246",
+        "groupid": 1
+    },
+    {
+        "names": "VC23G",
+        "create_at": "2025-12-22T23:00:00.000Z",
+        "ids": "247",
+        "groupid": 1
+    },
+    {
+        "names": "VC11F-RAZEL",
+        "create_at": "2025-12-22T23:00:00.000Z",
+        "ids": "248",
+        "groupid": 1
+    },
+    {
+        "names": "V307I-VL-YCDV-",
+        "create_at": "2025-12-22T23:00:00.000Z",
+        "ids": "250",
+        "groupid": 1
+    },
+    {
+        "names": "VC11F-RENAULT KERAX DXI-RAZEL",
+        "create_at": "2025-12-22T23:00:00.000Z",
+        "ids": "251",
+        "groupid": 1
+    },
+    {
+        "names": "VC23G-RENAULT KERAX DXI-RAZEL",
+        "create_at": "2025-12-22T23:00:00.000Z",
+        "ids": "252",
+        "groupid": 1
+    },
+    {
+        "names": "RAZEL",
+        "create_at": "2025-12-29T23:00:00.000Z",
+        "ids": "253",
+        "groupid": 1
+    },
+    {
+        "names": "VM53G-RENAULT KERAX-RAZEL",
+        "create_at": "2025-12-29T23:00:00.000Z",
+        "ids": "254",
+        "groupid": 1
+    },
+    {
+        "names": "VT45E-RENAULT KERAX-RAZEL",
+        "create_at": "2025-12-30T23:00:00.000Z",
+        "ids": "255",
+        "groupid": 1
+    },
+    {
+        "names": "V643G-RENAULT KERAX-RAZEL",
+        "create_at": "2026-01-05T23:00:00.000Z",
+        "ids": "256",
+        "groupid": 1
+    },
+    {
+        "names": "VB02J-VL-RAZEL",
+        "create_at": "2026-01-08T23:00:00.000Z",
+        "ids": "257",
+        "groupid": 1
+    },
+    {
+        "names": "VB03J-VL-RAZEL",
+        "create_at": "2026-01-08T23:00:00.000Z",
+        "ids": "258",
+        "groupid": 1
+    },
+    {
+        "names": "V276F-VL",
+        "create_at": "2026-01-04T23:00:00.000Z",
+        "ids": "260",
+        "groupid": 1
+    },
+    {
+        "names": "V308I-VL - PANDEU ALAIN",
+        "create_at": "2026-01-08T23:00:00.000Z",
+        "ids": "261",
+        "groupid": 1
+    },
+    {
+        "names": "V595M-VL-",
+        "create_at": "2026-01-08T23:00:00.000Z",
+        "ids": "265",
+        "groupid": 1
+    },
+    {
+        "names": "V109I-",
+        "create_at": "2026-01-08T23:00:00.000Z",
+        "ids": "266",
+        "groupid": 1
+    },
+    {
+        "names": "V595M-VL- ALAIN PANDEU",
+        "create_at": "2026-01-02T23:00:00.000Z",
+        "ids": "270",
+        "groupid": 1
+    },
+    {
+        "names": "V394G-FORT-",
+        "create_at": "2026-01-09T23:00:00.000Z",
+        "ids": "273",
+        "groupid": 1
+    },
+    {
+        "names": "V180G-VL- TOPO - YCDV",
+        "create_at": "2026-01-08T23:00:00.000Z",
+        "ids": "262",
+        "groupid": 1
+    },
+    {
+        "names": "V308I-VL - YVON MEKA",
+        "create_at": "2026-01-02T23:00:00.000Z",
+        "ids": "269",
+        "groupid": 1
+    },
+    {
+        "names": "PRO-PME",
+        "create_at": "2026-01-13T23:00:00.000Z",
+        "ids": "276",
+        "groupid": 1
+    },
+    {
+        "names": "CH 649957-TOYOTA HILUX-PRO-PME",
+        "create_at": "2026-01-13T23:00:00.000Z",
+        "ids": "277",
+        "groupid": 1
+    },
+    {
+        "names": "V596M-VL- NDJAH - YCDV NEW 140",
+        "create_at": "2026-01-14T23:00:00.000Z",
+        "ids": "279",
+        "groupid": 1
+    },
+    {
+        "names": "V492E-FORT-BASILE ATEB",
+        "create_at": "2026-01-14T23:00:00.000Z",
+        "ids": "280",
+        "groupid": 1
+    },
+    {
+        "names": "V492E-FORT-BASILE ATEB OLDA",
+        "create_at": "2026-01-14T23:00:00.000Z",
+        "ids": "281",
+        "groupid": 1
+    },
+    {
+        "names": "V497N-LCRUIS-D'ENT-NGUEMO ERIC NEW 140",
+        "create_at": "2026-01-15T23:00:00.000Z",
+        "ids": "282",
+        "groupid": 1
+    },
+    {
+        "names": "V52N-RAZEL",
+        "create_at": "2026-01-15T23:00:00.000Z",
+        "ids": "283",
+        "groupid": 1
+    },
+    {
+        "names": "V541M-VL- RAZEL",
+        "create_at": "2026-01-18T23:00:00.000Z",
+        "ids": "285",
+        "groupid": 1
+    },
+    {
+        "names": "VB04J-RAZEL",
+        "create_at": "2026-01-11T23:00:00.000Z",
+        "ids": "286",
+        "groupid": 1
+    },
+    {
+        "names": "V183G-VL- MBELECK MERIMEE",
+        "create_at": "2026-01-08T23:00:00.000Z",
+        "ids": "263",
+        "groupid": 1
+    },
+    {
+        "names": "V196G-RAZEL",
+        "create_at": "2026-01-13T23:00:00.000Z",
+        "ids": "275",
+        "groupid": 1
+    },
+    {
+        "names": "V521J-VL- MICHAEL",
+        "create_at": "2026-01-01T23:00:00.000Z",
+        "ids": "259",
+        "groupid": 1
+    },
+    {
+        "names": "V176G-VL- PRINCE",
+        "create_at": "2025-12-22T23:00:00.000Z",
+        "ids": "249",
+        "groupid": 1
+    },
+    {
+        "names": "V303I-VL-TOPO - SIMBOCK -EVOUNA JUSTIN",
+        "create_at": "2026-01-09T23:00:00.000Z",
+        "ids": "271",
+        "groupid": 1
+    },
+    {
+        "names": "V509G-VL- PISTE - MATHIEU",
+        "create_at": "2026-01-09T23:00:00.000Z",
+        "ids": "272",
+        "groupid": 1
+    },
+    {
+        "names": "V307I-VL-YCDV- LEBONGO CHRISTIAN",
+        "create_at": "2026-01-08T23:00:00.000Z",
+        "ids": "264",
+        "groupid": 1
+    },
+    {
+        "names": "VL40K- RAZEL",
+        "create_at": "2026-01-20T23:00:00.000Z",
+        "ids": "292",
+        "groupid": 1
+    },
+    {
+        "names": "V559L-VL RAZEL",
+        "create_at": "2026-01-20T23:00:00.000Z",
+        "ids": "293",
+        "groupid": 1
+    },
+    {
+        "names": "V395G-VL- RAZEL",
+        "create_at": "2026-01-22T23:00:00.000Z",
+        "ids": "294",
+        "groupid": 1
+    },
+    {
+        "names": "V737A-RENAULT KERAX-RAZEL",
+        "create_at": "2026-01-22T23:00:00.000Z",
+        "ids": "295",
+        "groupid": 1
+    },
+    {
+        "names": "VL41K-VL- RAZEL",
+        "create_at": "2026-01-22T23:00:00.000Z",
+        "ids": "296",
+        "groupid": 1
+    },
+    {
+        "names": "V170F-RAZEL",
+        "create_at": "2026-01-22T23:00:00.000Z",
+        "ids": "297",
+        "groupid": 1
+    }
+]
+
+Request URL
+http://localhost:8000/api/razel_dashboard/vehicles_group
+Request Method
+GET
+
+[
+    {
+        "ids": 1,
+        "names": "RAZEL CAMEROUN",
+        "create_at": "2025-07-28T11:25:48.574Z",
+        "actives": "1"
+    },
+    {
+        "ids": 16,
+        "names": "RAZEL  TCHAD",
+        "create_at": "2025-07-28T15:46:44.068Z",
+        "actives": "1"
+    }
+]
+
+Request URL
+http://localhost:8000/api/razel_dashboard/heuremoteur?date1=2026-01-01&date2=2026-01-20&vehicle=%5B%2244%22%2C%2211%22%2C%2279%22%2C%2247%22%2C%22137%22%2C%226%22%2C%22122%22%2C%22163%22%2C%22164%22%5D&groupBy=day&weekDays=%5B1%2C2%2C4%2C3%5D
+Request Method
+GET
+Status Code
+304 Not Modified
+Remote Address
+[::1]:8000
+
+
+{
+    "engineData": [
+        {
+            "name": "lun. 5",
+            "stops": "07:44:05",
+            "usage": "10:14:13"
+        },
+        {
+            "name": "mar. 6",
+            "stops": "06:20:58",
+            "usage": "17:39:41"
+        },
+        {
+            "name": "mer. 7",
+            "stops": "03:43:58",
+            "usage": "10:14:43"
+        },
+        {
+            "name": "jeu. 8",
+            "stops": "04:28:20",
+            "usage": "15:36:21"
+        },
+        {
+            "name": "lun. 12",
+            "stops": "01:42:38",
+            "usage": "14:02:59"
+        },
+        {
+            "name": "mar. 13",
+            "stops": "03:32:36",
+            "usage": "18:13:33"
+        },
+        {
+            "name": "mer. 14",
+            "stops": "03:05:41",
+            "usage": "17:08:01"
+        },
+        {
+            "name": "jeu. 15",
+            "stops": "02:44:04",
+            "usage": "26:57:57"
+        },
+        {
+            "name": "lun. 19",
+            "stops": "04:05:51",
+            "usage": "19:59:38"
+        },
+        {
+            "name": "mar. 20",
+            "stops": "03:13:43",
+            "usage": "09:09:56"
+        }
+    ],
+    "engineDataPercentage": [
+        {
+            "name": "lun. 5",
+            "stops": 43,
+            "usage": 57
+        },
+        {
+            "name": "mar. 6",
+            "stops": 26,
+            "usage": 74
+        },
+        {
+            "name": "mer. 7",
+            "stops": 27,
+            "usage": 73
+        },
+        {
+            "name": "jeu. 8",
+            "stops": 22,
+            "usage": 78
+        },
+        {
+            "name": "lun. 12",
+            "stops": 11,
+            "usage": 89
+        },
+        {
+            "name": "mar. 13",
+            "stops": 16,
+            "usage": 84
+        },
+        {
+            "name": "mer. 14",
+            "stops": 15,
+            "usage": 85
+        },
+        {
+            "name": "jeu. 15",
+            "stops": 9,
+            "usage": 91
+        },
+        {
+            "name": "lun. 19",
+            "stops": 17,
+            "usage": 83
+        },
+        {
+            "name": "mar. 20",
+            "stops": 26,
+            "usage": 74
+        }
+    ],
+    "DaylyConsommationData": [
+        {
+            "name": "lun. 5",
+            "daylyConsom": 26.5
+        },
+        {
+            "name": "mar. 6",
+            "daylyConsom": 13.5
+        },
+        {
+            "name": "mer. 7",
+            "daylyConsom": 6.5
+        },
+        {
+            "name": "jeu. 8",
+            "daylyConsom": 28.5
+        },
+        {
+            "name": "lun. 12",
+            "daylyConsom": 0
+        },
+        {
+            "name": "mar. 13",
+            "daylyConsom": 0
+        },
+        {
+            "name": "mer. 14",
+            "daylyConsom": 0
+        },
+        {
+            "name": "jeu. 15",
+            "daylyConsom": 0
+        },
+        {
+            "name": "lun. 19",
+            "daylyConsom": 13.5
+        },
+        {
+            "name": "mar. 20",
+            "daylyConsom": 0
+        }
+    ],
+    "dureeDistanceparcouru": [
+        {
+            "name": "lun. 5",
+            "duration": "10:14:13",
+            "distance": 287.68
+        },
+        {
+            "name": "mar. 6",
+            "duration": "17:39:41",
+            "distance": 537.83
+        },
+        {
+            "name": "mer. 7",
+            "duration": "10:14:43",
+            "distance": 210.41
+        },
+        {
+            "name": "jeu. 8",
+            "duration": "15:36:21",
+            "distance": 357.69
+        },
+        {
+            "name": "lun. 12",
+            "duration": "14:02:59",
+            "distance": 372.41
+        },
+        {
+            "name": "mar. 13",
+            "duration": "18:13:33",
+            "distance": 530.61
+        },
+        {
+            "name": "mer. 14",
+            "duration": "17:08:01",
+            "distance": 439.23
+        },
+        {
+            "name": "jeu. 15",
+            "duration": "26:57:57",
+            "distance": 1239.73
+        },
+        {
+            "name": "lun. 19",
+            "duration": "19:59:38",
+            "distance": 534.98
+        },
+        {
+            "name": "mar. 20",
+            "duration": "09:09:56",
+            "distance": 290.37
+        }
+    ],
+    "DistanConsommation": [
+        {
+            "name": "lun. 5",
+            "consumption": 26.5,
+            "distance": 287.68
+        },
+        {
+            "name": "mar. 6",
+            "consumption": 13.5,
+            "distance": 537.83
+        },
+        {
+            "name": "mer. 7",
+            "consumption": 6.5,
+            "distance": 210.41
+        },
+        {
+            "name": "jeu. 8",
+            "consumption": 28.5,
+            "distance": 357.69
+        },
+        {
+            "name": "lun. 12",
+            "consumption": 0,
+            "distance": 372.41
+        },
+        {
+            "name": "mar. 13",
+            "consumption": 0,
+            "distance": 530.61
+        },
+        {
+            "name": "mer. 14",
+            "consumption": 0,
+            "distance": 439.23
+        },
+        {
+            "name": "jeu. 15",
+            "consumption": 0,
+            "distance": 1239.73
+        },
+        {
+            "name": "lun. 19",
+            "consumption": 13.5,
+            "distance": 534.98
+        },
+        {
+            "name": "mar. 20",
+            "consumption": 0,
+            "distance": 290.37
+        }
+    ],
+    "hundredKmConsumption": [
+        {
+            "name": "lun. 5",
+            "value": 9.21
+        },
+        {
+            "name": "mar. 6",
+            "value": 2.51
+        },
+        {
+            "name": "mer. 7",
+            "value": 3.09
+        },
+        {
+            "name": "jeu. 8",
+            "value": 7.97
+        },
+        {
+            "name": "lun. 12",
+            "value": 0
+        },
+        {
+            "name": "mar. 13",
+            "value": 0
+        },
+        {
+            "name": "mer. 14",
+            "value": 0
+        },
+        {
+            "name": "jeu. 15",
+            "value": 0
+        },
+        {
+            "name": "lun. 19",
+            "value": 2.52
+        },
+        {
+            "name": "mar. 20",
+            "value": 0
+        }
+    ],
+    "ratioConsumption": [
+        {
+            "name": "lun. 5",
+            "value": 2.59
+        },
+        {
+            "name": "mar. 6",
+            "value": 0.76
+        },
+        {
+            "name": "mer. 7",
+            "value": 0.63
+        },
+        {
+            "name": "jeu. 8",
+            "value": 1.83
+        },
+        {
+            "name": "lun. 12",
+            "value": 0
+        },
+        {
+            "name": "mar. 13",
+            "value": 0
+        },
+        {
+            "name": "mer. 14",
+            "value": 0
+        },
+        {
+            "name": "jeu. 15",
+            "value": 0
+        },
+        {
+            "name": "lun. 19",
+            "value": 0.68
+        },
+        {
+            "name": "mar. 20",
+            "value": 0
+        }
+    ],
+    "speeding": [
+        {
+            "name": "lun. 5",
+            "value": 2
+        },
+        {
+            "name": "mar. 6",
+            "value": 3
+        },
+        {
+            "name": "mer. 7",
+            "value": 2
+        },
+        {
+            "name": "jeu. 8",
+            "value": 2
+        },
+        {
+            "name": "lun. 12",
+            "value": 1
+        },
+        {
+            "name": "mar. 13",
+            "value": 2
+        },
+        {
+            "name": "mer. 14",
+            "value": 3
+        },
+        {
+            "name": "jeu. 15",
+            "value": 3
+        },
+        {
+            "name": "lun. 19",
+            "value": 3
+        },
+        {
+            "name": "mar. 20",
+            "value": 2
+        }
+    ]
+}
+Request URL
+http://localhost:8000/api/razel_dashboard/exceptions?date1=2026-01-01&date2=2026-01-20&vehicle=%5B%2244%22%2C%2211%22%2C%2279%22%2C%2247%22%2C%22137%22%2C%226%22%2C%22122%22%2C%22163%22%2C%22164%22%5D&groupBy=day&weekDays=%5B1%2C2%2C4%2C3%5D
+Request Method
+GET
+Status Code
+304 Not Modified
+Remote Address
+[::1]:8000
+
+{
+    "speeding": [
+        {
+            "name": "lun. 5",
+            "value": 37
+        },
+        {
+            "name": "mar. 6",
+            "value": 97
+        },
+        {
+            "name": "mer. 7",
+            "value": 32
+        },
+        {
+            "name": "jeu. 8",
+            "value": 37
+        },
+        {
+            "name": "lun. 12",
+            "value": 86
+        },
+        {
+            "name": "mar. 13",
+            "value": 110
+        },
+        {
+            "name": "mer. 14",
+            "value": 94
+        },
+        {
+            "name": "jeu. 15",
+            "value": 68
+        },
+        {
+            "name": "lun. 19",
+            "value": 89
+        },
+        {
+            "name": "mar. 20",
+            "value": 73
+        }
+    ],
+    "harshAccelerationBraking": [
+        {
+            "name": "lun. 5",
+            "acceleration": 0,
+            "braking": 1
+        },
+        {
+            "name": "mar. 6",
+            "acceleration": 1,
+            "braking": 25
+        },
+        {
+            "name": "mer. 7",
+            "acceleration": 0,
+            "braking": 0
+        },
+        {
+            "name": "jeu. 8",
+            "acceleration": 0,
+            "braking": 3
+        },
+        {
+            "name": "lun. 12",
+            "acceleration": 1,
+            "braking": 10
+        },
+        {
+            "name": "mar. 13",
+            "acceleration": 1,
+            "braking": 10
+        },
+        {
+            "name": "mer. 14",
+            "acceleration": 0,
+            "braking": 15
+        },
+        {
+            "name": "jeu. 15",
+            "acceleration": 0,
+            "braking": 71
+        },
+        {
+            "name": "lun. 19",
+            "acceleration": 2,
+            "braking": 15
+        },
+        {
+            "name": "mar. 20",
+            "acceleration": 0,
+            "braking": 4
+        }
+    ]
+}

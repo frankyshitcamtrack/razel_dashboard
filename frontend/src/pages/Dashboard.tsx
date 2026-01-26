@@ -1,6 +1,6 @@
 import Sidebar from "../components/layout/SideBar";
 import GlobalFilterBar from "../components/filters/GlobalFilterBars";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 //import CustomBarChart from "../components/charts/BarChart";
 import { useFilters } from "../store/GlobalFiltersContext";
 import PieChartComponent from "../components/charts/PieChart";
@@ -22,6 +22,14 @@ const Dashboard = () => {
     const [filterGlobalExpanded, setFilterGlobalExpanded] = useState(false);
     const { data, isLoading } = useHeureMoteurData(filters);
     const { data: exceptions } = useExceptions(filters);
+
+    useEffect(() => {
+        if (data) {
+            console.log('Dashboard data:', data);
+            console.log('engineData:', data.engineData);
+            console.log('engineDataPercentage:', data.engineDataPercentage);
+        }
+    }, [data]);
 
     if (!isInitialized) {
         return (
@@ -90,31 +98,35 @@ const Dashboard = () => {
                             </>
                         ) : (
                             <>
-                                {data?.engineData && (
-                                    <StackedBarChart
-                                        data={data.engineData}
-                                        dataKey1="usage"
-                                        dataKey2="stops"
-                                        label1="Somme de Durée d'utilisation réelle"
-                                        label2="Somme de Arrêts moteur tournant"
-                                        color1="#002060"
-                                        color2="#FAA330"
-                                        valueType="time"
-                                        title=""
-                                    />
+                                {data?.engineData && data.engineData.length > 0 && (
+                                    <div key="engine-data">
+                                        <StackedBarChart
+                                            data={data.engineData}
+                                            dataKey1="usage"
+                                            dataKey2="stops"
+                                            label1="Somme de Durée d'utilisation réelle"
+                                            label2="Somme de Arrêts moteur tournant"
+                                            color1="#002060"
+                                            color2="#FAA330"
+                                            valueType="time"
+                                            title="Durée d'utilisation"
+                                        />
+                                    </div>
                                 )}
-                                {data?.engineDataPercentage && (
-                                    <StackedBarChart
-                                        data={data.engineDataPercentage}
-                                        dataKey1="usage"
-                                        dataKey2="stops"
-                                        label1="Somme de % temps d'utilisation réel"
-                                        label2="Somme de % Arrêts moteur tournant"
-                                        color1="#002060"
-                                        color2="#FAA330"
-                                        valueType="percentage"
-                                        title=""
-                                    />
+                                {data?.engineDataPercentage && data.engineDataPercentage.length > 0 && (
+                                    <div key="engine-percentage">
+                                        <StackedBarChart
+                                            data={data.engineDataPercentage}
+                                            dataKey1="usage"
+                                            dataKey2="stops"
+                                            label1="Somme de % temps d'utilisation réel"
+                                            label2="Somme de % Arrêts moteur tournant"
+                                            color1="#002060"
+                                            color2="#FAA330"
+                                            valueType="percentage"
+                                            title="% temps d'utilisation"
+                                        />
+                                    </div>
                                 )}
 
                                 {
@@ -153,16 +165,14 @@ const Dashboard = () => {
                                     )
                                 }
 
-                                {exceptions?.speeding && (
-
+                                {data?.hundredKmConsumption && (
                                     <CombinedChartComponent
-                                        data={exceptions.speeding}
+                                        data={data.hundredKmConsumption}
                                         title="Consommation au 100 Km"
                                         barDataKey=""
                                         barLabel=""
                                         lineDataKey="value"
-                                        lineLabel="Nombre d'excès de vitesse"
-                                        vehicleReference="VE38A"
+                                        lineLabel="L/100km"
                                     />
                                 )}
                                 {exceptions?.harshAccelerationBraking && (
@@ -176,25 +186,13 @@ const Dashboard = () => {
                                     />
                                 )}
                                 {exceptions?.speeding && (
-
                                     <CombinedChartComponent
                                         data={exceptions.speeding}
-                                        title="Consommation au 100 Km"
+                                        title="Excès de vitesse"
                                         barDataKey=""
                                         barLabel=""
                                         lineDataKey="value"
                                         lineLabel="Nombre d'excès de vitesse"
-                                        vehicleReference="VE38A"
-                                    />
-                                )}
-                                {exceptions?.harshAccelerationBraking && (
-                                    <CombinedChartComponent
-                                        data={exceptions.harshAccelerationBraking}
-                                        title="Freinage & Acceleration"
-                                        barDataKey="acceleration"
-                                        barLabel="Somme des Accelerations"
-                                        lineDataKey="braking"
-                                        lineLabel="Somme de Freinage"
                                     />
                                 )}
                             </>
