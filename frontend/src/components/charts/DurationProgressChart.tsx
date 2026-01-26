@@ -42,22 +42,49 @@ const DurationProgressChart: React.FC<DurationProgressChartProps> = ({ data, tit
         return acc;
     }, {});
 
-    // Ensure minimum 4 references per group by adding dummy entries
+    // Ensure minimum 5 references per group by adding dummy entries with centering
     Object.keys(processedData).forEach(baseName => {
         const vehicles = Object.values(processedData[baseName]);
         const currentCount = vehicles.length;
         
-        if (currentCount < 4) {
-            const neededDummies = 4 - currentCount;
-            for (let i = 0; i < neededDummies; i++) {
-                const dummyKey = `dummy_${i}`;
+        if (currentCount < 5) {
+            const neededDummies = 5 - currentCount;
+            const dummiesBefore = Math.floor(neededDummies / 2);
+            const dummiesAfter = neededDummies - dummiesBefore;
+            
+            // Add dummies before
+            for (let i = 0; i < dummiesBefore; i++) {
+                const dummyKey = `dummy_before_${i}`;
                 processedData[baseName][dummyKey] = {
                     reference: '•',
                     totalSeconds: 0,
                     baseName: baseName,
-                    isDummy: true
+                    isDummy: true,
+                    order: -1000 - i
                 };
             }
+            
+            // Add order to real vehicles
+            vehicles.forEach((vehicle: any, index: number) => {
+                vehicle.order = index;
+            });
+            
+            // Add dummies after
+            for (let i = 0; i < dummiesAfter; i++) {
+                const dummyKey = `dummy_after_${i}`;
+                processedData[baseName][dummyKey] = {
+                    reference: '•',
+                    totalSeconds: 0,
+                    baseName: baseName,
+                    isDummy: true,
+                    order: 1000 + i
+                };
+            }
+        } else {
+            // Add order to vehicles when no dummies needed
+            vehicles.forEach((vehicle: any, index: number) => {
+                vehicle.order = index;
+            });
         }
     });
 
@@ -108,7 +135,12 @@ const DurationProgressChart: React.FC<DurationProgressChartProps> = ({ data, tit
                 
                 <div className="space-y-0 relative z-10">
                     {Object.entries(processedData).map(([baseName, vehicles]: [string, any], groupIndex: number) => {
-                        const sortedVehicles = Object.values(vehicles).sort((a: any, b: any) => b.totalSeconds - a.totalSeconds);
+                        const sortedVehicles = Object.values(vehicles).sort((a: any, b: any) => {
+                            if (a.isDummy && b.isDummy) return a.order - b.order;
+                            if (a.isDummy) return a.order < 0 ? -1 : 1;
+                            if (b.isDummy) return b.order < 0 ? 1 : -1;
+                            return b.totalSeconds - a.totalSeconds;
+                        });
                         const groupHeight = sortedVehicles.length * 24;
                         
                         return (
@@ -137,7 +169,7 @@ const DurationProgressChart: React.FC<DurationProgressChartProps> = ({ data, tit
                                             const durationStr = vehicle.isDummy ? '00:00:00' : secondsToTime(vehicle.totalSeconds);
                                             
                                             return (
-                                                <div key={`${vehicle.reference}-${vehicle.isDummy ? 'dummy' : 'real'}`} className="flex items-center h-6">
+                                                <div key={`${vehicle.reference}-${vehicle.isDummy ? 'dummy' : 'real'}`} className="flex items-center h-6" style={{ visibility: vehicle.isDummy ? 'hidden' : 'visible' }}>
                                                     <div className="w-12 text-xs text-gray-600 text-right pr-2 truncate">
                                                         {vehicle.reference}
                                                     </div>
@@ -160,11 +192,6 @@ const DurationProgressChart: React.FC<DurationProgressChartProps> = ({ data, tit
                                                                     className="absolute top-0 text-black text-xs font-medium h-5 flex items-center pl-1"
                                                                     style={{ left: `${Math.max(percentage, 2)}%` }}
                                                                 >
-                                                                    {durationStr}
-                                                                </span>
-                                                            )}
-                                                            {vehicle.isDummy && (
-                                                                <span className="absolute top-0 left-2 text-gray-400 text-xs font-medium h-5 flex items-center">
                                                                     {durationStr}
                                                                 </span>
                                                             )}
