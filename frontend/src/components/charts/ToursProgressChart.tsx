@@ -1,0 +1,196 @@
+import React from 'react';
+
+interface ToursProgressChartProps {
+    data: any[];
+    title: string;
+}
+
+const ToursProgressChart: React.FC<ToursProgressChartProps> = ({ data, title }) => {
+    // Group and sum data by base name and vehicle reference
+    const processedData = data.reduce((acc: any, item) => {
+        const parts = item.name.split(' - ');
+        const vehicleRef = parts[1]?.split('-')[0] || 'REF';
+        const baseName = parts[2] || 'BASE';
+        
+        if (!acc[baseName]) {
+            acc[baseName] = {};
+        }
+        
+        if (!acc[baseName][vehicleRef]) {
+            acc[baseName][vehicleRef] = {
+                reference: vehicleRef,
+                totalTours: 0,
+                baseName: baseName
+            };
+        }
+        
+        acc[baseName][vehicleRef].totalTours += parseInt(item.nombre_tours);
+        return acc;
+    }, {});
+
+    // Ensure minimum 4 references per group by adding dummy entries
+    Object.keys(processedData).forEach(baseName => {
+        const vehicles = Object.values(processedData[baseName]);
+        const currentCount = vehicles.length;
+        
+        if (currentCount < 4) {
+            const neededDummies = 4 - currentCount;
+            for (let i = 0; i < neededDummies; i++) {
+                const dummyKey = `dummy_${i}`;
+                processedData[baseName][dummyKey] = {
+                    reference: '•',
+                    totalTours: 0,
+                    baseName: baseName,
+                    isDummy: true
+                };
+            }
+        }
+    });
+
+    // Get max tours and total bars count
+    const allTours = Object.values(processedData).flatMap((base: any) => 
+        Object.values(base).filter((item: any) => !item.isDummy).map((item: any) => item.totalTours)
+    );
+    const maxTours = Math.max(...allTours);
+    const totalGroups = Object.keys(processedData).length;
+    const barWidth = Math.max(12, Math.min(25, (400 / (totalGroups * 4))));
+    const chartHeight = Math.max(250, Math.min(400, 300));
+
+    // Generate tours scale marks for left axis
+    const generateToursMarks = () => {
+        const marks = [];
+        const step = Math.max(1, Math.floor(maxTours / 6));
+        
+        for (let i = maxTours; i >= 0; i -= step) {
+            marks.push(i.toString());
+        }
+        return marks;
+    };
+
+    const toursMarks = generateToursMarks();
+
+    return (
+        <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">{title}</h3>
+            </div>
+            
+            <div className="flex">
+                {/* Left axis - numeric values */}
+                <div className="w-12 flex flex-col justify-between flex-shrink-0" style={{ height: `${chartHeight}px` }}>
+                    {toursMarks.map((mark, index) => (
+                        <span key={index} className="text-xs text-gray-500 text-right">{mark}</span>
+                    ))}
+                </div>
+                
+                {/* Chart area */}
+                <div className="flex-1 relative" style={{ height: `${chartHeight}px` }}>
+                    {/* Horizontal grid lines */}
+                    <div className="absolute inset-0">
+                        {toursMarks.map((_, index) => {
+                            const position = (index / (toursMarks.length - 1)) * 100;
+                            return (
+                                <div 
+                                    key={index}
+                                    className="absolute left-0 right-0 border-t border-dashed border-gray-200"
+                                    style={{ top: `${position}%` }}
+                                />
+                            );
+                        })}
+                    </div>
+                    
+                    {/* Bars */}
+                    <div className="absolute bottom-0 left-0 flex items-end" style={{ paddingLeft: '20px' }}>
+                        {Object.entries(processedData).map(([baseName, vehicles]: [string, any]) => {
+                            const sortedVehicles = Object.values(vehicles).sort((a: any, b: any) => b.totalTours - a.totalTours);
+                            const groupWidth = 4 * (barWidth + 2) - 2;
+                            
+                            return (
+                                <div key={baseName} className="flex items-end" style={{ gap: '2px', width: `${groupWidth}px`, marginRight: '20px' }}>
+                                    {sortedVehicles.map((vehicle: any) => {
+                                        const percentage = vehicle.isDummy ? 0 : (vehicle.totalTours / maxTours) * 100;
+                                        
+                                        return (
+                                            <div key={`${vehicle.reference}-${vehicle.isDummy ? 'dummy' : 'real'}`} className="flex flex-col items-center">
+                                                <div className="relative">
+                                                    {!vehicle.isDummy ? (
+                                                        <div 
+                                                            className="bg-orange-400 relative"
+                                                            style={{ 
+                                                                width: `${barWidth}px`,
+                                                                height: `${Math.max((percentage * chartHeight) / 100, 6)}px` 
+                                                            }}
+                                                        >
+                                                            <span className="absolute -top-5 left-1/2 transform -translate-x-1/2 text-xs font-medium text-black">
+                                                                {vehicle.totalTours}
+                                                            </span>
+                                                        </div>
+                                                    ) : (
+                                                        <div 
+                                                            className="bg-gray-200 relative"
+                                                            style={{ 
+                                                                width: `${barWidth}px`,
+                                                                height: '6px' 
+                                                            }}
+                                                        >
+                                                            <span className="absolute -top-5 left-1/2 transform -translate-x-1/2 text-xs font-medium text-gray-400">
+                                                                0
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            </div>
+            
+            {/* Bottom axis - vehicle references and base names */}
+            <div className="flex mt-2">
+                <div className="w-12 flex-shrink-0"></div>
+                <div className="flex" style={{ paddingLeft: '20px' }}>
+                    {Object.entries(processedData).map(([baseName, vehicles]: [string, any], groupIndex: number) => {
+                        const sortedVehicles = Object.values(vehicles).sort((a: any, b: any) => b.totalTours - a.totalTours);
+                        const groupWidth = 4 * (barWidth + 2) - 2;
+                        
+                        return (
+                            <div key={baseName} className="flex flex-col relative" style={{ width: `${groupWidth}px`, marginRight: '20px' }}>
+                                {groupIndex > 0 && (
+                                    <div className="absolute left-0 top-0 border-l-2 border-gray-400" style={{ left: '-10px', height: '40px' }}></div>
+                                )}
+                                <div className="flex" style={{ gap: '2px' }}>
+                                    {sortedVehicles.map((vehicle: any) => (
+                                        <div key={`${vehicle.reference}-${vehicle.isDummy ? 'dummy' : 'real'}`} className="flex flex-col items-center" style={{ width: `${barWidth}px` }}>
+                                            <span className="text-xs text-gray-600 text-center transform -rotate-90 whitespace-nowrap" style={{ height: '20px', lineHeight: '20px' }}>
+                                                {vehicle.reference}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="text-xs text-gray-700 font-medium text-center pt-3" 
+                                     style={{ 
+                                         fontSize: '10px',
+                                         lineHeight: '1.2'
+                                     }}>
+                                    {baseName.length > 15 ? baseName.substring(0, 15) + '...' : baseName}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+            
+            {data.length === 0 && (
+                <div className="flex justify-center items-center h-64 text-gray-500">
+                    Aucune donnée disponible
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default ToursProgressChart;

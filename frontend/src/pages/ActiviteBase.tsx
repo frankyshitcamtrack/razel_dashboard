@@ -2,8 +2,9 @@ import Sidebar from "../components/layout/SideBar";
 import { useState } from "react";
 import GlobalFilterBar from "../components/filters/GlobalFilterBars";
 import StackedBarChart from "../components/charts/StackedBarChart";
-import VerticalStackedBarChart from "../components/charts/VerticalStakedBarChart";
-import CustomBarChart from "../components/charts/BarChart"
+// import CustomBarChart from "../components/charts/BarChart"
+import DurationProgressChart from "../components/charts/DurationProgressChart";
+import ToursProgressChart from "../components/charts/ToursProgressChart";
 import { useTransitData } from "../hooks/useTransitData";
 import { useFilters } from "../store/GlobalFiltersContext";
 import { VehicleLoadingSpinner } from "../components/UI/LoadingSpinner";
@@ -55,30 +56,15 @@ const ActiviteBase = () => {
                         ) : (
                             <>
                                 {data?.DureeParBase && (
-                                    <VerticalStackedBarChart
+                                    <DurationProgressChart
                                         data={data.DureeParBase}
-                                        dataKey1="duree_totale"
-                                        //dataKey2="usage"
-                                        label1="Sommes de durée"
-                                        //label2="Durée"
-                                        //color1="#02509D"
-                                        color1="#f3992bff"
-                                        valueType="time"
                                         title="Durée/Base"
                                     />
                                 )}
                                 {data?.ToursParBase && (
-                                    <CustomBarChart
+                                    <ToursProgressChart
                                         data={data.ToursParBase}
-                                        dataKey1="nombre_tours"
-                                        //dataKey2="usage"
-                                        label1="Nombre de tours"
-                                        //label2="Durée d'utilisation"
-                                        color1="#f3992bff"
-                                        //color2="#02509D"
-
-                                        title="Nbre de tours/Bases
-"
+                                        title="Nbre de tours/Bases"
                                     />
                                 )}
                                 {data?.HistoriqueTransit && (

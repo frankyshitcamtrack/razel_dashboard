@@ -1,4 +1,14 @@
 import { PureComponent } from "react";
+import {
+    Bar,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer,
+    BarChart,
+    Cell
+} from "recharts";
 
 interface VerticalStackedBarChartProps {
     data: any[];
@@ -107,16 +117,14 @@ export default class VerticalStackedBarChart extends PureComponent<VerticalStack
         const {
             data,
             dataKey1,
-            dataKey2,
             label1,
-            color1 = "#3b82f6",
+            color1 = "#f3992bff",
             title = "Graphique empilé vertical",
         } = this.props;
 
-        // Vérification des données
         if (!data || data.length === 0) {
             return (
-                <div className="bg-white rounded-lg shadow p-2 flex flex-col h-[320px]">
+                <div className="bg-white rounded-lg shadow p-2 flex flex-col h-[400px]">
                     <h3 className="text-lg font-semibold text-gray-700 mb-4">{title}</h3>
                     <div className="flex-grow flex items-center justify-center">
                         <p className="text-gray-500">Aucune donnée disponible</p>
@@ -125,235 +133,117 @@ export default class VerticalStackedBarChart extends PureComponent<VerticalStack
             );
         }
 
-        // Prépare les données normalisées et groupées par base
-        // Aggregate data by vehicle code (sum across all days)
+        // Aggregate data by vehicle code
         const aggregatedData: { [key: string]: any } = {};
         
         data.forEach(item => {
             const vehicleCode = this.extractVehicleCode(item.name);
             const baseName = this.extractBaseName(item.name);
             
-            // Skip items that couldn't be properly parsed
             if (!vehicleCode || !baseName || vehicleCode === item.name) return;
             
-            // Create a unique key combining vehicle and base to avoid conflicts
             const uniqueKey = `${vehicleCode}-${baseName}`;
             
             if (!aggregatedData[uniqueKey]) {
                 aggregatedData[uniqueKey] = {
-                    name: uniqueKey,
-                    vehicleCode,
+                    name: vehicleCode,
                     baseName,
                     [dataKey1]: 0,
                 };
-                if (dataKey2) {
-                    aggregatedData[uniqueKey][dataKey2] = 0;
-                }
             }
             
-            // Sum the values
             aggregatedData[uniqueKey][dataKey1] += this.normalizeValue(item[dataKey1], dataKey1);
-            if (dataKey2 && item[dataKey2] !== undefined) {
-                aggregatedData[uniqueKey][dataKey2] += this.normalizeValue(item[dataKey2], dataKey2);
-            }
         });
 
-        // Convert to array and sort by base name, then by vehicle code
+        // Convert to array and sort
         const chartData = Object.values(aggregatedData)
-            .filter(item => item[dataKey1] > 0) // Only filter by actual data values
+            .filter(item => item[dataKey1] > 0)
             .sort((a, b) => {
                 const baseCompare = a.baseName.localeCompare(b.baseName);
                 if (baseCompare !== 0) return baseCompare;
-                return a.vehicleCode.localeCompare(b.vehicleCode);
+                return a.name.localeCompare(b.name);
             });
 
-
-
-        // Group data by base name for vertical labels with proper positioning
-        const baseGroupsMap: { [key: string]: { start: number; count: number; items: any[] } } = {};
-        chartData.forEach((item, index) => {
-            if (!baseGroupsMap[item.baseName]) {
-                baseGroupsMap[item.baseName] = { start: index, count: 0, items: [] };
-            }
-            baseGroupsMap[item.baseName].count++;
-            baseGroupsMap[item.baseName].items.push(item);
-        });
-
-
-
-        const maxValue = Math.max(...chartData.map(item => item[dataKey1]));
-        const barHeight = Math.max(18, Math.min(28, 220 / chartData.length)); // Increased minimum height
-        const chartHeight = chartData.length * barHeight;
+        // Custom Y-axis tick to show base names as separators
+        const CustomYAxisTick = (props: any) => {
+            const { x, y, payload } = props;
+            const item = chartData.find(d => d.name === payload.value);
+            const index = chartData.findIndex(d => d.name === payload.value);
+            const isFirstInGroup = index === 0 || chartData[index - 1].baseName !== item?.baseName;
+            
+            return (
+                <g transform={`translate(${x},${y})`}>
+                    {isFirstInGroup && (
+                        <text 
+                            x={-10} 
+                            y={-15} 
+                            textAnchor="end" 
+                            fill="#1F497D" 
+                            fontSize="10" 
+                            fontWeight="bold"
+                        >
+                            {item?.baseName}
+                        </text>
+                    )}
+                    <text 
+                        x={-5} 
+                        y={0} 
+                        dy={3} 
+                        textAnchor="end" 
+                        fill="#1F497D" 
+                        fontSize="11" 
+                        fontWeight="bold"
+                    >
+                        {payload.value}
+                    </text>
+                </g>
+            );
+        };
 
         return (
-            <div className="bg-white rounded-lg shadow p-2 flex flex-col h-[320px]">
+            <div className="bg-white rounded-lg shadow p-2 flex flex-col h-[400px]">
                 <div className="flex items-center justify-between mb-4">
                     <span className="text-sm font-normal" style={{ color: '#1F497D' }}>{label1}</span>
                     <h3 className="text-lg font-semibold text-center flex-1" style={{ color: '#1F497D' }}>{title}</h3>
                     <span className="invisible text-sm">{label1}</span>
                 </div>
-                <div className="flex-grow flex overflow-hidden">
-                    <div className="flex">
-                    {/* Base name labels with exact alignment */}
-                    <div className="flex flex-col" style={{ width: '80px', minWidth: '80px', position: 'relative' }}>
-                        {Object.entries(baseGroupsMap).map(([baseName, group]) => {
-                            const groupHeight = group.count * barHeight;
-                            const startPosition = group.start * barHeight;
-                            const fontSize = Math.max(8, Math.min(11, groupHeight / 10));
-                            
-                            return (
-                                <div 
-                                    key={baseName}
-                                    className="flex items-center justify-center" 
-                                    style={{ 
-                                        position: 'absolute',
-                                        top: `${startPosition}px`,
-                                        height: `${groupHeight}px`,
-                                        width: '80px',
-                                        fontSize: `${fontSize}px`,
-                                        color: '#1F497D', 
-                                        fontWeight: 'bold',
-                                        writingMode: 'vertical-rl',
-                                        textOrientation: 'mixed',
-                                        transform: 'rotate(180deg)',
-                                        overflow: 'hidden',
-                                        textAlign: 'center',
-                                        paddingRight: '2px'
-                                    }}
-                                >
-                                    {baseName}
-                                </div>
-                            );
-                        })}
-                        <div style={{ height: `${chartHeight}px` }}></div>
-                    </div>
-                    
-                    {/* Vehicle codes column - with clear separation */}
-                    <div className="flex flex-col" style={{ width: '60px', minWidth: '60px' }}>
-                        {chartData.map((item, index) => {
-                            const isFirstInGroup = index === 0 || chartData[index - 1].baseName !== item.baseName;
-                            const fontSize = Math.max(9, Math.min(12, barHeight * 0.4));
-                            
-                            return (
-                                <div 
-                                    key={item.vehicleCode}
-                                    className="flex items-center justify-end" 
-                                    style={{ 
-                                        height: `${barHeight}px`,
-                                        fontSize: `${fontSize}px`,
-                                        color: '#1F497D', 
-                                        fontWeight: 'bold',
-                                        borderTop: isFirstInGroup && index > 0 ? '3px solid #1F497D' : '1px solid #e5e7eb',
-                                        paddingRight: '4px',
-                                        paddingTop: '3px',
-                                        paddingBottom: '3px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'flex-end'
-                                    }}
-                                >
-                                    <span style={{ 
-                                        wordBreak: 'break-all',
-                                        textAlign: 'right',
-                                        lineHeight: '1.2'
-                                    }}>
-                                        {item.vehicleCode}
-                                    </span>
-                                </div>
-                            );
-                        })}
-                    </div>
-                    
-                    {/* Chart area with proper value positioning */}
-                    <div className="flex-1 overflow-hidden">
-                        <svg width="100%" height="100%" viewBox={`0 0 450 ${chartHeight + 40}`} preserveAspectRatio="xMidYMid meet">
-                            {/* Y-axis line */}
-                            <line
-                                x1={0}
-                                y1={20}
-                                x2={0}
-                                y2={chartHeight + 20}
-                                stroke="#9ca3af"
-                                strokeWidth={1}
+                <div className="flex-grow">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart
+                            layout="horizontal"
+                            data={chartData}
+                            margin={{ top: 20, right: 30, left: 80, bottom: 5 }}
+                        >
+                            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                            <XAxis 
+                                type="number" 
+                                tickFormatter={(value) => this.formatValue(value, dataKey1)}
+                                tick={{ fontSize: 10, fill: '#1F497D' }}
                             />
-                            
-                            {/* X-axis line */}
-                            <line
-                                x1={0}
-                                y1={chartHeight + 20}
-                                x2={350}
-                                y2={chartHeight + 20}
-                                stroke="#9ca3af"
-                                strokeWidth={1}
+                            <YAxis 
+                                type="category" 
+                                dataKey="name"
+                                tick={<CustomYAxisTick />}
+                                width={75}
                             />
-                            
-                            {/* Grid lines */}
-                            {[0, 1, 2, 3, 4].map(i => {
-                                const x = (i * 330 / 4);
-                                return (
-                                    <line
-                                        key={`grid-${i}`}
-                                        x1={x}
-                                        y1={20}
-                                        x2={x}
-                                        y2={chartHeight + 20}
-                                        stroke="#e5e7eb"
-                                        strokeDasharray="3 3"
-                                    />
-                                );
-                            })}
-                            
-                            {/* Bars and values */}
-                            {chartData.map((item, index) => {
-                                const y = 20 + index * barHeight;
-                                const barWidth = (item[dataKey1] / maxValue) * 330;
-                                
-                                return (
-                                    <g key={item.vehicleCode}>
-                                        {/* Bar */}
-                                        <rect
-                                            x={0}
-                                            y={y + 2}
-                                            width={barWidth}
-                                            height={barHeight - 4}
+                            <Tooltip 
+                                formatter={(value) => [this.formatValue(Number(value), dataKey1), label1]}
+                            />
+                            <Bar dataKey={dataKey1} fill={color1}>
+                                {chartData.map((entry, index) => {
+                                    const isFirstInGroup = index === 0 || chartData[index - 1].baseName !== entry.baseName;
+                                    return (
+                                        <Cell 
+                                            key={`cell-${index}`} 
                                             fill={color1}
+                                            stroke={isFirstInGroup && index > 0 ? '#1F497D' : 'none'}
+                                            strokeWidth={isFirstInGroup && index > 0 ? 2 : 0}
                                         />
-                                        
-                                        {/* Value label */}
-                                        <text
-                                            x={Math.min(barWidth + 5, 400)}
-                                            y={y + barHeight / 2}
-                                            dominantBaseline="middle"
-                                            fontSize="9"
-                                            fill="#1F497D"
-                                            fontWeight="bold"
-                                        >
-                                            {this.formatValue(item[dataKey1], dataKey1)}
-                                        </text>
-                                    </g>
-                                );
-                            })}
-                            
-                            {/* X-axis labels */}
-                            {[0, 1, 2, 3, 4].map(i => {
-                                const x = (i * 330 / 4);
-                                const value = (i * maxValue / 4);
-                                return (
-                                    <text
-                                        key={`x-label-${i}`}
-                                        x={x}
-                                        y={chartHeight + 35}
-                                        textAnchor="middle"
-                                        fontSize="10"
-                                        fill="#1F497D"
-                                    >
-                                        {this.formatValue(value, dataKey1)}
-                                    </text>
-                                );
-                            })}
-                        </svg>
-                    </div>
-                    </div>
+                                    );
+                                })}
+                            </Bar>
+                        </BarChart>
+                    </ResponsiveContainer>
                 </div>
             </div>
         );
