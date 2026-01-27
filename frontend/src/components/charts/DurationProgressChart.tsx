@@ -212,10 +212,19 @@ const DurationProgressChart: React.FC<DurationProgressChartProps> = ({ data, tit
             <div className="flex items-center mt-2">
                 <div className="w-24"></div>
                 <div className="w-12"></div>
-                <div className="flex-1 flex justify-between text-xs text-gray-500">
-                    {timeMarks.map((mark, index) => (
-                        <span key={index}>{mark}</span>
-                    ))}
+                <div className="flex-1 relative">
+                    {timeMarks.map((mark, index) => {
+                        const position = (index / (timeMarks.length - 1)) * 100;
+                        return (
+                            <span 
+                                key={index} 
+                                className="absolute text-xs text-gray-500 transform -translate-x-1/2"
+                                style={{ left: `${position}%` }}
+                            >
+                                {mark}
+                            </span>
+                        );
+                    })}
                 </div>
             </div>
             

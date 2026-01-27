@@ -340,43 +340,52 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                     </ResponsiveContainer>
                     {/* Time range labels - only show if dates exist */}
                     {hasDateFields && (
-                        <div className="flex relative" style={{ height: '30px', marginTop: '-65px', marginLeft: '20px', marginRight: '30px' }}>
-                            {chartData.map((item: any, index: number) => {
-                                const widthPercent = (1 / chartData.length) * 100;
-                                const leftPercent = (index / chartData.length) * 100;
-                                // Responsive font size based on number of items
-                                const fontSize = chartData.length > 5 ? '8px' : chartData.length > 3 ? '9px' : '10px';
-                                return (
-                                    <div
-                                        key={`time-${item.vehicleCode}`}
-                                        className="flex items-center justify-center"
-                                        style={{
-                                            position: 'absolute',
-                                            left: `${leftPercent}%`,
-                                            width: `${widthPercent}%`,
-                                            fontSize: fontSize,
-                                            color: '#1F497D',
-                                            fontWeight: '600',
-                                            overflow: 'hidden',
-                                            textAlign: 'center',
-                                            lineHeight: '1.1',
-                                            wordBreak: 'break-word',
-                                            hyphens: 'auto'
-                                        }}
-                                    >
-                                        {item.timeRange}
-                                    </div>
-                                );
-                            })}
+                        <div className="relative" style={{ height: '60px', marginTop: '-95px' }}>
+                            <div className="absolute inset-0" style={{ left: '80px', right: '40px' }}>
+                                {chartData.map((item: any, index: number) => {
+                                    const totalWidth = 100;
+                                    const itemWidth = (1 / chartData.length) * totalWidth;
+                                    const leftPosition = (index / chartData.length) * totalWidth;
+                                    const fontSize = chartData.length > 4 ? '8px' : '9px';
+                                    
+                                    // Split time range into parts
+                                    const timeRange = item.timeRange || '';
+                                    const parts = timeRange.split(' à ');
+                                    const startTime = parts[0] || '';
+                                    const endTime = parts[1] || '';
+                                    
+                                    return (
+                                        <div
+                                            key={`time-${item.vehicleCode}`}
+                                            className="absolute flex flex-col items-center justify-center"
+                                            style={{
+                                                left: `${leftPosition}%`,
+                                                width: `${itemWidth}%`,
+                                                height: '60px',
+                                                fontSize: fontSize,
+                                                color: '#000000',
+                                                fontWeight: '600',
+                                                textAlign: 'center',
+                                                lineHeight: '1.2',
+                                                padding: '0 1px'
+                                            }}
+                                        >
+                                            <div>{startTime}</div>
+                                            <div style={{ fontSize: '7px' }}>à</div>
+                                            <div>{endTime}</div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </div>
                     )}
                     {/* Base name labels with exact chart alignment */}
-                    <div className="relative" style={{ height: '40px', marginTop: hasDateFields ? '5px' : '-35px' }}>
-                        <div className="absolute inset-x-0" style={{ left: '50px', right: '50px' }}>
+                    <div className="relative" style={{ height: '40px', marginTop: hasDateFields ? '35px' : '-35px' }}>
+                        <div className="absolute inset-0" style={{ left: '80px', right: '40px' }}>
                             {baseGroups.map(([baseName, groupInfo]) => {
-                                const barSpacing = 100 / chartData.length; // Equal spacing for each bar
-                                const leftPosition = groupInfo.start * barSpacing;
-                                const width = groupInfo.count * barSpacing;
+                                const totalWidth = 100;
+                                const groupWidth = (groupInfo.count / chartData.length) * totalWidth;
+                                const leftPosition = (groupInfo.start / chartData.length) * totalWidth;
                                 
                                 return (
                                     <div
@@ -384,13 +393,12 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                                         className="absolute flex items-center justify-center"
                                         style={{
                                             left: `${leftPosition}%`,
-                                            width: `${width}%`,
+                                            width: `${groupWidth}%`,
                                             height: '40px',
                                             fontSize: '9px',
                                             color: '#1F497D',
                                             fontWeight: 'bold',
                                             borderLeft: groupInfo.start > 0 ? '2px solid #1F497D' : 'none',
-                                            overflow: 'hidden',
                                             textAlign: 'center',
                                             padding: '0 2px',
                                             lineHeight: '1.2'

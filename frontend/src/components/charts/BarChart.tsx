@@ -159,7 +159,7 @@ const CustomBarChart: React.FC<BarChartProps> = ({
                         <Tooltip />
                         <Legend />
                         <Bar yAxisId="left" dataKey={dataKey1} name={label1} fill={color1} >
-                            <LabelList dataKey={dataKey1} position="center" fill="#1F497D" fontSize={12} fontWeight="bold" />
+                            <LabelList dataKey={dataKey1} position="center" fill="white" fontSize={12} fontWeight="bold" />
                         </Bar>
                         {dataKey2 && (
                             <Bar yAxisId="left" dataKey={dataKey2} name={label2} fill={color2} >
