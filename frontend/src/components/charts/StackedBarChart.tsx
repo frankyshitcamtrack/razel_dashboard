@@ -340,7 +340,7 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                     </ResponsiveContainer>
                     {/* Time range labels - only show if dates exist */}
                     {hasDateFields && (
-                        <div className="flex relative" style={{ height: '20px', marginTop: '-55px', marginLeft: '20px', marginRight: '30px' }}>
+                        <div className="flex relative" style={{ height: '30px', marginTop: '-65px', marginLeft: '20px', marginRight: '30px' }}>
                             {chartData.map((item: any, index: number) => {
                                 const widthPercent = (1 / chartData.length) * 100;
                                 const leftPercent = (index / chartData.length) * 100;
@@ -358,8 +358,10 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                                             color: '#1F497D',
                                             fontWeight: '600',
                                             overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                            whiteSpace: 'nowrap',
+                                            textAlign: 'center',
+                                            lineHeight: '1.1',
+                                            wordBreak: 'break-word',
+                                            hyphens: 'auto'
                                         }}
                                     >
                                         {item.timeRange}

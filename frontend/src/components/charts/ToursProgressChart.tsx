@@ -28,50 +28,58 @@ const ToursProgressChart: React.FC<ToursProgressChartProps> = ({ data, title }) 
         return acc;
     }, {});
 
-    // Ensure minimum 5 references per group by adding dummy entries with centering
+    // Add dummy entries for centering based on count
     Object.keys(processedData).forEach(baseName => {
         const vehicles = Object.values(processedData[baseName]);
         const currentCount = vehicles.length;
         
-        if (currentCount < 5) {
-            const neededDummies = 5 - currentCount;
-            const dummiesBefore = Math.floor(neededDummies / 2);
-            const dummiesAfter = neededDummies - dummiesBefore;
-            
-            // Add dummies before
-            for (let i = 0; i < dummiesBefore; i++) {
-                const dummyKey = `dummy_before_${i}`;
-                processedData[baseName][dummyKey] = {
-                    reference: '•',
-                    totalTours: 0,
-                    baseName: baseName,
-                    isDummy: true,
-                    order: -1000 - i
+        if (currentCount === 1) {
+            // 3 left, 1 right
+            for (let i = 0; i < 3; i++) {
+                processedData[baseName][`dummy_left_${i}`] = {
+                    reference: '•', totalTours: 0, baseName, isDummy: true, order: -1000 - i
                 };
             }
-            
-            // Add order to real vehicles
-            vehicles.forEach((vehicle: any, index: number) => {
-                vehicle.order = index;
-            });
-            
-            // Add dummies after
-            for (let i = 0; i < dummiesAfter; i++) {
-                const dummyKey = `dummy_after_${i}`;
-                processedData[baseName][dummyKey] = {
-                    reference: '•',
-                    totalTours: 0,
-                    baseName: baseName,
-                    isDummy: true,
-                    order: 1000 + i
+            processedData[baseName][`dummy_right_0`] = {
+                reference: '•', totalTours: 0, baseName, isDummy: true, order: 1000
+            };
+        } else if (currentCount === 2) {
+            // 2 left, 1 right
+            for (let i = 0; i < 2; i++) {
+                processedData[baseName][`dummy_left_${i}`] = {
+                    reference: '•', totalTours: 0, baseName, isDummy: true, order: -1000 - i
                 };
             }
-        } else {
-            // Add order to vehicles when no dummies needed
-            vehicles.forEach((vehicle: any, index: number) => {
-                vehicle.order = index;
-            });
+            processedData[baseName][`dummy_right_0`] = {
+                reference: '•', totalTours: 0, baseName, isDummy: true, order: 1000
+            };
+        } else if (currentCount === 3) {
+            // 1 left, 1 right
+            processedData[baseName][`dummy_left_0`] = {
+                reference: '•', totalTours: 0, baseName, isDummy: true, order: -1000
+            };
+            processedData[baseName][`dummy_right_0`] = {
+                reference: '•', totalTours: 0, baseName, isDummy: true, order: 1000
+            };
+        } else if (currentCount === 4) {
+            // 1 left
+            processedData[baseName][`dummy_left_0`] = {
+                reference: '•', totalTours: 0, baseName, isDummy: true, order: -1000
+            };
+        } else if (currentCount > 5) {
+            // 1 left, 1 right for groups with more than 5 elements
+            processedData[baseName][`dummy_left_0`] = {
+                reference: '•', totalTours: 0, baseName, isDummy: true, order: -1000
+            };
+            processedData[baseName][`dummy_right_0`] = {
+                reference: '•', totalTours: 0, baseName, isDummy: true, order: 1000
+            };
         }
+        
+        // Add order to real vehicles
+        vehicles.forEach((vehicle: any, index: number) => {
+            vehicle.order = index;
+        });
     });
 
     // Get max tours and total bars count
@@ -135,7 +143,7 @@ const ToursProgressChart: React.FC<ToursProgressChartProps> = ({ data, title }) 
                                 if (b.isDummy) return b.order < 0 ? 1 : -1;
                                 return b.totalTours - a.totalTours;
                             });
-                            const groupWidth = 5 * (barWidth + 2) - 2;
+                            const groupWidth = Math.max(5, Object.values(vehicles).length) * (barWidth + 2) - 2;
                             
                             return (
                                 <div key={baseName} className="flex items-end" style={{ gap: '2px', width: `${groupWidth}px`, marginRight: '20px' }}>
@@ -143,7 +151,7 @@ const ToursProgressChart: React.FC<ToursProgressChartProps> = ({ data, title }) 
                                         const percentage = vehicle.isDummy ? 0 : (vehicle.totalTours / maxTours) * 100;
                                         
                                         return (
-                                            <div key={`${vehicle.reference}-${vehicle.isDummy ? 'dummy' : 'real'}`} className="flex flex-col items-center" style={{ visibility: vehicle.isDummy ? 'hidden' : 'visible' }}>
+                                            <div key={`${vehicle.reference}-${vehicle.isDummy ? 'dummy' : 'real'}`} className="flex flex-col items-center" style={{ width: `${barWidth}px` }}>
                                                 <div className="relative">
                                                     {!vehicle.isDummy ? (
                                                         <div 
@@ -158,17 +166,7 @@ const ToursProgressChart: React.FC<ToursProgressChartProps> = ({ data, title }) 
                                                             </span>
                                                         </div>
                                                     ) : (
-                                                        <div 
-                                                            className="bg-gray-200 relative"
-                                                            style={{ 
-                                                                width: `${barWidth}px`,
-                                                                height: '6px' 
-                                                            }}
-                                                        >
-                                                            <span className="absolute -top-5 left-1/2 transform -translate-x-1/2 text-xs font-medium text-gray-400">
-                                                                0
-                                                            </span>
-                                                        </div>
+                                                        <div style={{ width: `${barWidth}px`, height: '6px' }} />
                                                     )}
                                                 </div>
                                             </div>
@@ -192,7 +190,7 @@ const ToursProgressChart: React.FC<ToursProgressChartProps> = ({ data, title }) 
                             if (b.isDummy) return b.order < 0 ? 1 : -1;
                             return b.totalTours - a.totalTours;
                         });
-                        const groupWidth = 5 * (barWidth + 2) - 2;
+                        const groupWidth = Math.max(5, Object.values(vehicles).length) * (barWidth + 2) - 2;
                         
                         return (
                             <div key={baseName} className="flex flex-col relative" style={{ width: `${groupWidth}px`, marginRight: '20px' }}>
@@ -201,19 +199,23 @@ const ToursProgressChart: React.FC<ToursProgressChartProps> = ({ data, title }) 
                                 )}
                                 <div className="flex" style={{ gap: '2px' }}>
                                     {sortedVehicles.map((vehicle: any) => (
-                                        <div key={`${vehicle.reference}-${vehicle.isDummy ? 'dummy' : 'real'}`} className="flex flex-col items-center" style={{ width: `${barWidth}px`, visibility: vehicle.isDummy ? 'hidden' : 'visible' }}>
-                                            <span className="text-xs text-gray-600 text-left transform -rotate-45 whitespace-nowrap" style={{ height: '20px', lineHeight: '20px', transformOrigin: 'left bottom', marginTop: '10px' }}>
-                                                {vehicle.reference}
-                                            </span>
+                                        <div key={`${vehicle.reference}-${vehicle.isDummy ? 'dummy' : 'real'}`} className="flex flex-col items-center" style={{ width: `${barWidth}px` }}>
+                                            {!vehicle.isDummy && (
+                                                <span className="text-xs text-gray-600 text-left transform -rotate-45 whitespace-nowrap" style={{ height: '20px', lineHeight: '20px', transformOrigin: 'left bottom', marginTop: '10px' }}>
+                                                    {vehicle.reference}
+                                                </span>
+                                            )}
                                         </div>
                                     ))}
                                 </div>
                                 <div className="text-xs text-gray-700 font-medium text-center pt-3" 
                                      style={{ 
                                          fontSize: '10px',
-                                         lineHeight: '1.2'
+                                         lineHeight: '1.2',
+                                         wordWrap: 'break-word',
+                                         overflowWrap: 'break-word'
                                      }}>
-                                    {baseName.length > 15 ? baseName.substring(0, 15) + '...' : baseName}
+                                    {baseName}
                                 </div>
                             </div>
                         );
