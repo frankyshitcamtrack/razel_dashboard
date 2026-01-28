@@ -145,7 +145,7 @@ const Dashboard = () => {
                                     data?.dureeDistanceparcouru && (
                                         <CombinedBarChartTimeComponent
                                             data={data?.dureeDistanceparcouru}
-                                            title="Distance parcourue et durée"
+                                            title="Durée/Base"
                                             barLabel="Durée (heures)"
                                             lineLabel="Distance (km)"
                                         />
@@ -193,6 +193,16 @@ const Dashboard = () => {
                                         barLabel=""
                                         lineDataKey="value"
                                         lineLabel="Nombre d'excès de vitesse"
+                                    />
+                                )}
+                                {data?.DistanConsommation && (
+                                    <CombinedChartComponent
+                                        data={data.DistanConsommation}
+                                        title="Historique Transit"
+                                        barDataKey="distance"
+                                        barLabel="Distance Transit"
+                                        lineDataKey="consumption"
+                                        lineLabel="Durée Transit"
                                     />
                                 )}
                             </>

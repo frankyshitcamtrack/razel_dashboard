@@ -36,51 +36,55 @@ const CombinedChartComponent: React.FC<CombinedChartProps> = ({
         
         return (
             <div className="bg-white rounded-lg shadow p-4 h-full flex flex-col">
-                <h3 className="text-lg font-semibold text-gray-700 mb-4">{title}</h3>
+                <h3 className="text-lg font-semibold mb-4" style={{ color: title === "Historique Transit" ? "#FFC000" : "#6b7280" }}>{title}</h3>
                 <div className="flex-grow">
                     <div className="relative">
-                        {/* Y-axis labels */}
-                        <div className="absolute left-0 top-0 bottom-16 w-8 flex flex-col justify-between text-xs text-gray-600">
-                            {Array.from({length: 11}, (_, i) => Math.round((scaleMax - (i * scaleMax / 10)))).map(val => (
-                                <span key={val}>{val}</span>
-                            ))}
-                        </div>
                         {/* Chart area */}
-                        <div className="ml-12 pl-4">
-                            <div className="relative h-64">
-                                {/* Bars */}
-                                <div className="relative h-full flex items-end justify-around gap-8 px-4">
+                        <div className="flex">
+                            {/* Y-axis labels */}
+                            <div className="w-12 h-64 flex flex-col justify-between text-xs text-gray-600 pr-2">
+                                {Array.from({length: 11}, (_, i) => Math.round((scaleMax - (i * scaleMax / 10)))).map(val => (
+                                    <span key={val} className="text-right">{val}</span>
+                                ))}
+                            </div>
+                            {/* Bars container */}
+                            <div className="flex-1">
+                                <div className="relative h-64">
+                                    {/* Bars */}
+                                    <div className="relative h-full flex items-end justify-between">
+                                        {data?.map((item: any, index: number) => (
+                                            <div key={index} className="flex flex-col items-center" style={{ width: `${100 / data.length}%` }}>
+                                                <span className="mb-2 text-sm font-semibold text-gray-700">
+                                                    {item.value}
+                                                </span>
+                                                <div
+                                                    className="mx-auto"
+                                                    style={{ 
+                                                        backgroundColor: '#4E80BC',
+                                                        height: `${(item.value / scaleMax) * 256}px`,
+                                                        width: '60%'
+                                                    }}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                {/* X-axis labels */}
+                                <div className="flex justify-between mt-4">
                                     {data?.map((item: any, index: number) => (
-                                        <div key={index} className="flex flex-col items-center flex-1 max-w-20">
-                                            <span className="mb-2 text-sm font-semibold text-gray-700">
-                                                {item.value}
-                                            </span>
-                                            <div
-                                                className="w-full"
-                                                style={{ 
-                                                    backgroundColor: '#4E80BC',
-                                                    height: `${(item.value / scaleMax) * 256}px` 
-                                                }}
-                                            />
+                                        <div key={index} className="text-center text-sm text-gray-700" style={{ width: `${100 / data.length}%` }}>
+                                            {item.name}
                                         </div>
                                     ))}
                                 </div>
                             </div>
-                            {/* X-axis labels */}
-                            <div className="flex justify-around gap-8 mt-4 px-4">
-                                {data?.map((item: any, index: number) => (
-                                    <div key={index} className="flex-1 text-center text-sm text-gray-700">
-                                        {item.name}
-                                    </div>
-                                ))}
-                            </div>
-                            {/* Vehicle label */}
-                            {vehicleReference && vehicleReference !== "Multiple" && (
-                                <div className="text-center mt-3 text-sm text-gray-600">
-                                    {vehicleReference}
-                                </div>
-                            )}
                         </div>
+                        {/* Vehicle label */}
+                        {vehicleReference && vehicleReference !== "Multiple" && (
+                            <div className="text-center mt-3 text-sm text-gray-600">
+                                {vehicleReference}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -90,7 +94,7 @@ const CombinedChartComponent: React.FC<CombinedChartProps> = ({
     return (
         <div className="bg-white rounded-lg shadow p-4 h-full flex flex-col">
             <div className="flex justify-between items-start mb-4">
-                <h3 className="text-lg font-semibold text-gray-700">{title}</h3>
+                <h3 className="text-lg font-semibold" style={{ color: title === "Historique Transit" ? "#FFC000" : "#6b7280" }}>{title}</h3>
                 <div className="flex flex-col text-sm text-right">
                     <div className="flex items-center justify-end mb-1">
                         <div className="w-3 h-3 mr-2" style={{ backgroundColor: "#5B7DBF" }}></div>

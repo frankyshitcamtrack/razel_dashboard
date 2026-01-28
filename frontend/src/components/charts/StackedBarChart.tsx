@@ -7,6 +7,7 @@ import {
     CartesianGrid,
     Tooltip,
     ResponsiveContainer,
+    LabelList,
 } from "recharts";
 
 interface StackedBarChartProps {
@@ -22,6 +23,106 @@ interface StackedBarChartProps {
 }
 
 export default class StackedBarChart extends PureComponent<StackedBarChartProps> {
+    // Custom label component for time values - first bar
+    renderTimeLabel1 = (props: any) => {
+        const { x, y, width, height, value, index } = props;
+        if (!value || value <= 0 || index === undefined) return null;
+        
+        // Get the original data item
+        const dataItem = this.props.data[index];
+        const actualValue = dataItem?.[this.props.dataKey1];
+        if (!actualValue) return null;
+        
+        return (
+            <text
+                x={x + width / 2}
+                y={y + height / 2}
+                fill="white"
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fontSize="10"
+                fontWeight="bold"
+            >
+                {actualValue}
+            </text>
+        );
+    };
+
+    // Custom label component for time values - second bar
+    renderTimeLabel2 = (props: any) => {
+        const { x, y, width, height, value, index } = props;
+        if (!value || value <= 0 || index === undefined || !this.props.dataKey2) return null;
+        
+        // Get the original data item
+        const dataItem = this.props.data[index];
+        const actualValue = dataItem?.[this.props.dataKey2];
+        if (!actualValue) return null;
+        
+        return (
+            <text
+                x={x + width / 2}
+                y={y + height / 2}
+                fill="white"
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fontSize="10"
+                fontWeight="bold"
+            >
+                {actualValue}
+            </text>
+        );
+    };
+
+    // Custom label component for percentage values - first bar
+    renderPercentageLabel1 = (props: any) => {
+        const { x, y, width, height, value, index } = props;
+        if (!value || value <= 0 || index === undefined) return null;
+        
+        // Get the original data item
+        const dataItem = this.props.data[index];
+        const actualValue = dataItem?.[this.props.dataKey1];
+        if (!actualValue || actualValue <= 0) return null;
+        
+        return (
+            <text
+                x={x + width / 2}
+                y={y + height / 2}
+                fill="white"
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fontSize="10"
+                fontWeight="bold"
+            >
+                {Math.round(actualValue)}%
+            </text>
+        );
+    };
+
+    // Custom label component for percentage values - second bar
+    renderPercentageLabel2 = (props: any) => {
+        const { x, y, width, height, value, index } = props;
+        if (!value || value <= 0 || index === undefined || !this.props.dataKey2) return null;
+        
+        // Get the original data item
+        const dataItem = this.props.data[index];
+        const actualValue = dataItem?.[this.props.dataKey2];
+        if (!actualValue || actualValue <= 0) return null;
+        
+        return (
+            <text
+                x={x + width / 2}
+                y={y + height / 2}
+                fill="white"
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fontSize="10"
+                fontWeight="bold"
+            >
+                {Math.round(actualValue)}%
+            </text>
+        );
+    };
+
     // Extract vehicle code from name
     extractVehicleCode = (fullName: string): string => {
         if (!fullName) return 'Unknown';
@@ -83,6 +184,8 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
 
     // Normalise les valeurs pour le graphique
     normalizeValue = (value: any, _key: string): number => {
+        if (value === undefined || value === null) return 0;
+        
         const type = this.props.valueType || this.detectValueType(value);
 
         switch (type) {
@@ -91,13 +194,17 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
             case 'percentage':
                 return typeof value === 'string' ? parseFloat(value.replace('%', '')) : value;
             default:
-                return typeof value === 'string' ? parseFloat(value) : value;
+                const numValue = typeof value === 'string' ? parseFloat(value) : value;
+                return isNaN(numValue) ? 0 : numValue;
         }
     };
 
     // Formatte les valeurs pour l'affichage
     formatValue = (value: number, key: string): string => {
-        const type = this.props.valueType || this.detectValueType(this.props.data[0]?.[key]);
+        if (value === undefined || value === null || isNaN(value)) return '0';
+        
+        const firstDataItem = this.props.data?.[0];
+        const type = this.props.valueType || (firstDataItem?.[key] ? this.detectValueType(firstDataItem[key]) : 'number');
 
         switch (type) {
             case 'time':
@@ -140,11 +247,13 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
 
         if (isTimeBased) {
             // Handle time-based data directly without vehicle parsing
-            const chartData = data.map(item => ({
-                name: item.name,
-                [dataKey1]: this.normalizeValue(item[dataKey1], dataKey1),
-                ...(dataKey2 && { [dataKey2]: this.normalizeValue(item[dataKey2], dataKey2) })
-            }));
+            const chartData = data
+                .filter(item => item && item.name && item[dataKey1] !== undefined && item[dataKey1] !== null)
+                .map(item => ({
+                    name: item.name,
+                    [dataKey1]: this.normalizeValue(item[dataKey1], dataKey1),
+                    ...(dataKey2 && item[dataKey2] !== undefined && item[dataKey2] !== null && { [dataKey2]: this.normalizeValue(item[dataKey2], dataKey2) })
+                }));
 
             const formatTooltip = (value: number, name: string) => {
                 let dataKey = dataKey1;
@@ -158,8 +267,7 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                 <div className="bg-white rounded-lg shadow p-2 flex flex-col h-[320px]">
                     <div className="flex items-center justify-between mb-4">
                         <span className="text-sm font-normal" style={{ color: '#1F497D' }}>{label1}</span>
-                        <h3 className="text-lg font-semibold text-center flex-1" style={{ color: '#1F497D' }}>{title}</h3>
-                        <span className="invisible text-sm">{label1}</span>
+                        <h3 className="text-sm font-normal text-right" style={{ color: '#1F497D' }}>{title}</h3>
                     </div>
                     <div className="flex-grow">
                         <ResponsiveContainer width="100%" height={250}>
@@ -184,14 +292,28 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                                     stackId="a"
                                     fill={color1}
                                     name={label1}
-                                />
+                                >
+                                    {this.props.valueType === 'time' && (
+                                        <LabelList content={this.renderTimeLabel1} />
+                                    )}
+                                    {this.props.valueType === 'percentage' && (
+                                        <LabelList content={this.renderPercentageLabel1} />
+                                    )}
+                                </Bar>
                                 {dataKey2 && (
                                     <Bar
                                         dataKey={dataKey2}
                                         stackId="a"
                                         fill={color2}
                                         name={label2 || dataKey2}
-                                    />
+                                    >
+                                        {this.props.valueType === 'time' && (
+                                            <LabelList content={this.renderTimeLabel2} />
+                                        )}
+                                        {this.props.valueType === 'percentage' && (
+                                            <LabelList content={this.renderPercentageLabel2} />
+                                        )}
+                                    </Bar>
                                 )}
                             </BarChart>
                         </ResponsiveContainer>
@@ -206,7 +328,7 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
         
         data.forEach(item => {
             // Skip items without valid data
-            if (!item || !item.name || !item[dataKey1]) return;
+            if (!item || !item.name || item[dataKey1] === undefined || item[dataKey1] === null) return;
             
             const vehicleCode = this.extractVehicleCode(item.name);
             const baseName = this.extractBaseName(item.name);
@@ -243,9 +365,15 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                 }
             }
             
-            aggregatedData[key][dataKey1] += this.normalizeValue(item[dataKey1], dataKey1);
-            if (dataKey2 && item[dataKey2] !== undefined) {
-                aggregatedData[key][dataKey2] += this.normalizeValue(item[dataKey2], dataKey2);
+            const normalizedValue1 = this.normalizeValue(item[dataKey1], dataKey1);
+            if (!isNaN(normalizedValue1)) {
+                aggregatedData[key][dataKey1] += normalizedValue1;
+            }
+            if (dataKey2 && item[dataKey2] !== undefined && item[dataKey2] !== null) {
+                const normalizedValue2 = this.normalizeValue(item[dataKey2], dataKey2);
+                if (!isNaN(normalizedValue2)) {
+                    aggregatedData[key][dataKey2] += normalizedValue2;
+                }
             }
         });
 
@@ -294,8 +422,7 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
             <div className="bg-white rounded-lg shadow p-2 flex flex-col h-[320px]">
                 <div className="flex items-center justify-between mb-4">
                     <span className="text-sm font-normal" style={{ color: '#1F497D' }}>{label1}</span>
-                    <h3 className="text-lg font-semibold text-center flex-1" style={{ color: '#1F497D' }}>{title}</h3>
-                    <span className="invisible text-sm">{label1}</span>
+                    <h3 className="text-sm font-normal text-right" style={{ color: '#1F497D' }}>{title}</h3>
                 </div>
                 <div className="flex-grow">
                     <ResponsiveContainer width="100%" height={220}>
@@ -325,7 +452,14 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                                 stackId="a"
                                 fill={color1}
                                 name={label1}
-                            />
+                            >
+                                {this.props.valueType === 'time' && (
+                                    <LabelList content={this.renderTimeLabel1} />
+                                )}
+                                {this.props.valueType === 'percentage' && (
+                                    <LabelList content={this.renderPercentageLabel1} />
+                                )}
+                            </Bar>
 
                             {/* Deuxième bar - seulement si dataKey2 est présent */}
                             {dataKey2 && (
@@ -334,7 +468,14 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                                     stackId="a"
                                     fill={color2}
                                     name={label2 || dataKey2}
-                                />
+                                >
+                                    {this.props.valueType === 'time' && (
+                                        <LabelList content={this.renderTimeLabel2} />
+                                    )}
+                                    {this.props.valueType === 'percentage' && (
+                                        <LabelList content={this.renderPercentageLabel2} />
+                                    )}
+                                </Bar>
                             )}
                         </BarChart>
                     </ResponsiveContainer>

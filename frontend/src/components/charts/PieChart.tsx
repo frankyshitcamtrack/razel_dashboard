@@ -343,7 +343,7 @@ const PieChartComponent: React.FC<PieChartProps> = ({
                                     style={{ backgroundColor: segment.color }}
                                 />
                                 <span className="text-gray-700 truncate max-w-[120px] lg:max-w-none">
-                                    VE38A {segment.name}: {segment.daylyConsom}{unit}
+                                    {segment.name}: {segment.daylyConsom}{unit}
                                 </span>
                             </div>
                         ))}
