@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 
 interface ToursProgressChartProps {
     data: any[];
@@ -82,6 +82,23 @@ const ToursProgressChart: React.FC<ToursProgressChartProps> = ({ data, title }) 
         });
     });
 
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [containerHeight, setContainerHeight] = useState(300);
+
+    useEffect(() => {
+        const updateHeight = () => {
+            if (containerRef.current) {
+                const rect = containerRef.current.getBoundingClientRect();
+                const availableHeight = Math.max(250, rect.height - 120); // Subtract padding and labels
+                setContainerHeight(availableHeight);
+            }
+        };
+
+        updateHeight();
+        window.addEventListener('resize', updateHeight);
+        return () => window.removeEventListener('resize', updateHeight);
+    }, []);
+
     // Get max tours and total bars count
     const allTours = Object.values(processedData).flatMap((base: any) => 
         Object.values(base).filter((item: any) => !item.isDummy).map((item: any) => item.totalTours)
@@ -89,12 +106,13 @@ const ToursProgressChart: React.FC<ToursProgressChartProps> = ({ data, title }) 
     const maxTours = Math.max(...allTours);
     const totalGroups = Object.keys(processedData).length;
     const barWidth = Math.max(12, Math.min(25, (400 / (totalGroups * 5))));
-    const chartHeight = Math.max(250, Math.min(400, 300));
+    const chartHeight = containerHeight;
 
-    // Generate tours scale marks for left axis
+    // Generate tours scale marks for left axis based on container height
     const generateToursMarks = () => {
         const marks = [];
-        const step = Math.max(1, Math.floor(maxTours / 6));
+        const maxMarks = Math.max(4, Math.floor(chartHeight / 40)); // Adaptive number of marks
+        const step = Math.max(1, Math.ceil(maxTours / maxMarks));
         
         for (let i = maxTours; i >= 0; i -= step) {
             marks.push(i.toString());
@@ -105,7 +123,7 @@ const ToursProgressChart: React.FC<ToursProgressChartProps> = ({ data, title }) 
     const toursMarks = generateToursMarks();
 
     return (
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div ref={containerRef} className="bg-white rounded-lg shadow-sm p-6 h-full">
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">{title}</h3>
             </div>
