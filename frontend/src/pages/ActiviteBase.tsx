@@ -5,6 +5,7 @@ import StackedBarChart from "../components/charts/StackedBarChart";
 // import CustomBarChart from "../components/charts/BarChart"
 import DurationProgressChart from "../components/charts/DurationProgressChart";
 import ToursProgressChart from "../components/charts/ToursProgressChart";
+import HistoriqueTransitChart from "../components/charts/HistoriqueTransitChart";
 import { useTransitData } from "../hooks/useTransitData";
 import { useFilters } from "../store/GlobalFiltersContext";
 import { VehicleLoadingSpinner } from "../components/UI/LoadingSpinner";
@@ -71,16 +72,8 @@ const ActiviteBase = () => {
                                 </div>
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                     {data?.HistoriqueTransit && (
-                                        <StackedBarChart
+                                        <HistoriqueTransitChart
                                             data={data.HistoriqueTransit}
-                                            dataKey1="duree_base_depart"
-                                            dataKey2="duree_transit"
-                                            label1="duree base depart"
-                                            label2="duree de transit"
-                                            color1="#F68A2A"
-                                            color2="#255186"
-                                            valueType="time"
-                                            title="Historique Transit"
                                         />
                                     )}
                                     {data?.DureeTransitMax && (

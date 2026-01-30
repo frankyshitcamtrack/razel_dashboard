@@ -8,6 +8,7 @@ import CombinedChartComponent from "../components/charts/CombinedChart";
 import StackedBarChart from "../components/charts/StackedBarChart";
 import { useHeureMoteurData } from "../hooks/useHeureMoteurData";
 import { useExceptions } from "../hooks/useExceptions";
+import { useTransitData } from "../hooks/useTransitData";
 import HamburgerButton from "../components/UI/HamburgerButton";
 /* import CombinedChartTimeComponent from "../components/charts/CombinedChartTime"; */
 import CombinedBarChartTimeComponent from "../components/charts/CombinedBarChartTime";
@@ -22,6 +23,7 @@ const Dashboard = () => {
     const [filterGlobalExpanded, setFilterGlobalExpanded] = useState(false);
     const { data, isLoading } = useHeureMoteurData(filters);
     const { data: exceptions } = useExceptions(filters);
+    const { data: transitData } = useTransitData(filters);
 
     useEffect(() => {
         if (data) {
@@ -195,13 +197,13 @@ const Dashboard = () => {
                                         lineLabel="Nombre d'excès de vitesse"
                                     />
                                 )}
-                                {data?.DistanConsommation && (
+                                {transitData?.HistoriqueTransit && (
                                     <CombinedChartComponent
-                                        data={data.DistanConsommation}
+                                        data={transitData.HistoriqueTransit}
                                         title="Historique Transit"
-                                        barDataKey="distance"
-                                        barLabel="Distance Transit"
-                                        lineDataKey="consumption"
+                                        barDataKey="duree_base_depart"
+                                        barLabel="Durée Base Départ"
+                                        lineDataKey="duree_transit"
                                         lineLabel="Durée Transit"
                                     />
                                 )}
