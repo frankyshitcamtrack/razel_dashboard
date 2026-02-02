@@ -3,8 +3,8 @@ import GlobalFilterBar from "../components/filters/GlobalFilterBars";
 import { useState, useEffect } from "react";
 //import CustomBarChart from "../components/charts/BarChart";
 import { useFilters } from "../store/GlobalFiltersContext";
-import PieChartComponent from "../components/charts/PieChart";
 import CombinedChartComponent from "../components/charts/CombinedChart";
+
 import StackedBarChart from "../components/charts/StackedBarChart";
 import { useHeureMoteurData } from "../hooks/useHeureMoteurData";
 import { useExceptions } from "../hooks/useExceptions";
@@ -13,6 +13,7 @@ import HamburgerButton from "../components/UI/HamburgerButton";
 /* import CombinedChartTimeComponent from "../components/charts/CombinedChartTime"; */
 import CombinedBarChartTimeComponent from "../components/charts/CombinedBarChartTime";
 import { VehicleLoadingSpinner } from "../components/UI/LoadingSpinner";
+import PieChartComponent from "../components/charts/PieChart";
 /* import LineChartComponent from "../components/charts/LineChart"; */
 
 const Dashboard = () => {
@@ -131,7 +132,7 @@ const Dashboard = () => {
                                     </div>
                                 )}
 
-                                {
+                                  {
                                     data?.DistanConsommation && (
                                         <PieChartComponent
                                             title="Consommation journalière par moteur"

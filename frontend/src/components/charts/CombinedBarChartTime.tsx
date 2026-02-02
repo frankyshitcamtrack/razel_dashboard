@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
     Line,
     Bar,
@@ -11,11 +11,7 @@ import {
 } from "recharts";
 
 interface CombinedChartProps {
-    data?: Array<{
-        name: string;
-        duration: string;
-        distance: number;
-    }>;
+    data?: any;
     title: string;
     barLabel: string;
     lineLabel: string;
@@ -39,10 +35,68 @@ const CombinedBarChartTimeComponent: React.FC<CombinedChartProps> = ({
     barLabel = "Durée (heures)",
     lineLabel = "Distance (km)",
 }) => {
-    const chartData = data.map(item => ({
-        ...item,
-        durationHours: convertToHours(item.duration)
-    }));
+    const processedData = useMemo(() => {
+        if (!data) return [];
+        
+        // Group by vehicle first, then sort within each group by date
+        const groups: { [key: string]: any[] } = {};
+        data.forEach((item: any) => {
+            const vehicleName = item.vehicle_name;
+            let extractedVehicle = vehicleName || '';
+            
+            if (vehicleName) {
+                const match = vehicleName.match(/^([A-Z]+\d+[A-Z]*)/); 
+                if (match) {
+                    extractedVehicle = match[1];
+                }
+            }
+            
+            if (!groups[extractedVehicle]) {
+                groups[extractedVehicle] = [];
+            }
+            groups[extractedVehicle].push({
+                ...item,
+                vehicleCode: extractedVehicle,
+                durationHours: convertToHours(item.duration)
+            });
+        });
+        
+        // Sort each group by date and flatten
+        return Object.keys(groups)
+            .sort()
+            .map(vehicleCode => 
+                groups[vehicleCode].sort((a, b) => a.name.localeCompare(b.name))
+            )
+            .flat();
+    }, [data]);
+
+    const vehicleGroups = useMemo(() => {
+        if (!processedData.length) return [];
+        
+        // Calculate groups based on the sorted processedData order
+        const groups: { vehicleCode: string; count: number }[] = [];
+        let currentVehicle = '';
+        let currentCount = 0;
+        
+        processedData.forEach((item: any) => {
+            if (item.vehicleCode !== currentVehicle) {
+                if (currentVehicle) {
+                    groups.push({ vehicleCode: currentVehicle, count: currentCount });
+                }
+                currentVehicle = item.vehicleCode;
+                currentCount = 1;
+            } else {
+                currentCount++;
+            }
+        });
+        
+        // Add the last group
+        if (currentVehicle) {
+            groups.push({ vehicleCode: currentVehicle, count: currentCount });
+        }
+        
+        return groups;
+    }, [processedData]);
 
     return (
         <div className="bg-white rounded-lg shadow p-4 h-full flex flex-col">
@@ -60,14 +114,14 @@ const CombinedBarChartTimeComponent: React.FC<CombinedChartProps> = ({
                     </div>
                 </div>
             </div>
-            <div className="flex-grow">
+            <div className="flex-grow relative">
                 <ResponsiveContainer width="100%" height={300}>
-                    <ComposedChart data={chartData}>
+                    <ComposedChart data={processedData}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
                         <XAxis 
                             dataKey="name" 
                             tick={{ fontSize: 12 }}
-                            label={{ value: '', position: 'insideBottom', offset: -5, fontSize: 12 }}
+                            axisLine={false}
                         />
                         <YAxis 
                             yAxisId="left"
@@ -105,6 +159,30 @@ const CombinedBarChartTimeComponent: React.FC<CombinedChartProps> = ({
                         />
                     </ComposedChart>
                 </ResponsiveContainer>
+                
+                {/* Vehicle labels positioned under their respective groups */}
+                <div className="absolute bottom-0 left-0 right-0 flex justify-center" style={{ transform: 'translateY(20px)' }}>
+                    <div className="flex" style={{ width: '100%', paddingLeft: '60px', paddingRight: '60px' }}>
+                        {vehicleGroups.map((group, index) => {
+                            const widthPercentage = (group.count / processedData.length) * 100;
+                            return (
+                                <div
+                                    key={group.vehicleCode}
+                                    className="text-center text-xs font-medium flex items-center justify-center"
+                                    style={{ 
+                                        width: `${widthPercentage}%`,
+                                        color: '#6b7280',
+                                        fontSize: '10px',
+                                        height: '40px',
+                                        borderLeft: index > 0 ? '2px solid #374151' : 'none'
+                                    }}
+                                >
+                                    {group.vehicleCode}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
             </div>
         </div>
     );

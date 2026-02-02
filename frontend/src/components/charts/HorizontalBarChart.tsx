@@ -133,6 +133,32 @@ export default class HorizontalBarChart extends PureComponent<HorizontalBarChart
         }
     };
 
+    // Custom label renderer that hides labels for dummy data
+    renderCustomLabel = (props: any) => {
+        const { x, y, width, height, value, index } = props;
+        if (!value || value <= 0 || index === undefined) return null;
+        
+        // Check if this is dummy data
+        const dataItem = this.props.data?.[index];
+        if (dataItem?.isDummy) return null;
+        
+        const labelX = x + width + 5;
+        const labelY = y + height / 2;
+        return (
+            <text 
+                x={labelX} 
+                y={labelY} 
+                fill="black" 
+                fontSize={12} 
+                fontWeight="bold"
+                textAnchor="start"
+                dominantBaseline="middle"
+            >
+                {this.formatTime(value)}
+            </text>
+        );
+    };
+
     render() {
         const {
             data,
@@ -154,28 +180,95 @@ export default class HorizontalBarChart extends PureComponent<HorizontalBarChart
             );
         }
 
-        // Process data to extract vehicle codes and aggregate durations
-        const aggregatedData: { [key: string]: number } = {};
+        // Process data to extract vehicle codes, base names and aggregate durations
+        const aggregatedData: { [key: string]: { duration: number; baseName: string } } = {};
         
         data.forEach(item => {
             if (!item || !item.name || !item[dataKey1]) return;
             
             const vehicleCode = this.extractVehicleCode(item.name);
-            if (vehicleCode === 'Unknown') return;
+            const baseName = this.extractBaseName(item.name);
+            if (vehicleCode === 'Unknown' || baseName === 'Unknown') return;
+            
+            // Use composite key (vehicle + base) to keep vehicles separate by base
+            const key = `${vehicleCode}-${baseName}`;
             
             const duration = this.timeToSeconds(item[dataKey1]);
             if (duration > 0) {
-                aggregatedData[vehicleCode] = (aggregatedData[vehicleCode] || 0) + duration;
+                if (!aggregatedData[key]) {
+                    aggregatedData[key] = { duration: 0, baseName };
+                }
+                aggregatedData[key].duration += duration;
             }
         });
 
         const chartData = Object.entries(aggregatedData)
-            .map(([vehicle, duration]) => ({
-                status: vehicle,
-                frequency: duration, // Keep as seconds
-                timeLabel: this.formatTime(duration) // Add formatted time label
-            }))
-            .sort((a, b) => b.frequency - a.frequency);
+            .map(([key, data]) => {
+                const vehicleCode = key.split('-')[0]; // Extract vehicle code from composite key
+                return {
+                    status: vehicleCode,
+                    frequency: data.duration, // Keep as seconds
+                    timeLabel: this.formatTime(data.duration), // Add formatted time label
+                    baseName: data.baseName
+                };
+            })
+            .sort((a, b) => {
+                // Sort by base name first, then by duration descending
+                const baseCompare = a.baseName.localeCompare(b.baseName);
+                if (baseCompare !== 0) return baseCompare;
+                return b.frequency - a.frequency;
+            });
+
+        // Add dummy data to ensure minimum 4 items per group
+        const groupedByBase: { [key: string]: any[] } = {};
+        chartData.forEach(item => {
+            if (!groupedByBase[item.baseName]) {
+                groupedByBase[item.baseName] = [];
+            }
+            groupedByBase[item.baseName].push(item);
+        });
+
+        // Create final chart data with dummy entries
+        const finalChartData: any[] = [];
+        Object.entries(groupedByBase).forEach(([baseName, items]) => {
+            const realCount = items.length;
+            const minCount = 4;
+            const dummyCount = Math.max(0, minCount - realCount);
+            
+            if (dummyCount > 0) {
+                // Add dummy entries based on real count
+                if (realCount === 1) {
+                    // 2 before, 1 after
+                    finalChartData.push({ status: '', frequency: 0, baseName, isDummy: true });
+                    finalChartData.push({ status: '', frequency: 0, baseName, isDummy: true });
+                    finalChartData.push(...items);
+                    finalChartData.push({ status: '', frequency: 0, baseName, isDummy: true });
+                } else if (realCount === 2) {
+                    // 1 before, 1 after
+                    finalChartData.push({ status: '', frequency: 0, baseName, isDummy: true });
+                    finalChartData.push(...items);
+                    finalChartData.push({ status: '', frequency: 0, baseName, isDummy: true });
+                } else if (realCount === 3) {
+                    // 1 after
+                    finalChartData.push(...items);
+                    finalChartData.push({ status: '', frequency: 0, baseName, isDummy: true });
+                }
+            } else {
+                finalChartData.push(...items);
+            }
+        });
+
+        // Recalculate groups with dummy data
+        const finalBaseGroupsMap: { [key: string]: { start: number; count: number } } = {};
+        finalChartData.forEach((item, index) => {
+            const baseName = item.baseName;
+            if (!finalBaseGroupsMap[baseName]) {
+                finalBaseGroupsMap[baseName] = { start: index, count: 0 };
+            }
+            finalBaseGroupsMap[baseName].count++;
+        });
+
+        const finalBaseGroups = Object.entries(finalBaseGroupsMap);
 
         if (chartData.length === 0) {
             return (
@@ -196,10 +289,63 @@ export default class HorizontalBarChart extends PureComponent<HorizontalBarChart
         return (
             <div className="bg-white rounded-lg shadow p-2 flex flex-col h-[320px]">
                 <h3 className="text-lg font-semibold text-gray-700 mb-4">{title}</h3>
-                <div className="flex-grow">
+                <div className="flex-grow relative">
+                    {/* Base name labels positioned to the left of each group */}
+                    <div className="absolute" style={{ 
+                        top: '20px', 
+                        left: '15px', 
+                        height: 'calc(100% - 40px)',
+                        width: '90px',
+                        display: 'flex',
+                        flexDirection: 'column'
+                    }}>
+                        {finalBaseGroups.map(([baseName, groupInfo]) => {
+                            const groupHeight = (groupInfo.count / finalChartData.length) * 100;
+                            const topPosition = (groupInfo.start / finalChartData.length) * 100;
+                            
+                            return (
+                                <div
+                                    key={baseName}
+                                    className="absolute flex items-center justify-center"
+                                    style={{
+                                        top: `${topPosition + 4}%`,
+                                        height: `${groupHeight - 8}%`,
+                                        width: '85px',
+                                        fontSize: '9px',
+                                        color: '#1F497D',
+                                        fontWeight: 'bold',
+                                        textAlign: 'center',
+                                        paddingRight: '0px',
+                                        borderTop: groupInfo.start > 0 ? '1px solid #1F497D' : 'none',
+                                        borderTopWidth: groupInfo.start > 0 ? '1px' : '0',
+                                        marginTop: groupInfo.start > 0 ? '-25px' : '0'
+                                    }}
+                                >
+                                    <span style={{ 
+                                        transform: 'rotate(-90deg)',
+                                        transformOrigin: 'center',
+                                        lineHeight: '1.1',
+                                        display: 'block',
+                                        height: '100%',
+                                        width: '100%',
+                                        whiteSpace: 'normal',
+                                        wordWrap: 'break-word',
+                                        textAlign: 'center',
+                                        overflow: 'hidden',
+                                        wordBreak: 'break-word',
+                                        hyphens: 'auto'
+                                    }}>
+                                        {baseName.split(' ').map((word, i) => (
+                                            <tspan key={i} x="0" dy={i === 0 ? "0" : "1.2em"}>{word}</tspan>
+                                        ))}
+                                    </span>
+                                </div>
+                            );
+                        })}
+                    </div>
                     <ResponsiveContainer width="100%" height="100%">
                         <BarChart 
-                            data={chartData} 
+                            data={finalChartData} 
                             layout="vertical"
                             margin={{ top: 20, right: 30, left: 100, bottom: 20 }}
                         >
@@ -212,21 +358,31 @@ export default class HorizontalBarChart extends PureComponent<HorizontalBarChart
                             <YAxis 
                                 type="category" 
                                 dataKey="status"
+                                interval={0}
+                                tick={{ fontSize: 10 }}
+                                width={60}
                             />
                             <Tooltip 
-                                formatter={(value) => [this.formatTime(value as number), 'Durée']}
-                                labelFormatter={(label) => `Véhicule: ${label}`}
+                                formatter={(value, _, props) => {
+                                    if (props.payload?.isDummy) return [null, null];
+                                    return [this.formatTime(value as number), 'Durée'];
+                                }}
+                                labelFormatter={(label, payload) => {
+                                    if (payload?.[0]?.payload?.isDummy) return null;
+                                    return `Véhicule: ${label}`;
+                                }}
                             />
                             <Bar dataKey="frequency" radius={[0, 4, 4, 0]}>
                                 <LabelList 
-                                    dataKey="timeLabel" 
-                                    position="right"
-                                    fill="#ffffff"
-                                    fontSize={12} 
-                                    fontWeight="bold"
+                                    content={this.renderCustomLabel}
                                 />
-                                {chartData.map((_, index) => (
-                                    <Cell key={`cell-${index}`} fill="#f3992bff" stroke="#e67e22" strokeWidth={1} />
+                                {finalChartData.map((item, index: number) => (
+                                    <Cell 
+                                        key={`cell-${index}`} 
+                                        fill={item.isDummy ? "transparent" : "#f3992bff"} 
+                                        stroke={item.isDummy ? "transparent" : "#e67e22"} 
+                                        strokeWidth={item.isDummy ? 0 : 1} 
+                                    />
                                 ))}
                             </Bar>
                         </BarChart>

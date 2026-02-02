@@ -21,7 +21,9 @@ export interface EngineUsagePercentageItem extends BaseChartItem {
 
 export interface DaylyConsommationItem extends BaseChartItem {
     name: string,
-    daylyConsom: number
+    daylyConsom: number,
+    vehicle_id: string,
+    vehicle_name: string
 }
 
 

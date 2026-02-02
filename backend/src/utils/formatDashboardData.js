@@ -91,7 +91,7 @@ async function formatDashboardData(rawData, id = undefined) {
 
 
 async function formatDashboardDataWithperiod(rawData, groupBy = 'day', id) {
-    const dataByPeriod = {};
+    const dataByPeriodAndVehicle = {};
 
     // Fonction pour convertir les secondes en hh:mm:ss
     const secondsToHms = (totalSeconds) => {
@@ -114,7 +114,7 @@ async function formatDashboardDataWithperiod(rawData, groupBy = 'day', id) {
         return `${d.getFullYear()}-W${weekNo.toString().padStart(2, '0')}`;
     };
 
-    // 1. Grouper les données selon la période
+    // 1. Grouper les données selon la période et le véhicule
     rawData.forEach(item => {
         const date = new Date(item.dates);
         let periodKey;
@@ -130,10 +130,17 @@ async function formatDashboardDataWithperiod(rawData, groupBy = 'day', id) {
                 periodKey = date.toISOString().split('T')[0]; // Format YYYY-MM-DD
         }
 
-        if (!dataByPeriod[periodKey]) {
-            dataByPeriod[periodKey] = [];
+        const vehicleKey = `${periodKey}_${item.vcleid}`;
+        
+        if (!dataByPeriodAndVehicle[vehicleKey]) {
+            dataByPeriodAndVehicle[vehicleKey] = {
+                periodKey,
+                vehicleId: item.vcleid,
+                vehicleName: item.vehicle_name,
+                data: []
+            };
         }
-        dataByPeriod[periodKey].push(item);
+        dataByPeriodAndVehicle[vehicleKey].data.push(item);
     });
 
     // 2. Préparer la structure de résultats
@@ -148,8 +155,8 @@ async function formatDashboardDataWithperiod(rawData, groupBy = 'day', id) {
         speeding: []
     };
 
-    // 3. Calculer les agrégats pour chaque période
-    Object.entries(dataByPeriod).forEach(([periodKey, periodData]) => {
+    // 3. Calculer les agrégats pour chaque période et véhicule
+    Object.values(dataByPeriodAndVehicle).forEach(({ periodKey, vehicleId, vehicleName, data: periodData }) => {
         if (periodData.length === 0) return;
 
         // Calcul des totaux
@@ -199,36 +206,44 @@ async function formatDashboardDataWithperiod(rawData, groupBy = 'day', id) {
                 });
         }
 
-        // Ajouter les données au résultat
+        // Ajouter les données au résultat avec les informations du véhicule
         result.engineData.push({
             name: displayName,
             stops: secondsToHms(totalStopsSec),
-            usage: secondsToHms(totalUsageSec)
+            usage: secondsToHms(totalUsageSec),
+            vehicle_id: vehicleId,
+            vehicle_name: vehicleName
         });
 
         result.engineDataPercentage.push({
             name: displayName,
             stops: 100 - usagePercentage,
-            usage: usagePercentage
+            usage: usagePercentage,
+            vehicle_id: vehicleId,
+            vehicle_name: vehicleName
         });
-
 
         result.DaylyConsommationData.push({
             name: displayName,
-            daylyConsom: parseFloat(totalConsumption.toFixed(2))
+            daylyConsom: parseFloat(totalConsumption.toFixed(2)),
+            vehicle_id: vehicleId,
+            vehicle_name: vehicleName
         });
-
 
         result.dureeDistanceparcouru.push({
             name: displayName,
             duration: secondsToHms(totalUsageSec),
-            distance: parseFloat(totalDistance.toFixed(2))
+            distance: parseFloat(totalDistance.toFixed(2)),
+            vehicle_id: vehicleId,
+            vehicle_name: vehicleName
         });
 
         result.DistanConsommation.push({
             name: displayName,
             consumption: parseFloat(totalConsumption.toFixed(2)),
-            distance: parseFloat(totalDistance.toFixed(2))
+            distance: parseFloat(totalDistance.toFixed(2)),
+            vehicle_id: vehicleId,
+            vehicle_name: vehicleName
         });
 
         const avg100km = totalDistance > 0
@@ -237,7 +252,9 @@ async function formatDashboardDataWithperiod(rawData, groupBy = 'day', id) {
 
         result.hundredKmConsumption.push({
             name: displayName,
-            value: parseFloat(avg100km.toFixed(2))
+            value: parseFloat(avg100km.toFixed(2)),
+            vehicle_id: vehicleId,
+            vehicle_name: vehicleName
         });
 
         const avgLiterPerHour = totalUsageSec > 0
@@ -246,12 +263,16 @@ async function formatDashboardDataWithperiod(rawData, groupBy = 'day', id) {
 
         result.ratioConsumption.push({
             name: displayName,
-            value: parseFloat(avgLiterPerHour.toFixed(2))
+            value: parseFloat(avgLiterPerHour.toFixed(2)),
+            vehicle_id: vehicleId,
+            vehicle_name: vehicleName
         });
 
         result.speeding.push({
             name: displayName,
-            value: speedingCount
+            value: speedingCount,
+            vehicle_id: vehicleId,
+            vehicle_name: vehicleName
         });
     });
 

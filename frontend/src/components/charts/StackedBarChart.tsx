@@ -23,24 +23,39 @@ interface StackedBarChartProps {
 }
 
 export default class StackedBarChart extends PureComponent<StackedBarChartProps> {
-    // Custom label component for time values - first bar
-    renderTimeLabel1 = (props: any) => {
+    // Custom label component for number values - first bar
+    renderNumberLabel1 = (props: any) => {
         const { x, y, width, height, value, index } = props;
         if (!value || value <= 0 || index === undefined) return null;
-        
-        // Get the original data item
-        const dataItem = this.props.data[index];
-        const actualValue = dataItem?.[this.props.dataKey1];
-        if (!actualValue) return null;
-        
-        // For time values, display the original time string
-        const displayValue = typeof actualValue === 'string' ? actualValue : this.formatTime(value);
         
         return (
             <text
                 x={x + width / 2}
                 y={y + height / 2}
-                fill="white"
+                fill="black"
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fontSize="12"
+                fontWeight="bold"
+            >
+                {value}
+            </text>
+        );
+    };
+
+    // Custom label component for time values - first bar
+    renderTimeLabel1 = (props: any) => {
+        const { x, y, width, height, value, index } = props;
+        if (!value || value <= 0 || index === undefined) return null;
+        
+        // Use the normalized value (which represents the aggregated data) and format it
+        const displayValue = this.formatTime(value);
+        
+        return (
+            <text
+                x={x + width / 2}
+                y={y + height / 2}
+                fill="black"
                 textAnchor="middle"
                 dominantBaseline="middle"
                 fontSize="10"
@@ -56,22 +71,20 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
         const { x, y, width, height, value, index } = props;
         if (!value || value <= 0 || index === undefined || !this.props.dataKey2) return null;
         
-        // Get the original data item
-        const dataItem = this.props.data[index];
-        const actualValue = dataItem?.[this.props.dataKey2];
-        if (!actualValue) return null;
+        // Use the normalized value and format it - this is the aggregated value for the second segment
+        const displayValue = this.formatTime(value);
         
         return (
             <text
                 x={x + width / 2}
                 y={y + height / 2}
-                fill="white"
+                fill="black"
                 textAnchor="middle"
                 dominantBaseline="middle"
                 fontSize="10"
                 fontWeight="bold"
             >
-                {actualValue}
+                {displayValue}
             </text>
         );
     };
@@ -126,29 +139,23 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
         );
     };
 
-    // Extract vehicle code from name
-    extractVehicleCode = (fullName: string): string => {
-        if (!fullName) return 'Unknown';
-        // Try multiple patterns to catch vehicle codes
+    // Extract vehicle code from vehicle_name field
+    extractVehicleReference = (vehicleName: string): string => {
+        if (!vehicleName) return 'Unknown';
+        
+        // Extract vehicle reference patterns like V507G, V484N, VC01G, etc.
         const patterns = [
-            /V[A-Z0-9]+/,  // Standard pattern like V492E, V453N
-            /[A-Z][0-9]+[A-Z]/,  // Alternative pattern
+            /^([A-Z]+\d+[A-Z]*)/, // Matches V507G, V484N, VC01G, VB07N, etc.
+            /V[A-Z0-9]+/,         // Standard V pattern
+            /[A-Z][0-9]+[A-Z]/,   // Alternative pattern
         ];
         
         for (const pattern of patterns) {
-            const match = fullName.match(pattern);
-            if (match) return match[0];
+            const match = vehicleName.match(pattern);
+            if (match) return match[1] || match[0];
         }
         
-        // If no vehicle code found, try to extract from the second part after first dash
-        const parts = fullName.split(' - ');
-        if (parts.length >= 2) {
-            const secondPart = parts[1];
-            const vehicleMatch = secondPart.match(/^([A-Z0-9]+)/);
-            if (vehicleMatch) return vehicleMatch[1];
-        }
-        
-        return 'Unknown';
+        return vehicleName.split('-')[0] || 'Unknown';
     };
 
     // Extract base name from the full name string
@@ -243,6 +250,188 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
             );
         }
 
+        // Check if this is the new data format with vehicle_name and vehicle_id
+        const hasVehicleInfo = data.some(item => item.vehicle_name && item.vehicle_id);
+        
+        if (hasVehicleInfo) {
+            // Handle new data format with vehicle grouping but keep time periods on X-axis
+            const groupedByVehicle: { [key: string]: any[] } = {};
+            
+            // Group data by vehicle reference
+            data.forEach(item => {
+                if (!item || !item.vehicle_name || item[dataKey1] === undefined || item[dataKey1] === null) return;
+                
+                const vehicleRef = this.extractVehicleReference(item.vehicle_name);
+                if (vehicleRef === 'Unknown') return;
+                
+                if (!groupedByVehicle[vehicleRef]) {
+                    groupedByVehicle[vehicleRef] = [];
+                }
+                groupedByVehicle[vehicleRef].push(item);
+            });
+            
+            // Create chart data with time periods but grouped by vehicle
+            const chartData: any[] = [];
+            const vehicleGroups: { [key: string]: { start: number; count: number } } = {};
+            
+            Object.entries(groupedByVehicle).forEach(([vehicleRef, vehicleData]) => {
+                const startIndex = chartData.length;
+                vehicleGroups[vehicleRef] = { start: startIndex, count: vehicleData.length };
+                
+                vehicleData.forEach(item => {
+                    chartData.push({
+                        name: item.name, // Keep time period name like "lun. 2"
+                        vehicleRef,
+                        [dataKey1]: this.normalizeValue(item[dataKey1], dataKey1),
+                        [`${dataKey1}_original`]: item[dataKey1], // Store original value for labels
+                        ...(dataKey2 && item[dataKey2] !== undefined && item[dataKey2] !== null && { 
+                            [dataKey2]: this.normalizeValue(item[dataKey2], dataKey2),
+                            [`${dataKey2}_original`]: item[dataKey2] // Store original value for labels
+                        })
+                    });
+                });
+            });
+            
+            const formatTooltip = (value: number, name: string, props: any) => {
+                const dataItem = chartData[props.payload?.index];
+                if (!dataItem) return [this.formatValue(value, dataKey1), name];
+                
+                let originalValue;
+                if (name === label1) {
+                    originalValue = dataItem[`${dataKey1}_original`];
+                } else if (dataKey2 && name === (label2 || dataKey2)) {
+                    originalValue = dataItem[`${dataKey2}_original`];
+                } else {
+                    originalValue = value;
+                }
+                
+                // For time values, return the original time string directly
+                // For other values, format appropriately
+                if (this.props.valueType === 'time' && originalValue) {
+                    return [originalValue, name];
+                }
+                
+                return [originalValue || this.formatValue(value, dataKey1), name];
+            };
+            
+            return (
+                <div className="bg-white rounded-lg shadow p-2 flex flex-col h-[320px]">
+                    <div className="flex items-center justify-between mb-4">
+                        <span className="text-sm font-normal" style={{ color: '#1F497D' }}>{label1}</span>
+                        <h3 className="text-sm font-normal text-right" style={{ color: '#1F497D' }}>{title}</h3>
+                    </div>
+                    <div className="flex-grow">
+                        <ResponsiveContainer width="100%" height={220}>
+                            <BarChart
+                                data={chartData}
+                                margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
+                            >
+                                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                                <XAxis
+                                    dataKey="name"
+                                    axisLine={{ stroke: "#9ca3af" }}
+                                    tick={{ fill: "#1F497D", fontSize: 11, fontWeight: "bold" }}
+                                />
+                                <YAxis
+                                    domain={[0, 'dataMax']}
+                                    tickFormatter={(value) => this.formatValue(value, dataKey1)}
+                                    axisLine={{ stroke: "#9ca3af" }}
+                                    tick={{ fill: "#1F497D" }}
+                                />
+                                <Tooltip formatter={formatTooltip} />
+                                <Bar
+                                    dataKey={dataKey1}
+                                    stackId="a"
+                                    fill={color1}
+                                    name={label1}
+                                >
+                                    {this.props.valueType === 'time' && (
+                                        <LabelList content={(props: any) => {
+                                            const { x, y, width, height, index } = props;
+                                            if (index === undefined) return null;
+                                            const dataItem = chartData[index];
+                                            if (!dataItem) return null;
+                                            const originalValue = dataItem[`${dataKey1}_original`];
+                                            if (originalValue === undefined || originalValue === null) return null;
+                                            return (
+                                                <text x={x + width / 2} y={y + height / 2} fill="black" textAnchor="middle" dominantBaseline="middle" fontSize="10" fontWeight="bold">
+                                                    {originalValue}
+                                                </text>
+                                            );
+                                        }} />
+                                    )}
+                                    {this.props.valueType === 'percentage' && (
+                                        <LabelList content={this.renderPercentageLabel1} />
+                                    )}
+                                    {this.props.valueType === 'number' && (
+                                        <LabelList content={this.renderNumberLabel1} />
+                                    )}
+                                </Bar>
+                                {dataKey2 && (
+                                    <Bar
+                                        dataKey={dataKey2}
+                                        stackId="a"
+                                        fill={color2}
+                                        name={label2 || dataKey2}
+                                    >
+                                        {this.props.valueType === 'time' && (
+                                            <LabelList content={(props: any) => {
+                                                const { x, y, width, height, index } = props;
+                                                if (index === undefined || !dataKey2) return null;
+                                                const dataItem = chartData[index];
+                                                if (!dataItem) return null;
+                                                const originalValue = dataItem[`${dataKey2}_original`];
+                                                if (originalValue === undefined || originalValue === null) return null;
+                                                return (
+                                                    <text x={x + width / 2} y={y + height / 2} fill="black" textAnchor="middle" dominantBaseline="middle" fontSize="10" fontWeight="bold">
+                                                        {originalValue}
+                                                    </text>
+                                                );
+                                            }} />
+                                        )}
+                                        {this.props.valueType === 'percentage' && (
+                                            <LabelList content={this.renderPercentageLabel2} />
+                                        )}
+                                    </Bar>
+                                )}
+                            </BarChart>
+                        </ResponsiveContainer>
+                        {/* Vehicle reference labels below the chart */}
+                        <div className="relative" style={{ height: '40px', marginTop: '-60px' }}>
+                            <div className="absolute inset-0" style={{ left: '80px', right: '40px' }}>
+                                {Object.entries(vehicleGroups).map(([vehicleRef, groupInfo]) => {
+                                    const totalWidth = 100;
+                                    const groupWidth = (groupInfo.count / chartData.length) * totalWidth;
+                                    const leftPosition = (groupInfo.start / chartData.length) * totalWidth;
+                                    
+                                    return (
+                                        <div
+                                            key={vehicleRef}
+                                            className="absolute flex items-center justify-center"
+                                            style={{
+                                                left: `${leftPosition}%`,
+                                                width: `${groupWidth}%`,
+                                                height: '40px',
+                                                fontSize: '12px',
+                                                color: '#1F497D',
+                                                fontWeight: 'bold',
+                                                borderLeft: groupInfo.start > 0 ? '2px solid #1F497D' : 'none',
+                                                textAlign: 'center',
+                                                padding: '0 2px',
+                                                lineHeight: '1.2'
+                                            }}
+                                        >
+                                            <span>{vehicleRef}</span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
         // Check if this is time-based data (simple names like "lun. 5") vs vehicle-based data
         const isTimeBased = data.every(item => 
             item.name && !item.name.includes(' - ') && item.name.match(/^[a-z]{3}\. \d+$/)
@@ -258,12 +447,22 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                     ...(dataKey2 && item[dataKey2] !== undefined && item[dataKey2] !== null && { [dataKey2]: this.normalizeValue(item[dataKey2], dataKey2) })
                 }));
 
-            const formatTooltip = (value: number, name: string) => {
-                let dataKey = dataKey1;
-                if (dataKey2 && name === label2) {
-                    dataKey = dataKey2;
+            const formatTooltip = (value: number, name: string, props: any) => {
+                // Get the original data item to show the correct aggregated values
+                const dataItem = chartData[props.payload?.index];
+                if (!dataItem) return [this.formatTime(value), name];
+                
+                // Use the actual aggregated value from the data item
+                let actualValue;
+                if (name === label1) {
+                    actualValue = dataItem[dataKey1];
+                } else if (dataKey2 && name === (label2 || dataKey2)) {
+                    actualValue = dataItem[dataKey2];
+                } else {
+                    actualValue = value;
                 }
-                return [this.formatValue(value, dataKey), name];
+                
+                return [this.formatTime(actualValue), name];
             };
 
             return (
@@ -303,6 +502,9 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                                     {this.props.valueType === 'percentage' && (
                                         <LabelList content={this.renderPercentageLabel1} />
                                     )}
+                                    {this.props.valueType === 'number' && (
+                                        <LabelList content={this.renderNumberLabel1} />
+                                    )}
                                 </Bar>
                                 {dataKey2 && (
                                     <Bar
@@ -334,20 +536,20 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
             // Skip items without valid data
             if (!item || !item.name || item[dataKey1] === undefined || item[dataKey1] === null) return;
             
-            const vehicleCode = this.extractVehicleCode(item.name);
+            const vehicleCode = this.extractVehicleReference(item.name);
             const baseName = this.extractBaseName(item.name);
             
             // Skip items that couldn't be properly parsed
             if (vehicleCode === 'Unknown' || baseName === 'Unknown') return;
             
-            // Use only vehicle code as key to aggregate all data for each vehicle
-            const key = vehicleCode;
+            // Use composite key (vehicle + base) to keep vehicles separate by base
+            const key = `${vehicleCode}-${baseName}`;
             
             if (!aggregatedData[key]) {
                 aggregatedData[key] = {
                     name: vehicleCode,
                     vehicleCode,
-                    baseName, // Use the first base name encountered
+                    baseName,
                     [dataKey1]: 0,
                 };
                 if (dataKey2) {
@@ -394,7 +596,14 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
 
         // Filter out items with no valid data and sort
         const chartData = Object.values(aggregatedData)
-            .filter((item: any) => item[dataKey1] > 0 || (dataKey2 && item[dataKey2] > 0))
+            .filter((item: any) => {
+                // For single dataKey charts, show items even if value is 0
+                if (!dataKey2) {
+                    return item[dataKey1] !== undefined && item[dataKey1] !== null;
+                }
+                // For stacked charts, show if either value exists
+                return item[dataKey1] > 0 || (dataKey2 && item[dataKey2] > 0);
+            })
             .sort((a: any, b: any) => {
                 const baseCompare = a.baseName.localeCompare(b.baseName);
                 if (baseCompare !== 0) return baseCompare;
@@ -413,13 +622,76 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
 
         const baseGroups = Object.entries(baseGroupsMap);
 
-        // Formatteur pour le tooltip
-        const formatTooltip = (value: number, name: string) => {
-            let dataKey = dataKey1;
-            if (dataKey2 && name === label2) {
-                dataKey = dataKey2;
+        // Create local label functions that have access to chartData
+        const renderTimeLabel1Local = (props: any) => {
+            const { x, y, width, height, index } = props;
+            if (index === undefined) return null;
+            
+            const dataItem = chartData[index];
+            if (!dataItem) return null;
+            
+            const actualValue = dataItem[dataKey1];
+            if (actualValue === undefined || actualValue === null) return null;
+            
+            const displayValue = this.formatTime(actualValue);
+            
+            return (
+                <text
+                    x={x + width / 2}
+                    y={y + height / 2}
+                    fill="black"
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fontSize="10"
+                    fontWeight="bold"
+                >
+                    {displayValue}
+                </text>
+            );
+        };
+
+        const renderTimeLabel2Local = (props: any) => {
+            const { x, y, width, height, index } = props;
+            if (index === undefined || !dataKey2) return null;
+            
+            const dataItem = chartData[index];
+            if (!dataItem) return null;
+            
+            const actualValue = dataItem[dataKey2];
+            if (actualValue === undefined || actualValue === null) return null;
+            
+            const displayValue = this.formatTime(actualValue);
+            
+            return (
+                <text
+                    x={x + width / 2}
+                    y={y + height / 2}
+                    fill="black"
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fontSize="10"
+                    fontWeight="bold"
+                >
+                    {displayValue}
+                </text>
+            );
+        };
+        const formatTooltip = (value: number, name: string, props: any) => {
+            // Get the original data item to show the correct aggregated values
+            const dataItem = chartData[props.payload?.index];
+            if (!dataItem) return [this.formatTime(value), name];
+            
+            // Use the actual aggregated value from the data item
+            let actualValue;
+            if (name === label1) {
+                actualValue = dataItem[dataKey1];
+            } else if (dataKey2 && name === (label2 || dataKey2)) {
+                actualValue = dataItem[dataKey2];
+            } else {
+                actualValue = value;
             }
-            return [this.formatValue(value, dataKey), name];
+            
+            return [this.formatTime(actualValue), name];
         };
 
         return (
@@ -448,7 +720,7 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                             />
                             <Tooltip
                                 formatter={formatTooltip}
-                                labelFormatter={(label) => `Période: ${label}`}
+                                labelFormatter={(label) => `Véhicule: ${label}`}
                             />
 
                             {/* Premier bar - toujours présent */}
@@ -459,10 +731,13 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                                 name={label1}
                             >
                                 {this.props.valueType === 'time' && (
-                                    <LabelList content={this.renderTimeLabel1} />
+                                    <LabelList content={renderTimeLabel1Local} />
                                 )}
                                 {this.props.valueType === 'percentage' && (
                                     <LabelList content={this.renderPercentageLabel1} />
+                                )}
+                                {this.props.valueType === 'number' && (
+                                    <LabelList content={this.renderNumberLabel1} />
                                 )}
                             </Bar>
 
@@ -475,7 +750,7 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                                     name={label2 || dataKey2}
                                 >
                                     {this.props.valueType === 'time' && (
-                                        <LabelList content={this.renderTimeLabel2} />
+                                        <LabelList content={renderTimeLabel2Local} />
                                     )}
                                     {this.props.valueType === 'percentage' && (
                                         <LabelList content={this.renderPercentageLabel2} />
@@ -556,6 +831,7 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                             })}
                         </div>
                     </div>
+
                 </div>
             </div>
         );
