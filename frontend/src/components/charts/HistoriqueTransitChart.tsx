@@ -14,19 +14,7 @@ const HistoriqueTransitChart: React.FC<HistoriqueTransitChartProps> = ({
     return hours * 3600 + minutes * 60 + seconds;
   };
 
-  const addTimes = (time1: string, time2: string): string => {
-    const seconds1 = timeToSeconds(time1);
-    const seconds2 = timeToSeconds(time2);
-    const totalSeconds = seconds1 + seconds2;
-    
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
-    
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  };
-
-  // Group and sum data by base name and vehicle reference (same as ToursProgressChart)
+  // Process data to show individual records instead of aggregating
   const processedData = data.reduce((acc: any, item) => {
     const parts = item.name.split(' - ');
     const vehicleRef = parts[1]?.split('-')[0] || 'REF';
@@ -36,25 +24,17 @@ const HistoriqueTransitChart: React.FC<HistoriqueTransitChartProps> = ({
       acc[baseName] = {};
     }
     
-    if (!acc[baseName][vehicleRef]) {
-      acc[baseName][vehicleRef] = {
-        reference: vehicleRef,
-        duree_base_depart: '00:00:00',
-        duree_transit: '00:00:00',
-        baseName: baseName,
-        date_depart: item.date_depart,
-        date_arrivee: item.date_arrivee
-      };
-    }
+    // Create unique key for each record
+    const uniqueKey = `${vehicleRef}_${item.date_depart}_${item.date_arrivee || 'null'}`;
     
-    acc[baseName][vehicleRef].duree_base_depart = addTimes(
-      acc[baseName][vehicleRef].duree_base_depart, 
-      item.duree_base_depart
-    );
-    acc[baseName][vehicleRef].duree_transit = addTimes(
-      acc[baseName][vehicleRef].duree_transit, 
-      item.duree_transit
-    );
+    acc[baseName][uniqueKey] = {
+      reference: vehicleRef,
+      duree_base_depart: item.duree_base_depart || '00:00:00',
+      duree_transit: item.duree_transit || '00:00:00',
+      baseName: baseName,
+      date_depart: item.date_depart,
+      date_arrivee: item.date_arrivee
+    };
     
     return acc;
   }, {});
@@ -80,7 +60,22 @@ const HistoriqueTransitChart: React.FC<HistoriqueTransitChartProps> = ({
     )
   );
   const maxTotalSeconds = Math.max(...allDurations);
-  const maxScaleSeconds = Math.max(maxTotalSeconds, 20 * 3600);
+  const maxScaleSeconds = maxTotalSeconds;
+
+  // Generate dynamic time marks based on actual data
+  const generateTimeMarks = () => {
+    const maxHours = Math.ceil(maxScaleSeconds / 3600);
+    const marks = [];
+    const step = Math.max(1, Math.ceil(maxHours / 5)); // 5 marks maximum
+    
+    for (let i = maxHours; i >= 0; i -= step) {
+      const hours = Math.floor(i);
+      marks.push(`${hours.toString().padStart(2, '0')}:00:00`);
+    }
+    return marks;
+  };
+
+  const timeMarks = generateTimeMarks();
 
   const totalGroups = Object.keys(processedData).length;
   const totalVehicles = Object.values(processedData).reduce((sum: number, vehicles: any) => sum + Object.keys(vehicles).length, 0);
@@ -106,24 +101,22 @@ const HistoriqueTransitChart: React.FC<HistoriqueTransitChartProps> = ({
       </div>
       
       <div className="relative" style={{ height: `${height}px` }}>
-        {/* Y-axis with time labels */}
+        {/* Y-axis with dynamic time labels */}
         <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-xs text-gray-500 pr-2">
-          <div>20:00:00</div>
-          <div>15:00:00</div>
-          <div>10:00:00</div>
-          <div>05:00:00</div>
-          <div>00:00:00</div>
+          {timeMarks.map((mark, index) => (
+            <div key={index}>{mark}</div>
+          ))}
         </div>
         
         {/* Chart area */}
         <div className="ml-16 h-full relative overflow-hidden">
           {/* Horizontal grid lines */}
           <div className="absolute inset-0">
-            {[0, 1, 2, 3, 4].map((index) => (
+            {timeMarks.map((_, index) => (
               <div 
                 key={index}
                 className="absolute w-full border-t border-gray-200"
-                style={{ top: `${(index / 4) * chartHeight}px` }}
+                style={{ top: `${(index / (timeMarks.length - 1)) * chartHeight}px` }}
               />
             ))}
           </div>

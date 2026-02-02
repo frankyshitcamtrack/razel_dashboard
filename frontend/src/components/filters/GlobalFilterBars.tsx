@@ -147,10 +147,36 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters, set
                 ...prev,
                 [name]: value || undefined
             };
-            if ((name === "date1" && !value) || (name === "date2" && !value)) {
-                newFilters.date1 = undefined;
-                newFilters.date2 = undefined;
+            
+            // Only trigger effect when both dates are set or both are cleared
+            if (name === "date1") {
+                if (!value) {
+                    // If clearing date1, also clear date2 and return immediately
+                    return {
+                        ...prev,
+                        date1: undefined,
+                        date2: undefined
+                    };
+                } else if (!prev.date2) {
+                    // If setting date1 but date2 is not set, only update local state
+                    return { ...prev, date1: value };
+                }
             }
+            
+            if (name === "date2") {
+                if (!value) {
+                    // If clearing date2, also clear date1 and return immediately
+                    return {
+                        ...prev,
+                        date1: undefined,
+                        date2: undefined
+                    };
+                } else if (!prev.date1) {
+                    // If setting date2 but date1 is not set, only update local state
+                    return { ...prev, date2: value };
+                }
+            }
+            
             return newFilters;
         });
     };

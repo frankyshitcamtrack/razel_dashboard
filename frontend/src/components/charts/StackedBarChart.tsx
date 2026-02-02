@@ -33,6 +33,9 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
         const actualValue = dataItem?.[this.props.dataKey1];
         if (!actualValue) return null;
         
+        // For time values, display the original time string
+        const displayValue = typeof actualValue === 'string' ? actualValue : this.formatTime(value);
+        
         return (
             <text
                 x={x + width / 2}
@@ -43,7 +46,7 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                 fontSize="10"
                 fontWeight="bold"
             >
-                {actualValue}
+                {displayValue}
             </text>
         );
     };
@@ -282,6 +285,7 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                                     tick={{ fill: "#1F497D", fontSize: 11, fontWeight: "bold" }}
                                 />
                                 <YAxis
+                                    domain={[0, 'dataMax']}
                                     tickFormatter={(value) => this.formatValue(value, dataKey1)}
                                     axisLine={{ stroke: "#9ca3af" }}
                                     tick={{ fill: "#1F497D" }}
@@ -437,6 +441,7 @@ export default class StackedBarChart extends PureComponent<StackedBarChartProps>
                                 tick={{ fill: "#1F497D", fontSize: 11, fontWeight: "bold" }}
                             />
                             <YAxis
+                                domain={[0, 'dataMax']}
                                 tickFormatter={(value) => this.formatValue(value, dataKey1)}
                                 axisLine={{ stroke: "#9ca3af" }}
                                 tick={{ fill: "#1F497D" }}

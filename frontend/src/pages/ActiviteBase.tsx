@@ -2,10 +2,7 @@ import Sidebar from "../components/layout/SideBar";
 import { useState } from "react";
 import GlobalFilterBar from "../components/filters/GlobalFilterBars";
 import StackedBarChart from "../components/charts/StackedBarChart";
-// import CustomBarChart from "../components/charts/BarChart"
-import DurationProgressChart from "../components/charts/DurationProgressChart";
-import ToursProgressChart from "../components/charts/ToursProgressChart";
-import HistoriqueTransitChart from "../components/charts/HistoriqueTransitChart";
+import HorizontalBarChart from "../components/charts/HorizontalBarChart";
 import { useTransitData } from "../hooks/useTransitData";
 import { useFilters } from "../store/GlobalFiltersContext";
 import { VehicleLoadingSpinner } from "../components/UI/LoadingSpinner";
@@ -58,34 +55,46 @@ const ActiviteBase = () => {
                             <>                                
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                     {data?.DureeParBase && (
-                                        <DurationProgressChart
+                                        <HorizontalBarChart
                                             data={data.DureeParBase}
+                                            dataKey1="duree_totale"
+                                            label1="Durée totale"
+                                            color1="#f3992bff"
                                             title="Durée/Base"
+                                            valueType="time"
                                         />
                                     )}
                                     {data?.ToursParBase && (
-                                        <ToursProgressChart
+                                        <StackedBarChart
                                             data={data.ToursParBase}
+                                            dataKey1="nombre_tours"
+                                            label1="Nombre de tours"
+                                            color1="#f3992bff"
                                             title="Nbre de tours/Bases"
+                                            valueType="number"
                                         />
                                     )}
                                 </div>
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                     {data?.HistoriqueTransit && (
-                                        <HistoriqueTransitChart
+                                        <StackedBarChart
                                             data={data.HistoriqueTransit}
+                                            dataKey1="duree_base_depart"
+                                            dataKey2="duree_transit"
+                                            label1="Durée base départ"
+                                            label2="Durée transit"
+                                            color1="#f3992bff"
+                                            color2="#1e40af"
+                                            title="Historique Transit"
+                                            valueType="time"
                                         />
                                     )}
                                     {data?.DureeTransitMax && (
                                         <StackedBarChart
                                             data={data?.DureeTransitMax}
                                             dataKey1="duree_transit_max"
-                                            //dataKey2=""
                                             label1="Max duree transit"
-                                            //label2=""
                                             color1="#f3992bff"
-                                            //color2="#02509D"
-                                            // valueType="percentage"
                                             title="Duree Transit"
                                             valueType="time"
                                         />
