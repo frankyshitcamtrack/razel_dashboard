@@ -27,22 +27,46 @@ export const FilterProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     const [isInitialized, setIsInitialized] = useState(false);
 
     const [filters, setFilters] = useState<Filters>(() => {
-        // 1. Essayer de récupérer depuis localStorage
+        // Always use current week logic for default dates
+        const today = new Date();
+        const currentDay = today.getDay(); // 0 = dimanche, 1 = lundi, etc.
+        
+        let startDate, endDate;
+        
+        if (currentDay === 1) { // Si c'est lundi
+            // Start date = lundi précédent, end date = lundi actuel
+            startDate = new Date(today);
+            startDate.setDate(today.getDate() - 7);
+            endDate = new Date(today);
+        } else {
+            // Start date = lundi de cette semaine, end date = aujourd'hui
+            const daysFromMonday = currentDay === 0 ? 6 : currentDay - 1; // Dimanche = 6 jours depuis lundi
+            startDate = new Date(today);
+            startDate.setDate(today.getDate() - daysFromMonday);
+            endDate = new Date(today);
+        }
+        
+        // Try to get saved filters but override dates with current week
         const saved = localStorage.getItem('global-filters');
+        let baseFilters = {
+            groupBy: "day" as const,
+            weekDays: [1]
+        };
+        
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
+                baseFilters = { ...baseFilters, ...parsed };
                 setIsInitialized(true);
-                return parsed;
             } catch (error) {
                 console.error('Erreur parsing saved filters:', error);
             }
         }
-
-        // 2. Valeurs par défaut (seront mises à jour après)
+        
         return {
-            groupBy: "day",
-            weekDays: [1]
+            ...baseFilters,
+            date1: startDate.toISOString().split('T')[0],
+            date2: endDate.toISOString().split('T')[0]
         };
     });
 

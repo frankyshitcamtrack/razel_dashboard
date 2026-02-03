@@ -394,15 +394,22 @@ const AccordionFilterBar: React.FC<FilterBarProps> = ({ filters, setFilters, set
                                     name="date1"
                                     value={filters.date1 ?? ""}
                                     onChange={handleDateChange}
-                                    className="py-2 px-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                    className={`py-2 px-3 border rounded-lg focus:ring-blue-500 focus:border-blue-500 ${
+                                        filters.date1 && !filters.date2 ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                                    }`}
                                 />
                                 <input
                                     type="date"
                                     name="date2"
                                     value={filters.date2 ?? ""}
                                     onChange={handleDateChange}
-                                    className="py-2 px-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                    className={`py-2 px-3 border rounded-lg focus:ring-blue-500 focus:border-blue-500 ${
+                                        filters.date1 && !filters.date2 ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                                    }`}
                                 />
+                                {filters.date1 && !filters.date2 && (
+                                    <p className="text-red-500 text-xs mt-1">Veuillez sélectionner la date de fin</p>
+                                )}
                             </div>
                         </div>
 

@@ -9,10 +9,12 @@ export const useExceptions = (params: {
     vcleGroupId?: number;
     groupBy?: "day" | "week" | "month";
 }) => {
+    const isEnabled = !!(params.date1 && params.date2 && params.date1.trim() && params.date2.trim());
+    
     return useQuery<exceptions, Error>({
         queryKey: ['exceptions values', params],
         queryFn: () => fetchExceptions(params),
-        enabled: !!(params.date2 && params.date2.length > 0) || params.vehicle !== undefined || params.groupBy !== undefined,
+        enabled: isEnabled,
         staleTime: 0,
     });
 };

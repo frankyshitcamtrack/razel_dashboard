@@ -239,11 +239,14 @@ const HistoriqueTransitChart: React.FC<HistoriqueTransitChartProps> = ({
                 </div>
                 <div className="text-xs text-gray-700 font-medium text-center pt-3" 
                      style={{ 
-                       fontSize: '10px',
-                       lineHeight: '1.2',
-                       wordWrap: 'break-word',
-                       overflowWrap: 'break-word'
-                     }}>
+                       fontSize: '8px',
+                       lineHeight: '1.1',
+                       width: `${groupWidth}px`,
+                       wordBreak: 'break-all',
+                       overflowWrap: 'break-word',
+                       hyphens: 'auto'
+                     }}
+                     title={baseName}>
                   {baseName}
                 </div>
               </div>

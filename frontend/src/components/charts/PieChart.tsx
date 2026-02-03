@@ -121,234 +121,220 @@ const PieChartComponent: React.FC<PieChartProps> = ({
             <h3 className="text-lg font-semibold text-gray-800 mb-1 text-center">{title}</h3>
 
             <div className="flex-grow flex flex-col lg:flex-row items-center justify-center relative min-h-[300px]">
-                {/* 3D Pie Chart */}
-                <div className="lg:flex-1">
-                    <svg width="600" height="450" viewBox="0 0 600 450" className="w-full h-auto" preserveAspectRatio="xMidYMid meet">
-                        {filteredData.length === 1 ? (
-                            // Single element - draw complete ellipse with proper 3D effect
-                            <>
-                                {/* 3D side surface for single element */}
-                                <ellipse
-                                    cx="300"
-                                    cy="240"
-                                    rx="220"
-                                    ry="130"
-                                    fill={darkenColor(segments[0].color, 35)}
-                                    stroke="#fff"
-                                    strokeWidth="3"
-                                />
-                                {/* Main ellipse */}
-                                <ellipse
-                                    cx="300"
-                                    cy="200"
-                                    rx="220"
-                                    ry="130"
-                                    fill={segments[0].color}
-                                    stroke="#fff"
-                                    strokeWidth="3"
-                                    style={{
-                                        transform: isAnimated ? 'scale(1)' : 'scale(0)',
-                                        transformOrigin: '300px 200px',
-                                        transition: 'transform 0.8s ease-out'
-                                    }}
-                                />
-                                {variant === "donut" && (
+                {filteredData.length === 0 ? (
+                    // No data - show only text
+                    <div className="flex items-center justify-center h-full w-full">
+                        <span className="text-gray-500 font-medium text-lg">
+                            Aucune donnée disponible
+                        </span>
+                    </div>
+                ) : (
+                    <>
+                        {/* 3D Pie Chart */}
+                        <div className="lg:flex-1">
+                            <svg width="600" height="450" viewBox="0 0 600 450" className="w-full h-auto" preserveAspectRatio="xMidYMid meet">
+                                {filteredData.length === 1 ? (
+                                    // Single element - draw complete ellipse with proper 3D effect
                                     <>
+                                        {/* 3D side surface for single element */}
                                         <ellipse
                                             cx="300"
                                             cy="240"
-                                            rx="110"
-                                            ry="65"
-                                            fill={darkenColor('#ffffff', 20)}
+                                            rx="220"
+                                            ry="130"
+                                            fill={darkenColor(segments[0].color, 35)}
+                                            stroke="#fff"
+                                            strokeWidth="3"
                                         />
+                                        {/* Main ellipse */}
                                         <ellipse
                                             cx="300"
                                             cy="200"
-                                            rx="110"
-                                            ry="65"
-                                            fill="white"
+                                            rx="220"
+                                            ry="130"
+                                            fill={segments[0].color}
                                             stroke="#fff"
-                                            strokeWidth="2"
+                                            strokeWidth="3"
+                                            style={{
+                                                transform: isAnimated ? 'scale(1)' : 'scale(0)',
+                                                transformOrigin: '300px 200px',
+                                                transition: 'transform 0.8s ease-out'
+                                            }}
                                         />
+                                        {variant === "donut" && (
+                                            <>
+                                                <ellipse
+                                                    cx="300"
+                                                    cy="240"
+                                                    rx="110"
+                                                    ry="65"
+                                                    fill={darkenColor('#ffffff', 20)}
+                                                />
+                                                <ellipse
+                                                    cx="300"
+                                                    cy="200"
+                                                    rx="110"
+                                                    ry="65"
+                                                    fill="white"
+                                                    stroke="#fff"
+                                                    strokeWidth="2"
+                                                />
+                                            </>
+                                        )}
+                                        {/* Label */}
+                                        <text
+                                            x="300"
+                                            y="200"
+                                            textAnchor="middle"
+                                            dominantBaseline="middle"
+                                            className="fill-white font-bold text-2xl"
+                                            style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}
+                                        >
+                                            {segments[0].daylyConsom}{unit}
+                                        </text>
+                                    </>
+                                ) : (
+                                    // Multiple elements - draw 3D pie slices
+                                    <>
+                                        {/* Draw side surfaces first (3D depth) */}
+                                        {segments.map((segment, index) => {
+                                            const { sidePath, sideEdge1, sideEdge2 } = createPieSlice(
+                                                segment.startAngle,
+                                                segment.endAngle,
+                                                40
+                                            );
+                                            return (
+                                                <g key={`side-${index}`}>
+                                                    <path
+                                                        d={sidePath}
+                                                        fill={darkenColor(segment.color, 35)}
+                                                        stroke="#fff"
+                                                        strokeWidth="2"
+                                                        style={{
+                                                            transformOrigin: '300px 200px',
+                                                            transform: isAnimated ? 'rotate(0deg)' : 'rotate(-90deg)',
+                                                            transition: `transform ${0.8 + index * 0.2}s ease-out`
+                                                        }}
+                                                    />
+                                                    <path
+                                                        d={sideEdge1}
+                                                        fill={darkenColor(segment.color, 50)}
+                                                        stroke="#fff"
+                                                        strokeWidth="2"
+                                                        style={{
+                                                            transformOrigin: '300px 200px',
+                                                            transform: isAnimated ? 'rotate(0deg)' : 'rotate(-90deg)',
+                                                            transition: `transform ${0.8 + index * 0.2}s ease-out`
+                                                        }}
+                                                    />
+                                                    <path
+                                                        d={sideEdge2}
+                                                        fill={darkenColor(segment.color, 50)}
+                                                        stroke="#fff"
+                                                        strokeWidth="2"
+                                                        style={{
+                                                            transformOrigin: '300px 200px',
+                                                            transform: isAnimated ? 'rotate(0deg)' : 'rotate(-90deg)',
+                                                            transition: `transform ${0.8 + index * 0.2}s ease-out`
+                                                        }}
+                                                    />
+                                                </g>
+                                            );
+                                        })}
+                                        
+                                        {/* Draw top surfaces */}
+                                        {segments.map((segment, index) => {
+                                            const { topPath } = createPieSlice(
+                                                segment.startAngle,
+                                                segment.endAngle
+                                            );
+                                            
+                                            const midAngle = ((segment.startAngle + segment.endAngle) / 2 - 90) * Math.PI / 180;
+                                            const labelRadiusX = variant === "donut" ? 165 : 145;
+                                            const labelRadiusY = variant === "donut" ? 95 : 85;
+                                            const labelX = 300 + labelRadiusX * Math.cos(midAngle);
+                                            const labelY = 200 + labelRadiusY * Math.sin(midAngle);
+                                            
+                                            return (
+                                                <g key={`top-${index}`}>
+                                                    <path
+                                                        d={topPath}
+                                                        fill={segment.color}
+                                                        stroke="#fff"
+                                                        strokeWidth="3"
+                                                        className="transition-all duration-300 hover:opacity-80 cursor-pointer"
+                                                        style={{
+                                                            transformOrigin: '300px 200px',
+                                                            transform: isAnimated ? 'rotate(0deg)' : 'rotate(-90deg)',
+                                                            transition: `transform ${0.8 + index * 0.2}s ease-out`
+                                                        }}
+                                                    />
+                                                    {segment.percentage > 5 && (
+                                                        <text
+                                                            x={labelX}
+                                                            y={labelY}
+                                                            textAnchor="middle"
+                                                            dominantBaseline="middle"
+                                                            className="fill-white font-bold text-xl"
+                                                            style={{ 
+                                                                textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+                                                                opacity: isAnimated ? 1 : 0,
+                                                                transition: `opacity ${1.2 + index * 0.2}s ease-out`
+                                                            }}
+                                                        >
+                                                            {segment.daylyConsom}{unit}
+                                                        </text>
+                                                    )}
+                                                </g>
+                                            );
+                                        })}
                                     </>
                                 )}
-                                {/* Label */}
-                                <text
-                                    x="300"
-                                    y="200"
-                                    textAnchor="middle"
-                                    dominantBaseline="middle"
-                                    className="fill-white font-bold text-2xl"
-                                    style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}
-                                >
-                                    {segments[0].daylyConsom}{unit}
-                                </text>
-                            </>
-                        ) : filteredData.length === 0 ? (
-                            // No data - show empty state
-                            <>
-                                <ellipse
-                                    cx="300"
-                                    cy="200"
-                                    rx="220"
-                                    ry="130"
-                                    fill="#f3f4f6"
-                                    stroke="#d1d5db"
-                                    strokeWidth="3"
-                                />
-                                <text
-                                    x="300"
-                                    y="200"
-                                    textAnchor="middle"
-                                    dominantBaseline="middle"
-                                    className="fill-gray-500 font-medium text-lg"
-                                >
-                                    Aucune donnée
-                                </text>
-                            </>
-                        ) : (
-                            // Multiple elements - draw 3D pie slices
-                            <>
-                                {/* Draw side surfaces first (3D depth) */}
-                                {segments.map((segment, index) => {
-                                    const { sidePath, sideEdge1, sideEdge2 } = createPieSlice(
-                                        segment.startAngle,
-                                        segment.endAngle,
-                                        40
-                                    );
-                                    return (
-                                        <g key={`side-${index}`}>
-                                            {/* Curved side surface */}
-                                            <path
-                                                d={sidePath}
-                                                fill={darkenColor(segment.color, 35)}
-                                                stroke="#fff"
-                                                strokeWidth="2"
-                                                style={{
-                                                    transformOrigin: '300px 200px',
-                                                    transform: isAnimated ? 'rotate(0deg)' : 'rotate(-90deg)',
-                                                    transition: `transform ${0.8 + index * 0.2}s ease-out`
-                                                }}
-                                            />
-                                            {/* Vertical edge surfaces */}
-                                            <path
-                                                d={sideEdge1}
-                                                fill={darkenColor(segment.color, 50)}
-                                                stroke="#fff"
-                                                strokeWidth="2"
-                                                style={{
-                                                    transformOrigin: '300px 200px',
-                                                    transform: isAnimated ? 'rotate(0deg)' : 'rotate(-90deg)',
-                                                    transition: `transform ${0.8 + index * 0.2}s ease-out`
-                                                }}
-                                            />
-                                            <path
-                                                d={sideEdge2}
-                                                fill={darkenColor(segment.color, 50)}
-                                                stroke="#fff"
-                                                strokeWidth="2"
-                                                style={{
-                                                    transformOrigin: '300px 200px',
-                                                    transform: isAnimated ? 'rotate(0deg)' : 'rotate(-90deg)',
-                                                    transition: `transform ${0.8 + index * 0.2}s ease-out`
-                                                }}
-                                            />
-                                        </g>
-                                    );
-                                })}
                                 
-                                {/* Draw top surfaces */}
-                                {segments.map((segment, index) => {
-                                    const { topPath } = createPieSlice(
-                                        segment.startAngle,
-                                        segment.endAngle
-                                    );
-                                    
-                                    // Calculate label position with elliptical coordinates
-                                    const midAngle = ((segment.startAngle + segment.endAngle) / 2 - 90) * Math.PI / 180;
-                                    const labelRadiusX = variant === "donut" ? 165 : 145;
-                                    const labelRadiusY = variant === "donut" ? 95 : 85;
-                                    const labelX = 300 + labelRadiusX * Math.cos(midAngle);
-                                    const labelY = 200 + labelRadiusY * Math.sin(midAngle);
-                                    
-                                    return (
-                                        <g key={`top-${index}`}>
-                                            <path
-                                                d={topPath}
-                                                fill={segment.color}
-                                                stroke="#fff"
-                                                strokeWidth="3"
-                                                className="transition-all duration-300 hover:opacity-80 cursor-pointer"
-                                                style={{
-                                                    transformOrigin: '300px 200px',
-                                                    transform: isAnimated ? 'rotate(0deg)' : 'rotate(-90deg)',
-                                                    transition: `transform ${0.8 + index * 0.2}s ease-out`
-                                                }}
-                                            />
-                                            {segment.percentage > 5 && (
-                                                <text
-                                                    x={labelX}
-                                                    y={labelY}
-                                                    textAnchor="middle"
-                                                    dominantBaseline="middle"
-                                                    className="fill-white font-bold text-xl"
-                                                    style={{ 
-                                                        textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
-                                                        opacity: isAnimated ? 1 : 0,
-                                                        transition: `opacity ${1.2 + index * 0.2}s ease-out`
-                                                    }}
-                                                >
-                                                    {segment.daylyConsom}{unit}
-                                                </text>
-                                            )}
-                                        </g>
-                                    );
-                                })}
-                            </>
-                        )}
-                        
-                        {/* Center text for donut */}
-                        {variant === "donut" && total > 0 && (
-                            <g>
-                                <text
-                                    x="300"
-                                    y="190"
-                                    textAnchor="middle"
-                                    dominantBaseline="middle"
-                                    className="text-3xl font-bold fill-gray-800"
-                                >
-                                    {total.toFixed(1)}
-                                </text>
-                                <text
-                                    x="300"
-                                    y="215"
-                                    textAnchor="middle"
-                                    dominantBaseline="middle"
-                                    className="text-lg fill-gray-600"
-                                >
-                                    {unit}
-                                </text>
-                            </g>
-                        )}
-                    </svg>
-                </div>
+                                {/* Center text for donut */}
+                                {variant === "donut" && total > 0 && (
+                                    <g>
+                                        <text
+                                            x="300"
+                                            y="190"
+                                            textAnchor="middle"
+                                            dominantBaseline="middle"
+                                            className="text-3xl font-bold fill-gray-800"
+                                        >
+                                            {total.toFixed(1)}
+                                        </text>
+                                        <text
+                                            x="300"
+                                            y="215"
+                                            textAnchor="middle"
+                                            dominantBaseline="middle"
+                                            className="text-lg fill-gray-600"
+                                        >
+                                            {unit}
+                                        </text>
+                                    </g>
+                                )}
+                            </svg>
+                        </div>
 
-                {/* Legend */}
-                <div className="w-full lg:w-auto lg:flex-1 mt-4 lg:mt-0 lg:pl-4">
-                    <div className="flex flex-wrap justify-center lg:justify-start gap-2 lg:block">
-                        {segments.map((segment, index) => (
-                            <div key={index} className="flex items-center text-xs mb-1">
-                                <div
-                                    className="w-3 h-3 rounded-full mr-2 flex-shrink-0"
-                                    style={{ backgroundColor: segment.color }}
-                                />
-                                <span className="text-gray-700 truncate max-w-[120px] lg:max-w-none">
-                                    {segment.name}: {segment.daylyConsom}{unit}
-                                </span>
+                        {/* Legend */}
+                        <div className="w-full lg:w-auto lg:flex-1 mt-4 lg:mt-0 lg:pl-4">
+                            <div className="flex flex-wrap justify-center lg:justify-start gap-2 lg:block">
+                                {segments.map((segment, index) => (
+                                    <div key={index} className="flex items-center text-xs mb-1">
+                                        <div
+                                            className="w-3 h-3 rounded-full mr-2 flex-shrink-0"
+                                            style={{ backgroundColor: segment.color }}
+                                        />
+                                        <span className="text-gray-700 truncate max-w-[120px] lg:max-w-none">
+                                            {segment.name}: {segment.daylyConsom}{unit}
+                                        </span>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
-                </div>
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );

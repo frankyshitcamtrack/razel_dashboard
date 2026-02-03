@@ -9,10 +9,13 @@ export const useTransitData = (params: {
     vcleGroupId?: number;
     groupBy?: "day" | "week" | "month";
 }) => {
+    const isEnabled = !!(params.date1 && params.date2 && params.date1.trim() && params.date2.trim());
+    console.log('useTransitData enabled:', isEnabled, 'date1:', params.date1, 'date2:', params.date2);
+    
     return useQuery<DashboardTransitData, Error>({
         queryKey: ['transit data', params],
         queryFn: () => fetchTransitData(params),
-        enabled: (!!params.date2 && params.date2.length > 0) || params.vehicle !== undefined || params.groupBy !== undefined,
+        enabled: isEnabled,
         staleTime: 0,
     });
 };
