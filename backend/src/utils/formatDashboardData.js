@@ -325,7 +325,7 @@ async function formatExceptionsData(rawData) {
 
 
 async function formatExceptionsDataWithperiod(rawData, groupBy = 'day') {
-    const dataByPeriod = {};
+    const dataByPeriodAndVehicle = {};
 
     // Fonction pour obtenir la clé de semaine ISO
     const getWeekKey = (date) => {
@@ -340,7 +340,7 @@ async function formatExceptionsDataWithperiod(rawData, groupBy = 'day') {
         return `${d.getFullYear()}-W${weekNo.toString().padStart(2, '0')}`;
     };
 
-    // 1. Grouper les données selon la période
+    // 1. Grouper les données selon la période et le véhicule
     rawData.forEach(item => {
         const date = new Date(item.dates);
         let periodKey;
@@ -356,10 +356,17 @@ async function formatExceptionsDataWithperiod(rawData, groupBy = 'day') {
                 periodKey = date.toISOString().split('T')[0]; // Format YYYY-MM-DD
         }
 
-        if (!dataByPeriod[periodKey]) {
-            dataByPeriod[periodKey] = [];
+        const vehicleKey = `${periodKey}_${item.vcleid}`;
+        
+        if (!dataByPeriodAndVehicle[vehicleKey]) {
+            dataByPeriodAndVehicle[vehicleKey] = {
+                periodKey,
+                vehicleId: item.vcleid,
+                vehicleName: item.vehicle_name,
+                data: []
+            };
         }
-        dataByPeriod[periodKey].push(item);
+        dataByPeriodAndVehicle[vehicleKey].data.push(item);
     });
 
     // 2. Préparer la structure de résultats
@@ -368,8 +375,8 @@ async function formatExceptionsDataWithperiod(rawData, groupBy = 'day') {
         harshAccelerationBraking: []
     };
 
-    // 3. Calculer les agrégats pour chaque période
-    Object.entries(dataByPeriod).forEach(([periodKey, periodData]) => {
+    // 3. Calculer les agrégats pour chaque période et véhicule
+    Object.values(dataByPeriodAndVehicle).forEach(({ periodKey, vehicleId, vehicleName, data: periodData }) => {
         if (periodData.length === 0) return;
 
         // Calcul des totaux
@@ -405,16 +412,20 @@ async function formatExceptionsDataWithperiod(rawData, groupBy = 'day') {
                 });
         }
 
-        // Ajouter les données au résultat
+        // Ajouter les données au résultat avec les informations du véhicule
         result.speeding.push({
             name: displayName,
-            value: totalSpeeding
+            value: totalSpeeding,
+            vehicle_id: vehicleId,
+            vehicle_name: vehicleName
         });
 
         result.harshAccelerationBraking.push({
             name: displayName,
             acceleration: totalAcceleration,
-            braking: totalBraking
+            braking: totalBraking,
+            vehicle_id: vehicleId,
+            vehicle_name: vehicleName
         });
     });
 

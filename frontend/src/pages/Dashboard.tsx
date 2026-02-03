@@ -8,7 +8,7 @@ import CombinedChartComponent from "../components/charts/CombinedChart";
 import StackedBarChart from "../components/charts/StackedBarChart";
 import { useHeureMoteurData } from "../hooks/useHeureMoteurData";
 import { useExceptions } from "../hooks/useExceptions";
-import { useTransitData } from "../hooks/useTransitData";
+// import { useTransitData } from "../hooks/useTransitData";
 import HamburgerButton from "../components/UI/HamburgerButton";
 /* import CombinedChartTimeComponent from "../components/charts/CombinedChartTime"; */
 import CombinedBarChartTimeComponent from "../components/charts/CombinedBarChartTime";
@@ -24,7 +24,7 @@ const Dashboard = () => {
     const [filterGlobalExpanded, setFilterGlobalExpanded] = useState(false);
     const { data, isLoading } = useHeureMoteurData(filters);
     const { data: exceptions } = useExceptions(filters);
-    const { data: transitData } = useTransitData(filters);
+    // const { data: transitData } = useTransitData(filters);
 
     useEffect(() => {
         if (data) {
@@ -198,7 +198,7 @@ const Dashboard = () => {
                                         lineLabel="Nombre d'excès de vitesse"
                                     />
                                 )}
-                                {transitData?.HistoriqueTransit && (
+                                {/* {transitData?.HistoriqueTransit && (
                                     <CombinedChartComponent
                                         data={transitData.HistoriqueTransit}
                                         title="Historique Transit"
@@ -207,7 +207,7 @@ const Dashboard = () => {
                                         lineDataKey="duree_transit"
                                         lineLabel="Durée Transit"
                                     />
-                                )}
+                                )} */}
                             </>
                         )}
                     </div>
